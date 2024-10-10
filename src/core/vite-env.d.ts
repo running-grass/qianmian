@@ -34,3 +34,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+/** 应用版本 */
+declare const __APP_VERSION__: string
