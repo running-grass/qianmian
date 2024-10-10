@@ -1,22 +1,17 @@
 # 千面空间
 
-一个核心，多个场景APP
+同一个实体，具有多种表现形式
 
-## 模块分工
+## 已经实现的应用
 
-- core 核心数据逻辑
-  底层的数据结构和数据处理
+- 待办清单
 
-保证不同的节点拥有相同的处理逻辑
-
-- component 通用交互组件
-- pudding 待办事项管理
-- luffy 充分发挥创造力，可以拟合任意场景
-- account 罗格镇，个人中心
-
-## 未来功能
+## 未来的应用
 
 - 项目管理
-- 待办事项
-- Redmine镜像
+- 任务管理
 - 日记本
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=running-grass/qianmian&type=Date)](https://star-history.com/#running-grass/qianmian&Date)

@@ -8,6 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import packageInfo from './package.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -26,6 +27,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
+  esbuild: {
+    define: {
+      __APP_VERSION__: JSON.stringify(packageInfo.version)
     }
   },
   build: {
