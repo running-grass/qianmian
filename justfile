@@ -31,10 +31,14 @@ prod-db-shell:
 build:
   bun run build
 
-# release alpha
+# Release
+release:
+  bun release
+
+# Release alpha
 release-alpha:
   bun release --preRelease=alpha --github.preRelease
 
-# release beta
+# Release beta
 release-beta:
   bun release --preRelease=beta --github.preRelease

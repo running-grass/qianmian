@@ -17,7 +17,7 @@ export default {
         name: 'angular'
       },
       infile: 'CHANGELOG.md',
-      strictSemVer: true
+      strictSemVer: false
     }
   }
 } satisfies Config
