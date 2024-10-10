@@ -30,3 +30,11 @@ prod-db-shell:
 # 构建前端代码
 build:
   bun run build
+
+# release alpha
+release-alpha:
+  bun release --preRelease=alpha --github.preRelease
+
+# release beta
+release-beta:
+  bun release --preRelease=beta --github.preRelease
