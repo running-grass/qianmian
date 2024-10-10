@@ -6,18 +6,20 @@ export default {
     tag: true,
     push: true,
     requireCleanWorkingDir: false,
-    commitMessage: 'chore(release): ${version}'
+    commitMessage: 'chore(release): Release ${version}'
   },
   github: {
     release: true
   },
+
   plugins: {
     '@release-it/conventional-changelog': {
       preset: {
         name: 'angular'
       },
       infile: 'CHANGELOG.md',
-      strictSemVer: false
+      strictSemVer: false,
+      ignoreRecommendedBump: true
     }
   }
 } satisfies Config

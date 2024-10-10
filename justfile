@@ -37,8 +37,8 @@ release:
 
 # Release alpha
 release-alpha:
-  bun release --preRelease=alpha --github.preRelease
+  bun release --preReleaseId=alpha --github.preRelease
 
 # Release beta
 release-beta:
-  bun release --preRelease=beta --github.preRelease
+  bun release --preReleaseId=beta --github.preRelease
