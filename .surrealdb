@@ -1,0 +1,10 @@
+[core]
+  path = "./surrealdb"
+  schema = "full"
+
+[db]
+  address = "http://localhost:8000"
+  username = "root"
+  password = "root"
+  ns = "production"
+  db = "qianmian"

@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "ms-playwright.playwright",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "oven.bun-vscode",
+    "pinage404.nix-extension-pack",
+    "skellock.just",
+    "surrealdb.surrealql",
+    "editorconfig.editorconfig",
+    "bradlc.vscode-tailwindcss",
+    "tamasfe.even-better-toml",
+    "vue.volar"
+  ]
+}
