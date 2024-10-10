@@ -5,6 +5,7 @@ import router from './router/'
 
 /* element-plus 手动导入样式，对于API的组件，自动导入失败 */
 import 'element-plus/theme-chalk/el-message-box.css'
+import 'element-plus/theme-chalk/el-message.css'
 
 import './style.css'
 
@@ -12,6 +13,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
 import updateLocale from 'dayjs/plugin/updateLocale' // ES 2015
+import { ElMessage } from 'element-plus'
 
 dayjs.extend(updateLocale)
 dayjs.locale('zh-cn') // 全局使用简体中文
@@ -38,4 +40,5 @@ const app = createApp(App)
 // app.use(createPinia())
 
 app.use(router)
+
 app.mount('#app')

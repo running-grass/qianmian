@@ -25,7 +25,6 @@ DEFINE EVENT OVERWRITE auto_create_workspace ON TABLE account
 
 
 DEFINE ACCESS OVERWRITE front_user ON DATABASE TYPE RECORD
-	SIGNUP ( CREATE account CONTENT { username: $user, password: crypto::argon2::generate($pass), })
 	SIGNUP {
 		LET $exists = SELECT * FROM account WHERE username == $user;
 		IF $exists {
@@ -35,7 +34,18 @@ DEFINE ACCESS OVERWRITE front_user ON DATABASE TYPE RECORD
 
 		RETURN $reg_user;
 	}
-	SIGNIN ( SELECT * FROM account WHERE username == $user AND crypto::argon2::compare(password, $pass) )
+	SIGNIN {
+		LET $findedUser = SELECT * FROM ONLY account WHERE username == $user LIMIT 1;
+		IF ($findedUser == NONE) {
+			THROW "用户名不存在";
+		};
+
+		IF ($findedUser.password != crypto::argon2::generate($pass)) {
+			THROW "密码错误";
+		};
+
+		RETURN $findedUser;
+	}
 	DURATION FOR TOKEN 365d, FOR SESSION 24h
 	AUTHENTICATE {
 		LET $tokenRecord = fn::get_token_record();
