@@ -12,6 +12,15 @@
 - 任务管理
 - 日记本
 
+## 代码发布流程
+
+1. 从 main 分支检出新的特性分支
+2. 开发完成后通过PR合并回 main 分支
+3. 当需要进行版本发布的时候，切换到 alpha 分支。锁定当前的开发进度，调整为alpha版本号
+4. alpha 中的 bug 修复在 alpha 分支中进行
+5. 测试完毕后。修改为 release 版本号。然后通过 PR 合并回 master，title 为发布版本 x.x.x
+6. 对于main分支，有固定的预览环境。 择机合并到 release 分支，至此发布完成
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=running-grass/qianmian&type=Date)](https://star-history.com/#running-grass/qianmian&Date)
