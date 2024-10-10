@@ -5,7 +5,6 @@ import { surrealdbAuthed$ } from '@/core/subjects/surrealdbSubject'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ResponseError } from 'surrealdb'
 import { defaultHandleSurrealError } from '@/core/utils/error'
 
 const username = ref('')

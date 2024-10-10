@@ -11,17 +11,20 @@ import {
   refreshAllTodoList,
   selectedTodoList
 } from '../../sql'
-import { type RichEntity, type TodoItem } from '@/core'
+import { type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
 import { useMediaQuery } from '@vueuse/core'
 import {
   CheckIcon,
   EllipsisHorizontalIcon,
   ArrowsUpDownIcon,
-  Bars3Icon
+  Bars3Icon,
+  PlusCircleIcon
 } from '@heroicons/vue/24/solid'
 import { useExportData, useImportData } from './importExport'
 import dayjs from 'dayjs'
+import { ElDialog } from 'element-plus'
+import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 
 const selectedObject = ref<TodoItem | null>(null)
 
@@ -81,7 +84,7 @@ function TodoItemRow({ todoItem }: { todoItem: TodoItem }) {
         checked={todoItem.done}
         size="large"
         onChange={(ev: boolean) => changeTodoItemDone(todoItem, ev)}
-        onClick={withModifiers(() => {}, ['stop'])}
+        onClick={withModifiers(() => { }, ['stop'])}
       />
       <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
         {todoItem.title}
@@ -166,6 +169,27 @@ function TodoItemCreateRow() {
   )
 }
 
+// 清单编辑弹窗
+
+/** 清单编辑弹窗 */
+const createTodoListDialog = ref(false)
+/** 清单弹窗的模式 创建或者编辑 */
+const createTodoListDialogMode = ref<'create' | 'edit'>('create')
+
+function createTodoList() {
+  createTodoListDialogMode.value = 'create'
+  createTodoListDialog.value = true
+}
+
+function editTodoList(todoList: TodoList) {
+  selectedTodoList.value = todoList
+  createTodoListDialogMode.value = 'edit'
+  createTodoListDialog.value = true
+}
+
+
+
+
 function TodoListRow({ todoList }: { todoList: RichEntity }) {
   return (
     <li
@@ -186,7 +210,6 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
 function TodoListSection() {
   return (
     <>
-      <p class="text-md mb-2 text-gray-300">智能清单</p>
       <ul>
         <li
           class={[
@@ -199,7 +222,10 @@ function TodoListSection() {
         </li>
       </ul>
 
-      <p class="text-md my-2 text-gray-300">待办清单</p>
+      <p class="text-md my-2 text-gray-600 flex justify-between">
+        <span>待办清单</span>
+        <PlusCircleIcon title='新建清单' onClick={createTodoList} class="w-6 h-6" />
+      </p>
       <ul>
         {allTodoList.value.map((todoList) => (
           <TodoListRow key={todoList.entity_id.id.toString()} todoList={todoList} />
@@ -218,11 +244,7 @@ function TodoListSection() {
     <aside class="min-w-80 flex-1 flex flex-col p-4 border-r-2">
       <TodoItemCreateRow></TodoItemCreateRow>
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-auto">
-        <TodoItemRow
-          v-for="todoItem of todoItemsByList"
-          :key="todoItem.entity_id.id.toString()"
-          :todoItem="todoItem"
-        >
+        <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem">
         </TodoItemRow>
       </TransitionGroup>
     </aside>
@@ -230,42 +252,25 @@ function TodoListSection() {
     <el-divider v-if="isPcScreen" direction="vertical" class="h-full hidden md:inline-block" />
     <article v-if="isPcScreen" class="flex-1 p-2 flex-col hidden md:flex todo-item-detail-host">
       <el-empty v-if="!selectedObject" description="未选择事项" class="w-full h-full" />
-      <TodoItemDetail
-        v-else
-        :item="selectedObject"
-        :key="selectedObject.entity_id.id.toString()"
-        @delete="deleteSelectedTodoItem"
-      />
+      <TodoItemDetail v-else :item="selectedObject" :key="selectedObject.entity_id.id.toString()"
+        @delete="deleteSelectedTodoItem" />
     </article>
   </div>
 
-  <el-drawer
-    v-if="isMobileScreen"
-    modal-class="todo-item-detail-drawer"
-    v-model="mobileDrawer"
-    size="60%"
-    :with-header="false"
-    destroy-on-close
-    direction="btt"
-  >
-    <TodoItemDetail
-      v-if="selectedObject"
-      :item="selectedObject"
-      :key="selectedObject?.entity_id.toString()"
-      @delete="deleteSelectedTodoItem"
-    />
+  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="60%"
+    :with-header="false" destroy-on-close direction="btt">
+    <TodoItemDetail v-if="selectedObject" :item="selectedObject" :key="selectedObject?.entity_id.toString()"
+      @delete="deleteSelectedTodoItem" />
   </el-drawer>
 
-  <el-drawer
-    v-if="isMobileScreen"
-    v-model="todoListDrawer"
-    size="80%"
-    :with-header="false"
-    destroy-on-close
-    direction="ltr"
-  >
+  <el-drawer v-if="isMobileScreen" v-model="todoListDrawer" size="80%" :with-header="false" destroy-on-close
+    direction="ltr">
     <TodoListSection />
   </el-drawer>
+
+  <el-dialog v-model="createTodoListDialog" :with-header="false" destroy-on-close>
+    <TodoListEditPanel @close="createTodoListDialog = false" />
+  </el-dialog>
 </template>
 
 <style lang="css" scoped>

@@ -6,6 +6,7 @@ import router from './router/'
 /* element-plus 手动导入样式，对于API的组件，自动导入失败 */
 import 'element-plus/theme-chalk/el-message-box.css'
 import 'element-plus/theme-chalk/el-message.css'
+import 'element-plus/theme-chalk/el-dialog.css'
 
 import './style.css'
 

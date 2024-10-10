@@ -150,6 +150,19 @@ export async function changeTodoItemAttribute(
 }
 
 /**
+ * 创建一个新的待办清单
+ *
+ * @param title 待办清单的标题
+ * @returns 新创建的待办清单的 RecordId
+ */
+export async function createTodoList(title: string): Promise<EntityId> {
+  const id = await createEntity(identityTodoList.value.id, title)
+
+  // triggerTodoItems()
+  return id
+}
+
+/**
  * 创建一个新的待办事项
  *
  * @param title 待办事项的标题

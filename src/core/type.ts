@@ -17,8 +17,6 @@ export type SimpleEntityRelation = {
 export type RichEntity = Omit<
   Entity & {
     entity_id: EntityId
-    // entity_id_str: string
-    // identityObj: Identity
 
     attributes: Map<Attribute, SimpleEntityAttribute>
     relations: Map<Relation, SimpleEntityRelation[]>
