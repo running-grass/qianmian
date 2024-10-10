@@ -2,6 +2,8 @@
 import { SURREAL_ACCESS, SURREAL_DATABASE, SURREAL_NAMESPACE, token } from '@/core'
 import { getDb } from '@/core'
 import { surrealdbAuthed$ } from '@/core/subjects/surrealdbSubject'
+import { defaultHandleSurrealError } from '@/core/utils/error'
+import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -11,6 +13,14 @@ const password = ref('')
 const router = useRouter()
 
 async function register() {
+  if (!username.value || !password.value) {
+    ElMessage({
+      type: 'error',
+      message: '用户名和密码不能为空'
+    })
+    return
+  }
+
   const db = await getDb(false)
   const tokenStr = await db.signup({
     access: SURREAL_ACCESS,
@@ -20,6 +30,9 @@ async function register() {
       user: username.value,
       pass: password.value
     }
+  }).catch(e => {
+    defaultHandleSurrealError(e)
+    throw e
   })
 
   token.value = tokenStr

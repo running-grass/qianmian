@@ -4,6 +4,8 @@ import { getDb } from '@/core'
 import { surrealdbAuthed$ } from '@/core/subjects/surrealdbSubject'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { defaultHandleSurrealError } from '@/core/utils/error'
 
 const username = ref('')
 const password = ref('')
@@ -11,20 +13,35 @@ const password = ref('')
 const router = useRouter()
 
 async function login() {
+
+  if (!username.value || !password.value) {
+    ElMessage({
+      type: 'error',
+      message: '用户名和密码不能为空'
+    })
+    return
+  }
+
   const db = await getDb(false)
-  const tokenStr = await db.signin({
-    access: SURREAL_ACCESS,
-    namespace: SURREAL_NAMESPACE,
-    database: SURREAL_DATABASE,
 
-    username: username.value,
-    password: password.value
-  })
+  try {
 
-  token.value = tokenStr
+    const tokenStr = await db.signin({
+      access: SURREAL_ACCESS,
+      namespace: SURREAL_NAMESPACE,
+      database: SURREAL_DATABASE,
 
-  surrealdbAuthed$.next(true)
-  router.push({ name: 'workbench' })
+      username: username.value,
+      password: password.value
+    })
+    token.value = tokenStr
+
+    surrealdbAuthed$.next(true)
+    router.push({ name: 'workbench' })
+  } catch (e: unknown) {
+    defaultHandleSurrealError(e)
+  }
+
 }
 </script>
 

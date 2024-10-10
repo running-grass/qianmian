@@ -89,8 +89,10 @@ export const todoItemsByList = computedAsync<TodoItem[]>(async () => {
       break
   }
 
-  sql += ` ORDER BY ${sqlOrderField} DESC`
+  sql += ` ORDER BY ${sqlOrderField} DESC,created_at DESC`
 
+  // TODO 暂定一个 1000 条的限制
+  sql += ` LIMIT 1000`
   console.debug(sql)
   const db = await getDb()
 
@@ -147,6 +149,19 @@ export async function changeTodoItemAttribute(
   await changeAttribute(null, entityId, attrId, data)
 
   triggerTodoItems()
+}
+
+/**
+ * 创建一个新的待办清单
+ *
+ * @param title 待办清单的标题
+ * @returns 新创建的待办清单的 RecordId
+ */
+export async function createTodoList(title: string): Promise<EntityId> {
+  const id = await createEntity(identityTodoList.value.id, title)
+
+  // triggerTodoItems()
+  return id
 }
 
 /**

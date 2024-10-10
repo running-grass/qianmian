@@ -1,3 +1,20 @@
+<br>
+
+<p align="center">
+    <img width="300" src="./public/logo.webp" alt="QianMian Icon">
+</p>
+
+<br>
+
+<br>
+
+<p align="center">
+    <a href="https://github.com/running-grass/qianmian"><img src="https://img.shields.io/github/v/release/running-grass/qianmian?color=ff00a0&include_prereleases&label=version&sort=semver&style=flat-square"></a>
+    &nbsp;
+    <a href="https://devil-fruits.top"><img src="https://api.netlify.com/api/v1/badges/615ff6ff-355d-4e11-9d3f-64fbe8747ef3/deploy-status"></a>
+
+</p>
+
 # 千面空间
 
 同一个实体，具有多种表现形式

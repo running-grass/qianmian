@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem } from '../sql'
+import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, triggerTodoItems } from '../sql'
 import {
   attributePriority,
   attributeSchduledStart,
@@ -14,30 +14,18 @@ import {
 
 const emit = defineEmits(['delete'])
 
-const { item } = defineProps<{
-  item: TodoItem
-}>()
 
-const localItem = ref<TodoItem>(item)
-
-watch(
-  () => item,
-  (val) => {
-    console.debug('localItem prop update', localItem.value)
-
-    localItem.value = val
-  }
-)
-
-const currentScheduleStart = ref<Date | ''>(localItem.value.scheduled_start ?? '')
+const modelValue = defineModel<TodoItem>({ required: true })
 
 
-const selectedPriority = ref<TodoItemPriority | ''>(localItem.value.priority ?? '')
+const currentScheduleStart = ref<Date | ''>(modelValue.value.scheduled_start ?? '')
 
-watch(localItem, () => {
-  console.debug('localItem update', localItem.value)
-  currentScheduleStart.value = localItem.value.scheduled_start ?? ''
-  selectedPriority.value = localItem.value.priority ?? ''
+
+const selectedPriority = ref<TodoItemPriority | ''>(modelValue.value.priority ?? '')
+
+watch(modelValue, () => {
+  currentScheduleStart.value = modelValue.value.scheduled_start ?? ''
+  selectedPriority.value = modelValue.value.priority ?? ''
 })
 
 /**
@@ -46,38 +34,40 @@ watch(localItem, () => {
  * 如果当前未选择待办事项，则什么也不做
  */
 async function deleteSelectedTodoItem() {
-  await deleteTodoItem(item.entity_id)
+  await deleteTodoItem(modelValue.value.entity_id)
 
-  emit('delete', item.entity_id)
+  emit('delete', modelValue.value.entity_id)
 }
 
-const { triggerInput, triggerChange } = useAutoSaveEntity(localItem)
+const { triggerInput, triggerChange } = useAutoSaveEntity(modelValue)
 
 const localBelongs = ref<string | undefined>(
-  localItem.value.belong_to[0]?.id?.toString() ?? undefined
+  modelValue.value.belong_to[0]?.id?.toString() ?? undefined
 )
 
 async function changeBelongList(nid: string) {
   const db = await getDb()
 
   await db.query('DELETE FROM entity_relations WHERE in = $entity AND relation = $relation', {
-    entity: localItem.value.entity_id,
+    entity: modelValue.value.entity_id,
     relation: relationBelongToTodoList.value.id
   })
 
-  await db.relate(localItem.value.entity_id, 'entity_relations', new StringRecordId(nid), {
+  await db.relate(modelValue.value.entity_id, 'entity_relations', new StringRecordId(nid), {
     relation: relationBelongToTodoList.value.id
   })
+
+  triggerTodoItems()
 }
 </script>
 <template>
   <section class="w-full h-full p-2 flex flex-col todo-item-detail">
     <header class="flex items-center gap-2">
-      <el-checkbox :checked="localItem.done ?? false" size="large"
-        @change="changeTodoItemDone(localItem, $event as boolean)" />
+      <el-checkbox :checked="modelValue.done ?? false" size="large"
+        @change="changeTodoItemDone(modelValue, $event as boolean)" />
       <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="
         changeTodoItemAttribute(
-          localItem.entity_id,
+          modelValue.entity_id,
           attributePriority.id,
           ($event as TodoItemPriority | '') ? $event : null
         )
@@ -87,16 +77,16 @@ async function changeBelongList(nid: string) {
       <el-date-picker v-model="currentScheduleStart" type="datetime" size="small" placeholder="计划开始时间" class="!w-44"
         @change="
           changeTodoItemAttribute(
-            localItem.entity_id,
+            modelValue.entity_id,
             attributeSchduledStart.id,
             $event ? $event : null
           )
           " />
     </header>
-    <el-input tabindex="1" class="mb-4" type="text" v-model="localItem.title" @input="triggerInput"
+    <el-input tabindex="1" class="mb-4" type="text" v-model="modelValue.title" @input="triggerInput"
       @change="triggerChange" />
     <el-input type="textarea" tabindex="2" @input="triggerInput" @change="triggerChange"
-      class="textarea textarea-bordered flex-1 w-full resize-none" v-model="localItem.content" />
+      class="textarea textarea-bordered flex-1 w-full resize-none" v-model="modelValue.content" />
     <footer class="mt-4 justify-between items-center">
       <el-select v-model="localBelongs" size="small" clearable placeholder="Select" style="width: 240px"
         @change="changeBelongList">
