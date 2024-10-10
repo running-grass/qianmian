@@ -5,7 +5,8 @@ export default {
     commit: true,
     tag: true,
     push: true,
-    requireCleanWorkingDir: false
+    requireCleanWorkingDir: false,
+    commitMessage: 'chore(release): ${version}'
   },
   github: {
     release: true
@@ -15,7 +16,8 @@ export default {
       preset: {
         name: 'angular'
       },
-      infile: 'CHANGELOG.md'
+      infile: 'CHANGELOG.md',
+      strictSemVer: true
     }
   }
 } satisfies Config
