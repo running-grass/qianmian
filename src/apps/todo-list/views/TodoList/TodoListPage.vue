@@ -134,6 +134,12 @@ function TodoItemCreateRow() {
                   优先级
                 </el-dropdown-item>
                 <el-dropdown-item
+                  icon={orderField.value === 'created_at' ? CheckIcon : ''}
+                  command="created_at"
+                >
+                  创建时间
+                </el-dropdown-item>
+                <el-dropdown-item
                   icon={orderField.value === 'updated_at' ? CheckIcon : ''}
                   command="updated_at"
                 >
@@ -144,6 +150,20 @@ function TodoItemCreateRow() {
                   command="schedule_start"
                 >
                   计划开始时间
+                </el-dropdown-item>
+
+                <el-dropdown-item
+                  icon={orderField.value === 'schedule_end' ? CheckIcon : ''}
+                  command="schedule_end"
+                >
+                  计划结束时间
+                </el-dropdown-item>
+
+                <el-dropdown-item
+                  icon={orderField.value === 'deadline' ? CheckIcon : ''}
+                  command="deadline"
+                >
+                  截止时间
                 </el-dropdown-item>
               </el-dropdown-menu>
             )
@@ -175,19 +195,19 @@ function TodoItemCreateRow() {
 const createTodoListDialog = ref(false)
 /** 清单弹窗的模式 创建或者编辑 */
 const createTodoListDialogMode = ref<'create' | 'edit'>('create')
+const createTodoListDialogModeValue = ref<TodoList>()
 
 function createTodoList() {
+  createTodoListDialogModeValue.value = undefined
   createTodoListDialogMode.value = 'create'
   createTodoListDialog.value = true
 }
 
 function editTodoList(todoList: TodoList) {
-  selectedTodoList.value = todoList
+  createTodoListDialogModeValue.value = todoList
   createTodoListDialogMode.value = 'edit'
   createTodoListDialog.value = true
 }
-
-
 
 
 function TodoListRow({ todoList }: { todoList: RichEntity }) {
@@ -197,6 +217,7 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
         selectedTodoList.value = todoList
         todoListDrawer.value = false
       }}
+      onDblclick={() => editTodoList(todoList)}
       class={[
         'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
         ...(selectedTodoList.value?.entity_id.id === todoList.entity_id.id ? ['bg-green-100'] : [])
@@ -204,6 +225,7 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
     >
       {todoList.title}
     </li>
+
   )
 }
 
@@ -252,14 +274,14 @@ function TodoListSection() {
     <el-divider v-if="isPcScreen" direction="vertical" class="h-full hidden md:inline-block" />
     <article v-if="isPcScreen" class="flex-1 p-2 flex-col hidden md:flex todo-item-detail-host">
       <el-empty v-if="!selectedObject" description="未选择事项" class="w-full h-full" />
-      <TodoItemDetail v-else :item="selectedObject" :key="selectedObject.entity_id.id.toString()"
+      <TodoItemDetail v-else v-model="selectedObject" :key="selectedObject.entity_id.id.toString()"
         @delete="deleteSelectedTodoItem" />
     </article>
   </div>
 
   <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="60%"
     :with-header="false" destroy-on-close direction="btt">
-    <TodoItemDetail v-if="selectedObject" :item="selectedObject" :key="selectedObject?.entity_id.toString()"
+    <TodoItemDetail v-if="selectedObject" v-model="selectedObject" :key="selectedObject?.entity_id.toString()"
       @delete="deleteSelectedTodoItem" />
   </el-drawer>
 
@@ -269,7 +291,8 @@ function TodoListSection() {
   </el-drawer>
 
   <el-dialog v-model="createTodoListDialog" :with-header="false" destroy-on-close>
-    <TodoListEditPanel @close="createTodoListDialog = false" />
+    <TodoListEditPanel @close="createTodoListDialog = false" v-model="createTodoListDialogModeValue"
+      :mode="createTodoListDialogMode" />
   </el-dialog>
 </template>
 

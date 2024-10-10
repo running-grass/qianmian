@@ -89,8 +89,10 @@ export const todoItemsByList = computedAsync<TodoItem[]>(async () => {
       break
   }
 
-  sql += ` ORDER BY ${sqlOrderField} DESC`
+  sql += ` ORDER BY ${sqlOrderField} DESC,created_at DESC`
 
+  // TODO 暂定一个 1000 条的限制
+  sql += ` LIMIT 1000`
   console.debug(sql)
   const db = await getDb()
 
