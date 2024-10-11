@@ -111,7 +111,7 @@ export async function refreshtodoItems() {
 
   // TODO 暂定一个 1000 条的限制
   sql += ` LIMIT 1000`
-  console.debug(sql)
+
   const db = await getDb()
 
   const [list] = await db.query<[TodoItem[]]>(sql)
@@ -201,11 +201,8 @@ export async function createTodoItem(title: string): Promise<EntityId> {
 export const selectedTodoItem = ref<TodoItem | null>(null)
 watch(todoItemsByList, (items) => {
   // 如果当前选中的事项不在里面，则自动取消选中
-  const item = items.find((item) => item.entity_id.id === selectedTodoItem.value?.entity_id)
-
-  if (!item) {
-    selectedTodoItem.value = null
-  }
+  const item = items.find((item) => item.entity_id.id === selectedTodoItem.value?.entity_id?.id)
+  selectedTodoItem.value = item ?? null
 })
 
 /**

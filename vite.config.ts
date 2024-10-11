@@ -32,7 +32,8 @@ export default defineConfig({
   esbuild: {
     define: {
       __APP_VERSION__: JSON.stringify(packageInfo.version)
-    }
+    },
+    drop: ['console', 'debugger']
   },
   build: {
     target: 'esnext'

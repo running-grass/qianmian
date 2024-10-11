@@ -46,9 +46,7 @@ const newTitle = ref<string>('')
 const mobileDrawer = ref(false)
 
 async function changeCurrentObject(entity: TodoItem) {
-  selectedTodoItem.value = {
-    ...entity
-  }
+  selectedTodoItem.value = entity
   mobileDrawer.value = true
 }
 
@@ -309,7 +307,7 @@ function TodoListSection() {
 
     <aside class="min-w-80 flex-1 flex flex-col p-4 border-r-2">
       <TodoItemCreateRow></TodoItemCreateRow>
-      <TransitionGroup name="list" tag="ul" class="flex-1 overflow-hidden">
+      <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
         <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem">
         </TodoItemRow>
       </TransitionGroup>
