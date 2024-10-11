@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, refreshtodoItems } from '../sql'
+import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, refreshtodoItems } from '../store'
 import {
   attributePriority,
   attributeSchduledStart,

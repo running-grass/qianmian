@@ -17,8 +17,8 @@ import {
 import { getDb } from '@/core'
 import { type EntityId } from '@/core'
 import type { RichEntity } from '@/core/type'
-import { computedAsync, useLocalStorage } from '@vueuse/core'
-import { ref, watch, watchEffect, watchSyncEffect } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
+import { ref, watch, watchEffect } from 'vue'
 
 // 待办清单
 
@@ -234,4 +234,15 @@ export async function deleteTodoItem(nid: EntityId): Promise<void> {
   // 通过调用数据库函数来统一删除节点
   await db.delete(nid)
   refreshtodoItems()
+}
+
+/**
+ * 删除一个待办清单
+ *
+ * @param nid 待办清单的 RecordId
+ */
+export async function deleteTodoList(eid: EntityId): Promise<void> {
+  const db = await getDb()
+  await db.delete(eid)
+  refreshAllTodoList()
 }

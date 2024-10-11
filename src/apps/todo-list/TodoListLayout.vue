@@ -5,7 +5,7 @@ import {
   ChevronDoubleRightIcon,
   ListBulletIcon
 } from '@heroicons/vue/24/solid'
-import { initData } from './sql'
+import { initData } from './store'
 
 await initData()
 
@@ -19,13 +19,8 @@ const handleClose = (key: string, keyPath: string[]) => {
 </script>
 <template>
   <div class="w-screen h-screen overflow-hidden flex">
-    <el-menu
-      class="el-menu-vertical-demo hidden md:block"
-      router
-      :collapse="isCollapse"
-      @open="handleOpen"
-      @close="handleClose"
-    >
+    <el-menu class="el-menu-vertical-demo hidden md:block" router :collapse="isCollapse" @open="handleOpen"
+      @close="handleClose">
       <el-menu-item @click="isCollapse = !isCollapse">
         <ChevronDoubleRightIcon v-if="isCollapse" class="min-w-6 min-h-6 size-6 mr-2" />
         <ChevronDoubleLeftIcon v-else class="min-w-6 min-h-6 size-6 mr-2" />

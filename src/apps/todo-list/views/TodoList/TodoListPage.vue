@@ -1,5 +1,7 @@
 <script setup lang="tsx">
-import { computed, nextTick, ref, watch, withKeys, withModifiers } from 'vue'
+import { computed, reactive, ref, withKeys, withModifiers } from 'vue'
+import { vOnClickOutside } from '@vueuse/components'
+
 import {
   changeTodoItemDone,
   createTodoItem,
@@ -10,11 +12,12 @@ import {
   todoItemsByList,
   refreshAllTodoList,
   selectedTodoList,
-  selectedTodoItem
-} from '../../sql'
+  selectedTodoItem,
+  deleteTodoList
+} from '../../store'
 import { type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
-import { useMediaQuery } from '@vueuse/core'
+import { useMediaQuery, useMouse } from '@vueuse/core'
 import {
   CheckIcon,
   EllipsisHorizontalIcon,
@@ -26,6 +29,7 @@ import { useExportData, useImportData } from './importExport'
 import dayjs from 'dayjs'
 import { ElDialog } from 'element-plus'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
+import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
 
 
 await refreshAllTodoList()
@@ -213,6 +217,16 @@ function editTodoList(todoList: TodoList) {
   createTodoListDialogModeValue.value = todoList
   createTodoListDialogMode.value = 'edit'
   createTodoListDialog.value = true
+  closeTodoListContentMenu()
+
+}
+
+function deleteTodoListUI(todoList: TodoList) {
+  closeTodoListContentMenu()
+
+  if (confirm(`确定要删除清单${todoList.title}吗?`)) {
+    deleteTodoList(todoList.entity_id)
+  }
 }
 
 function selectTodoList(todoList: TodoList | null) {
@@ -221,12 +235,33 @@ function selectTodoList(todoList: TodoList | null) {
   todoListDrawer.value = false
 }
 
+const todoListContextMenuTarget = ref<TodoList>()
+const todoListContextMenuVisible = ref(false)
+const todoListContentMenuPosition = reactive({ left: '0', top: '0', padding: 0 })
+const { x, y } = useMouse()
+
+const openTodoListContentMenu = (todoList: TodoList) => {
+  console.log(x.value, y.value)
+  todoListContentMenuPosition.left = x.value + 'px'
+  todoListContentMenuPosition.top = y.value + 'px'
+
+  todoListContextMenuTarget.value = todoList
+  todoListContextMenuVisible.value = true
+}
+
+const closeTodoListContentMenu = () => {
+  todoListContextMenuVisible.value = false
+  todoListContextMenuTarget.value = undefined
+}
 
 function TodoListRow({ todoList }: { todoList: RichEntity }) {
   return (
     <li
       onClick={() => selectTodoList(todoList)}
       onDblclick={() => editTodoList(todoList)}
+      onContextmenu={withModifiers(() => {
+        openTodoListContentMenu(todoList)
+      }, ['stop', 'prevent'])}
       class={[
         'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
         ...(selectedTodoList.value?.entity_id.id === todoList.entity_id.id ? ['bg-green-100'] : [])
@@ -274,7 +309,7 @@ function TodoListSection() {
 
     <aside class="min-w-80 flex-1 flex flex-col p-4 border-r-2">
       <TodoItemCreateRow></TodoItemCreateRow>
-      <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-auto">
+      <TransitionGroup name="list" tag="ul" class="flex-1 overflow-hidden">
         <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem">
         </TodoItemRow>
       </TransitionGroup>
@@ -303,6 +338,12 @@ function TodoListSection() {
     <TodoListEditPanel @close="createTodoListDialog = false" v-model="createTodoListDialogModeValue"
       :mode="createTodoListDialogMode" />
   </el-dialog>
+
+  <el-popover v-if="todoListContextMenuTarget" :visible="todoListContextMenuVisible" virtual-triggering
+    placement="right" :popper-style="todoListContentMenuPosition" :show-arrow="false">
+    <TodoListContextMenu v-on-click-outside="closeTodoListContentMenu" :todoList="todoListContextMenuTarget"
+      @edit="editTodoList" @delete="deleteTodoListUI" />
+  </el-popover>
 </template>
 
 <style lang="css" scoped>

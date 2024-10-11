@@ -1,10 +1,6 @@
 import { StringRecordId, Table } from 'surrealdb'
 import { computed, reactive, ref, shallowRef, triggerRef } from 'vue'
 import {
-  attributeTable,
-  identityTable,
-  relationTable,
-  richEntityTable,
   type Attribute,
   type Identity,
   type Entity,
