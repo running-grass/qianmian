@@ -1,4 +1,3 @@
-import { refreshEntityById } from '../datapool'
 import { getDb } from '../db'
 import {
   entityTable,
@@ -21,7 +20,7 @@ export async function createEntity(
   if (!created) throw new Error('Failed to create entity')
 
   // FIXME 由于live查询暂时不触发create，手动更新节点池
-  await refreshEntityById(created.id)
+  // await refreshEntityById(created.id)
 
   return created.id
 }
@@ -35,5 +34,5 @@ export async function updateEntity(
     ...obj,
     updated_at: new Date()
   })
-  await refreshEntityById(id)
+  // await refreshEntityById(id)
 }

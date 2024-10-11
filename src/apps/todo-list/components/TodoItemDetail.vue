@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, triggerTodoItems } from '../sql'
+import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, refreshtodoItems } from '../store'
 import {
   attributePriority,
   attributeSchduledStart,
@@ -57,7 +57,7 @@ async function changeBelongList(nid: string) {
     relation: relationBelongToTodoList.value.id
   })
 
-  triggerTodoItems()
+  refreshtodoItems()
 }
 </script>
 <template>

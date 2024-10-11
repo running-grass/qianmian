@@ -40,7 +40,7 @@ DEFINE ACCESS OVERWRITE front_user ON DATABASE TYPE RECORD
 			THROW "用户名不存在";
 		};
 
-		IF ($findedUser.password != crypto::argon2::generate($pass)) {
+		IF (!crypto::argon2::compare($findedUser.password, $pass)) {
 			THROW "密码错误";
 		};
 

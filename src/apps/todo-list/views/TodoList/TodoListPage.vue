@@ -1,5 +1,7 @@
 <script setup lang="tsx">
-import { computed, ref, withKeys, withModifiers } from 'vue'
+import { computed, reactive, ref, withKeys, withModifiers } from 'vue'
+import { vOnClickOutside } from '@vueuse/components'
+
 import {
   changeTodoItemDone,
   createTodoItem,
@@ -9,11 +11,13 @@ import {
   allTodoList,
   todoItemsByList,
   refreshAllTodoList,
-  selectedTodoList
-} from '../../sql'
+  selectedTodoList,
+  selectedTodoItem,
+  deleteTodoList
+} from '../../store'
 import { type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
-import { useMediaQuery } from '@vueuse/core'
+import { useMediaQuery, useMouse } from '@vueuse/core'
 import {
   CheckIcon,
   EllipsisHorizontalIcon,
@@ -25,8 +29,8 @@ import { useExportData, useImportData } from './importExport'
 import dayjs from 'dayjs'
 import { ElDialog } from 'element-plus'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
+import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
 
-const selectedObject = ref<TodoItem | null>(null)
 
 await refreshAllTodoList()
 
@@ -42,14 +46,18 @@ const newTitle = ref<string>('')
 const mobileDrawer = ref(false)
 
 async function changeCurrentObject(entity: TodoItem) {
-  selectedObject.value = {
-    ...entity
-  }
+  selectedTodoItem.value = entity
   mobileDrawer.value = true
 }
 
-async function createTodo() {
-  await createTodoItem(newTitle.value)
+
+
+async function createTodoItemUI() {
+  const id = await createTodoItem(newTitle.value)
+
+  const item = todoItemsByList.value.find((i) => i.entity_id.id === id.id)
+  selectedTodoItem.value = item ?? null
+
   newTitle.value = ''
 }
 
@@ -61,10 +69,10 @@ const todoListDrawer = ref(false)
  * 如果当前未选择待办事项，则什么也不做
  */
 async function deleteSelectedTodoItem() {
-  if (!selectedObject.value) {
+  if (!selectedTodoItem.value) {
     return
   }
-  selectedObject.value = null
+  selectedTodoItem.value = null
 }
 
 async function changeOrderField(of: OrderField) {
@@ -77,7 +85,7 @@ function TodoItemRow({ todoItem }: { todoItem: TodoItem }) {
       onClick={() => changeCurrentObject(todoItem)}
       class={[
         'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
-        ...(selectedObject.value?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
+        ...(selectedTodoItem.value?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
       ]}
     >
       <el-checkbox
@@ -119,7 +127,7 @@ function TodoItemCreateRow() {
           type="text"
           modelValue={newTitle.value}
           onInput={(value: string) => (newTitle.value = value)}
-          onKeydown={withKeys(createTodo, ['enter'])}
+          onKeydown={withKeys(createTodoItemUI, ['enter'])}
           placeholder="添加一个事项"
         />
         <el-dropdown onCommand={changeOrderField}>
@@ -207,17 +215,51 @@ function editTodoList(todoList: TodoList) {
   createTodoListDialogModeValue.value = todoList
   createTodoListDialogMode.value = 'edit'
   createTodoListDialog.value = true
+  closeTodoListContentMenu()
+
 }
 
+function deleteTodoListUI(todoList: TodoList) {
+  closeTodoListContentMenu()
+
+  if (confirm(`确定要删除清单${todoList.title}吗?`)) {
+    deleteTodoList(todoList.entity_id)
+  }
+}
+
+function selectTodoList(todoList: TodoList | null) {
+  selectedTodoList.value = todoList
+  todoItemsByList.value = []
+  todoListDrawer.value = false
+}
+
+const todoListContextMenuTarget = ref<TodoList>()
+const todoListContextMenuVisible = ref(false)
+const todoListContentMenuPosition = reactive({ left: '0', top: '0', padding: 0 })
+const { x, y } = useMouse()
+
+const openTodoListContentMenu = (todoList: TodoList) => {
+  console.log(x.value, y.value)
+  todoListContentMenuPosition.left = x.value + 'px'
+  todoListContentMenuPosition.top = y.value + 'px'
+
+  todoListContextMenuTarget.value = todoList
+  todoListContextMenuVisible.value = true
+}
+
+const closeTodoListContentMenu = () => {
+  todoListContextMenuVisible.value = false
+  todoListContextMenuTarget.value = undefined
+}
 
 function TodoListRow({ todoList }: { todoList: RichEntity }) {
   return (
     <li
-      onClick={() => {
-        selectedTodoList.value = todoList
-        todoListDrawer.value = false
-      }}
+      onClick={() => selectTodoList(todoList)}
       onDblclick={() => editTodoList(todoList)}
+      onContextmenu={withModifiers(() => {
+        openTodoListContentMenu(todoList)
+      }, ['stop', 'prevent'])}
       class={[
         'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
         ...(selectedTodoList.value?.entity_id.id === todoList.entity_id.id ? ['bg-green-100'] : [])
@@ -238,7 +280,7 @@ function TodoListSection() {
             'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
             ...(selectedTodoList.value == null ? ['bg-green-100'] : [])
           ]}
-          onClick={() => (selectedTodoList.value = null)}
+          onClick={() => selectTodoList(null)}
         >
           全部待办事项
         </li>
@@ -265,7 +307,7 @@ function TodoListSection() {
 
     <aside class="min-w-80 flex-1 flex flex-col p-4 border-r-2">
       <TodoItemCreateRow></TodoItemCreateRow>
-      <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-auto">
+      <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
         <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem">
         </TodoItemRow>
       </TransitionGroup>
@@ -273,15 +315,15 @@ function TodoListSection() {
 
     <el-divider v-if="isPcScreen" direction="vertical" class="h-full hidden md:inline-block" />
     <article v-if="isPcScreen" class="flex-1 p-2 flex-col hidden md:flex todo-item-detail-host">
-      <el-empty v-if="!selectedObject" description="未选择事项" class="w-full h-full" />
-      <TodoItemDetail v-else v-model="selectedObject" :key="selectedObject.entity_id.id.toString()"
+      <el-empty v-if="!selectedTodoItem" description="未选择事项" class="w-full h-full" />
+      <TodoItemDetail v-else v-model="selectedTodoItem" :key="selectedTodoItem.entity_id.id.toString()"
         @delete="deleteSelectedTodoItem" />
     </article>
   </div>
 
   <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="60%"
     :with-header="false" destroy-on-close direction="btt">
-    <TodoItemDetail v-if="selectedObject" v-model="selectedObject" :key="selectedObject?.entity_id.toString()"
+    <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
       @delete="deleteSelectedTodoItem" />
   </el-drawer>
 
@@ -294,6 +336,12 @@ function TodoListSection() {
     <TodoListEditPanel @close="createTodoListDialog = false" v-model="createTodoListDialogModeValue"
       :mode="createTodoListDialogMode" />
   </el-dialog>
+
+  <el-popover v-if="todoListContextMenuTarget" :visible="todoListContextMenuVisible" virtual-triggering
+    placement="right" :popper-style="todoListContentMenuPosition" :show-arrow="false">
+    <TodoListContextMenu v-on-click-outside="closeTodoListContentMenu" :todoList="todoListContextMenuTarget"
+      @edit="editTodoList" @delete="deleteTodoListUI" />
+  </el-popover>
 </template>
 
 <style lang="css" scoped>

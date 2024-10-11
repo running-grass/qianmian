@@ -2,7 +2,7 @@
 import { updateEntity, type TodoList } from '@/core';
 import { ElMessage, type FormInstance } from 'element-plus';
 import { ref } from 'vue';
-import { createTodoList, refreshAllTodoList } from '../sql';
+import { createTodoList, refreshAllTodoList } from '../store';
 
 const emit = defineEmits(['close'])
 
