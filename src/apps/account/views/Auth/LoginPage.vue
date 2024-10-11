@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { defaultHandleSurrealError } from '@/core/utils/error'
+import posthog from 'posthog-js'
 
 const username = ref('')
 const password = ref('')
@@ -37,6 +38,7 @@ async function login() {
     token.value = tokenStr
 
     surrealdbAuthed$.next(true)
+    posthog.capture('login')
     router.push({ name: 'workbench' })
   } catch (e: unknown) {
     defaultHandleSurrealError(e)

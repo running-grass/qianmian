@@ -33,7 +33,7 @@ export default defineConfig({
     define: {
       __APP_VERSION__: JSON.stringify(packageInfo.version)
     },
-    drop: ['console', 'debugger']
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : []
   },
   build: {
     target: 'esnext'

@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp, nextTick } from 'vue'
 import App from './App.vue'
 import router from './router/'
 
@@ -9,34 +9,26 @@ import 'element-plus/theme-chalk/el-dialog.css'
 
 import './style.css'
 
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import 'dayjs/locale/zh-cn'
-import updateLocale from 'dayjs/plugin/updateLocale' // ES 2015
-
-dayjs.extend(updateLocale)
-dayjs.locale('zh-cn') // 全局使用简体中文
-dayjs.updateLocale('zh-cn', {
-  relativeTime: {
-    future: '%s后',
-    past: '%s前',
-    s: '1秒',
-    m: '1分支',
-    mm: '%d分钟',
-    h: '1小时',
-    hh: '%d小时',
-    d: '1天',
-    dd: '%d天',
-    M: '1个月',
-    MM: '%d个月',
-    y: '1年',
-    yy: '%d年'
-  }
-})
-dayjs.extend(relativeTime)
+import posthogPlugin from './plugins/posthog' //import the plugin.
+import dayjsPlugin from './plugins/dayjs'
+import posthog from 'posthog-js'
 
 const app = createApp(App)
 
-app.use(router)
+app.use(posthogPlugin) //install the plugin
 
+app.use(dayjsPlugin)
+app.use(router)
 app.mount('#app')
+
+router.afterEach((to, from, failure) => {
+  if (!failure) {
+    nextTick(() => {
+      app.config.globalProperties.$posthog.capture('$pageleave', {
+        $current_url: window.location.host + from.fullPath,
+        path: from.fullPath
+      })
+      app.config.globalProperties.$posthog.capture('$pageview', { path: to.fullPath })
+    })
+  }
+})

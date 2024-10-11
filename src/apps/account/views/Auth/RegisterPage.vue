@@ -4,6 +4,7 @@ import { getDb } from '@/core'
 import { surrealdbAuthed$ } from '@/core/subjects/surrealdbSubject'
 import { defaultHandleSurrealError } from '@/core/utils/error'
 import { ElMessage } from 'element-plus'
+import posthog from 'posthog-js'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -36,7 +37,7 @@ async function register() {
   })
 
   token.value = tokenStr
-
+  posthog.capture('register')
   surrealdbAuthed$.next(true)
   router.push({ name: 'workbench' })
 }

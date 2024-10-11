@@ -12,7 +12,7 @@ export type AccountConfig = {
 }
 export type Account = {
   id: AccountId
-  name: string
+  username: string
   config: AccountConfig
 }
 
