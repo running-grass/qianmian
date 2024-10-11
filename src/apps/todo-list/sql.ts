@@ -18,10 +18,36 @@ import { getDb } from '@/core'
 import { type EntityId } from '@/core'
 import type { RichEntity } from '@/core/type'
 import { computedAsync, useLocalStorage } from '@vueuse/core'
-import { ref } from 'vue'
+import { ref, watch, watchEffect, watchSyncEffect } from 'vue'
 
+// 待办清单
+
+/** 待办清单列表 */
+export const allTodoList = ref<ReadonlyArray<TodoList>>([])
+
+/** 刷新待办清单列表 */
+export async function refreshAllTodoList() {
+  const db = await getDb()
+  const list = await db.select<TodoList>(todoListView)
+  allTodoList.value = list
+}
+
+/** 选中的待办清单 */
+export const selectedTodoList = ref<RichEntity | null>(null)
+
+watch(allTodoList, (lists) => {
+  // 如果当前选中的不对清单不在里面，则自动取消选中
+  const list = lists.find((item) => item.entity_id.id === selectedTodoList.value?.entity_id?.id)
+
+  if (!list) {
+    selectedTodoList.value = null
+  }
+})
+
+/** 是否显示已完成的待办事项 */
 export const showDones = useLocalStorage('showDones', true)
 
+/** 排序字段 */
 export type OrderField =
   | 'priority'
   | 'created_at'
@@ -31,27 +57,19 @@ export type OrderField =
   | 'schedule_end'
   | 'deadline'
 
+/** 设置排序字段 */
 export const orderField = useLocalStorage<OrderField>('orderField', 'priority')
 
-export const allTodoList = ref<ReadonlyArray<TodoList>>([])
+/** 待办事项列表 */
+export const todoItemsByList = ref<TodoItem[]>([])
 
-export async function refreshAllTodoList() {
-  const db = await getDb()
-  const list = await db.select<TodoList>(todoListView)
-  allTodoList.value = list
-}
-export const selectedTodoList = ref<RichEntity | null>(null)
+/** 自动更新待办事项列表 */
+watchEffect(refreshtodoItems)
 
-const triggerRef = ref<number>(0)
-
-export const todoItemsByList = computedAsync<TodoItem[]>(async () => {
+/** 触发待办事项列表的更新 */
+export async function refreshtodoItems() {
   const _orderField = orderField.value
   const _showDones = showDones.value
-  const _trigger = triggerRef.value
-
-  if (_trigger < 0) {
-    return []
-  }
 
   let sql = `SELECT * FROM ${todoItemView.tb}`
 
@@ -98,11 +116,7 @@ export const todoItemsByList = computedAsync<TodoItem[]>(async () => {
 
   const [list] = await db.query<[TodoItem[]]>(sql)
 
-  return list
-}, [])
-
-export async function triggerTodoItems() {
-  triggerRef.value += 1
+  todoItemsByList.value = list
 }
 
 const _inboxTitle = '收集箱'
@@ -148,7 +162,7 @@ export async function changeTodoItemAttribute(
 ) {
   await changeAttribute(null, entityId, attrId, data)
 
-  triggerTodoItems()
+  refreshtodoItems()
 }
 
 /**
@@ -179,9 +193,20 @@ export async function createTodoItem(title: string): Promise<EntityId> {
     relation: relationBelongToTodoList.value.id
   })
 
-  triggerTodoItems()
+  await refreshtodoItems()
   return id
 }
+
+/** 当前选中的待办事项 */
+export const selectedTodoItem = ref<TodoItem | null>(null)
+watch(todoItemsByList, (items) => {
+  // 如果当前选中的事项不在里面，则自动取消选中
+  const item = items.find((item) => item.entity_id.id === selectedTodoItem.value?.entity_id)
+
+  if (!item) {
+    selectedTodoItem.value = null
+  }
+})
 
 /**
  * 更改一个待办事项的完成状态
@@ -208,5 +233,5 @@ export async function deleteTodoItem(nid: EntityId): Promise<void> {
   const db = await getDb()
   // 通过调用数据库函数来统一删除节点
   await db.delete(nid)
-  triggerTodoItems()
+  refreshtodoItems()
 }

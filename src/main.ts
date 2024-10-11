@@ -14,7 +14,6 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
 import updateLocale from 'dayjs/plugin/updateLocale' // ES 2015
-import { ElMessage } from 'element-plus'
 
 dayjs.extend(updateLocale)
 dayjs.locale('zh-cn') // 全局使用简体中文

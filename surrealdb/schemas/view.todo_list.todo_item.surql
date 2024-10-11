@@ -1,7 +1,17 @@
 -- 待办事项
 DEFINE TABLE OVERWRITE todo_item  TYPE NORMAL
 	AS SELECT
-		*
+		-- entity attrs
+		title
+		, content
+		, created_at
+		, updated_at
+		, creator
+		, updater
+		, workspace
+		-- rich_entity attrs
+		, entity_id
+
 		, attributes.find(|$attr| $attr.out.slug == "done").data ?? false as done
 		, attributes.find(|$attr| $attr.out.slug == "done_time").data ?? null as done_time
 		, attributes.find(|$attr| $attr.out.slug == "priority").data ?? null as priority

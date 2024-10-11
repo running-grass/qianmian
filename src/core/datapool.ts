@@ -345,13 +345,13 @@ surrealdbAuthed$.subscribe(async (authed) => {
   ])
   await dataPoolInitPromise
 
-  refreshEntityPool()
-  subscribeTable(identityTable, refreshIdentityPool)
-  subscribeTable(attributeTable, refreshAttributePool)
-  subscribeTable(relationTable, refreshRelationPool)
-  subscribeTable(richEntityTable, (action: string, result: { entity_id: EntityId }) => {
-    refreshEntityById(result.entity_id)
-  })
+  // refreshEntityPool()
+  // subscribeTable(identityTable, refreshIdentityPool)
+  // subscribeTable(attributeTable, refreshAttributePool)
+  // subscribeTable(relationTable, refreshRelationPool)
+  // subscribeTable(richEntityTable, (action: string, result: { entity_id: EntityId }) => {
+  //   // refreshEntityById(result.entity_id)
+  // })
 })
 
 export const allEntity = computed<Readonly<RichEntity>[]>(() => {
