@@ -1,3 +1,6 @@
+/** 是否是生产环境 */
+export const IS_PROD = import.meta.env.PROD
+
 /** 环境变量 */
 export const SURREAL_ENDPOINT = import.meta.env.VITE_SURREAL_ENDPOINT
 

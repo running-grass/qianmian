@@ -154,15 +154,15 @@ function TodoItemCreateRow() {
                   更新时间
                 </el-dropdown-item>
                 <el-dropdown-item
-                  icon={orderField.value === 'schedule_start' ? CheckIcon : ''}
-                  command="schedule_start"
+                  icon={orderField.value === 'scheduled_start' ? CheckIcon : ''}
+                  command="scheduled_start"
                 >
                   计划开始时间
                 </el-dropdown-item>
 
                 <el-dropdown-item
-                  icon={orderField.value === 'schedule_end' ? CheckIcon : ''}
-                  command="schedule_end"
+                  icon={orderField.value === 'scheduled_end' ? CheckIcon : ''}
+                  command="scheduled_end"
                 >
                   计划结束时间
                 </el-dropdown-item>

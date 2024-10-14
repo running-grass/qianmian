@@ -15,7 +15,7 @@ export default {
         future: '%s后',
         past: '%s前',
         s: '1秒',
-        m: '1分支',
+        m: '1分钟',
         mm: '%d分钟',
         h: '1小时',
         hh: '%d小时',
