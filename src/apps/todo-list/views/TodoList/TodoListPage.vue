@@ -13,7 +13,7 @@ import {
   refreshAllTodoList,
   selectedTodoList,
   selectedTodoItem,
-  deleteTodoList
+  deleteTodoList,
 } from '../../store'
 import { type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
@@ -26,10 +26,10 @@ import {
   PlusCircleIcon
 } from '@heroicons/vue/24/solid'
 import { useExportData, useImportData } from './importExport'
-import dayjs from 'dayjs'
 import { ElDialog } from 'element-plus'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
+import { getDoneInputClass, getTime } from '../../util'
 
 
 await refreshAllTodoList()
@@ -88,18 +88,15 @@ function TodoItemRow({ todoItem }: { todoItem: TodoItem }) {
         ...(selectedTodoItem.value?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
       ]}
     >
-      <el-checkbox
+      <input type="checkbox" class={getDoneInputClass(todoItem)}
         checked={todoItem.done}
-        size="large"
-        onChange={(ev: boolean) => changeTodoItemDone(todoItem, ev)}
-        onClick={withModifiers(() => { }, ['stop'])}
+        onClick={withModifiers(() => { changeTodoItemDone(todoItem, !todoItem.done); }, ['stop'])}
       />
       <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
         {todoItem.title}
       </div>
-      <span class="text-sm text-gray-400">
-        {todoItem.scheduled_start ? dayjs(todoItem.scheduled_start).fromNow() + '开始' : ''}
-      </span>
+      <div v-html={getTime(todoItem)} >
+      </div>
     </li>
   )
 }
@@ -154,15 +151,15 @@ function TodoItemCreateRow() {
                   更新时间
                 </el-dropdown-item>
                 <el-dropdown-item
-                  icon={orderField.value === 'schedule_start' ? CheckIcon : ''}
-                  command="schedule_start"
+                  icon={orderField.value === 'scheduled_start' ? CheckIcon : ''}
+                  command="scheduled_start"
                 >
                   计划开始时间
                 </el-dropdown-item>
 
                 <el-dropdown-item
-                  icon={orderField.value === 'schedule_end' ? CheckIcon : ''}
-                  command="schedule_end"
+                  icon={orderField.value === 'scheduled_end' ? CheckIcon : ''}
+                  command="scheduled_end"
                 >
                   计划结束时间
                 </el-dropdown-item>

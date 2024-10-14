@@ -53,8 +53,8 @@ export type OrderField =
   | 'created_at'
   | 'updated_at'
   | 'title'
-  | 'schedule_start'
-  | 'schedule_end'
+  | 'scheduled_start'
+  | 'scheduled_end'
   | 'deadline'
 
 /** 设置排序字段 */
@@ -96,11 +96,11 @@ export async function refreshtodoItems() {
     case 'title':
       sqlOrderField = 'title'
       break
-    case 'schedule_start':
-      sqlOrderField = 'schedule_start'
+    case 'scheduled_start':
+      sqlOrderField = 'scheduled_start'
       break
-    case 'schedule_end':
-      sqlOrderField = 'schedule_end'
+    case 'scheduled_end':
+      sqlOrderField = 'scheduled_end'
       break
     case 'deadline':
       sqlOrderField = 'deadline'
