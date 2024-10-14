@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, refreshtodoItems } from '../store'
+import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, getDoneInputClass, refreshtodoItems } from '../store'
 import {
   attributePriority,
   attributeSchduledStart,
@@ -63,8 +63,8 @@ async function changeBelongList(nid: string) {
 <template>
   <section class="w-full h-full p-2 flex flex-col todo-item-detail">
     <header class="flex items-center gap-2">
-      <el-checkbox :checked="modelValue.done ?? false" size="large"
-        @change="changeTodoItemDone(modelValue, $event as boolean)" />
+      <input type="checkbox" :class="getDoneInputClass(modelValue)" :checked="modelValue.done ?? false" size="large"
+        @change="changeTodoItemDone(modelValue, !modelValue.done)" />
       <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="
         changeTodoItemAttribute(
           modelValue.entity_id,

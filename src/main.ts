@@ -11,7 +11,6 @@ import './style.css'
 
 import posthogPlugin from './plugins/posthog' //import the plugin.
 import dayjsPlugin from './plugins/dayjs'
-import posthog from 'posthog-js'
 
 const app = createApp(App)
 

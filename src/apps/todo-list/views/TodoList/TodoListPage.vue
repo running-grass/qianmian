@@ -13,7 +13,8 @@ import {
   refreshAllTodoList,
   selectedTodoList,
   selectedTodoItem,
-  deleteTodoList
+  deleteTodoList,
+  getDoneInputClass
 } from '../../store'
 import { type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
@@ -88,11 +89,9 @@ function TodoItemRow({ todoItem }: { todoItem: TodoItem }) {
         ...(selectedTodoItem.value?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
       ]}
     >
-      <el-checkbox
+      <input type="checkbox" class={getDoneInputClass(todoItem)}
         checked={todoItem.done}
-        size="large"
-        onChange={(ev: boolean) => changeTodoItemDone(todoItem, ev)}
-        onClick={withModifiers(() => { }, ['stop'])}
+        onClick={withModifiers(() => { changeTodoItemDone(todoItem, !todoItem.done); }, ['stop'])}
       />
       <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
         {todoItem.title}

@@ -43,6 +43,7 @@
     "@vueuse/core": "^11.1.0",
     "@vueuse/rxjs": "^11.1.0",
     "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.13",
     "dayjs": "^1.11.13",
     "eslint": "^8.57.1",
     "eslint-plugin-playwright": "^1.6.2",
