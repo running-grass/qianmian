@@ -14,7 +14,6 @@ import {
   selectedTodoList,
   selectedTodoItem,
   deleteTodoList,
-  getDoneInputClass
 } from '../../store'
 import { type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
@@ -31,6 +30,7 @@ import dayjs from 'dayjs'
 import { ElDialog } from 'element-plus'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
+import { getDoneInputClass } from '../../util'
 
 
 await refreshAllTodoList()

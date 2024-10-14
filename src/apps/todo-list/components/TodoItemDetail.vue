@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, getDoneInputClass, refreshtodoItems } from '../store'
+import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, refreshtodoItems } from '../store'
 import {
+  attributeDeadline,
   attributePriority,
+  attributeSchduledEnd,
   attributeSchduledStart,
   getDb,
   relationBelongToTodoList,
@@ -11,6 +13,7 @@ import {
   type TodoItem,
   type TodoItemPriority
 } from '@/core'
+import { getDoneInputClass } from '../util';
 
 const emit = defineEmits(['delete'])
 
@@ -19,12 +22,16 @@ const modelValue = defineModel<TodoItem>({ required: true })
 
 
 const currentScheduleStart = ref<Date | ''>(modelValue.value.scheduled_start ?? '')
-
+const currentScheduleEnd = ref<Date | ''>(modelValue.value.scheduled_end ?? '')
+const currentDeadline = ref<Date | ''>(modelValue.value.deadline ?? '')
 
 const selectedPriority = ref<TodoItemPriority | ''>(modelValue.value.priority ?? '')
 
 watch(modelValue, () => {
+  console.debug('modelValue', modelValue.value)
   currentScheduleStart.value = modelValue.value.scheduled_start ?? ''
+  currentScheduleEnd.value = modelValue.value.scheduled_end ?? ''
+  currentDeadline.value = modelValue.value.deadline ?? ''
   selectedPriority.value = modelValue.value.priority ?? ''
 })
 
@@ -63,7 +70,7 @@ async function changeBelongList(nid: string) {
 <template>
   <section class="w-full h-full p-2 flex flex-col todo-item-detail">
     <header class="flex items-center gap-2">
-      <input type="checkbox" :class="getDoneInputClass(modelValue)" :checked="modelValue.done ?? false" size="large"
+      <input type="checkbox" :class="getDoneInputClass(modelValue)" :checked="modelValue.done ?? false"
         @change="changeTodoItemDone(modelValue, !modelValue.done)" />
       <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="
         changeTodoItemAttribute(
@@ -82,8 +89,24 @@ async function changeBelongList(nid: string) {
             $event ? $event : null
           )
           " />
+      <el-date-picker v-model="currentScheduleEnd" type="datetime" size="small" placeholder="计划结束时间" class="!w-44"
+        @change="
+          changeTodoItemAttribute(
+            modelValue.entity_id,
+            attributeSchduledEnd.id,
+            $event ? $event : null
+          )
+          " />
+
+      <el-date-picker v-model="currentDeadline" type="datetime" size="small" placeholder="截止时间" class="!w-44" @change="
+        changeTodoItemAttribute(
+          modelValue.entity_id,
+          attributeDeadline.id,
+          $event ? $event : null
+        )
+        " />
     </header>
-    <el-input tabindex="1" class="mb-4" type="text" v-model="modelValue.title" @input="triggerInput"
+    <el-input tabindex="1" class="my-4" type="text" v-model="modelValue.title" @input="triggerInput"
       @change="triggerChange" />
     <el-input type="textarea" tabindex="2" @input="triggerInput" @change="triggerChange"
       class="textarea textarea-bordered flex-1 w-full resize-none" v-model="modelValue.content" />
