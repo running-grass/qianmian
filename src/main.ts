@@ -10,13 +10,12 @@ import 'element-plus/theme-chalk/el-dialog.css'
 import './style.css'
 
 import posthogPlugin from './plugins/posthog' //import the plugin.
-import dayjsPlugin from './plugins/dayjs'
+import './plugins/dayjs'
 
 const app = createApp(App)
 
 app.use(posthogPlugin) //install the plugin
 
-app.use(dayjsPlugin)
 app.use(router)
 app.mount('#app')
 

@@ -1,9 +1,9 @@
 import { Surreal } from 'surrealdb'
 import { useJwt } from '@vueuse/integrations/useJwt'
-import dayjs from 'dayjs'
 import { token } from './storage'
 import { SURREAL_ENDPOINT } from './const'
 import { surrealdbAuthed$ } from './subjects/surrealdbSubject'
+import { myDayjs } from '@/plugins/dayjs'
 
 let globalDb: Surreal | undefined
 let dbP: Promise<Surreal> | null = null
@@ -69,7 +69,7 @@ async function tryAuth(db: Surreal): Promise<boolean> {
   const exp = payload.value?.exp
 
   if (!exp) return false
-  if (dayjs.unix(exp).isBefore(dayjs())) return false
+  if (myDayjs.unix(exp).isBefore(myDayjs())) return false
   try {
     await db.authenticate(token.value)
   } catch (err) {

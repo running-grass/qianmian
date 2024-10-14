@@ -26,11 +26,10 @@ import {
   PlusCircleIcon
 } from '@heroicons/vue/24/solid'
 import { useExportData, useImportData } from './importExport'
-import dayjs from 'dayjs'
 import { ElDialog } from 'element-plus'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
-import { getDoneInputClass } from '../../util'
+import { getDoneInputClass, getTime } from '../../util'
 
 
 await refreshAllTodoList()
@@ -96,9 +95,8 @@ function TodoItemRow({ todoItem }: { todoItem: TodoItem }) {
       <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
         {todoItem.title}
       </div>
-      <span class="text-sm text-gray-400">
-        {todoItem.scheduled_start ? dayjs(todoItem.scheduled_start).fromNow() + '开始' : ''}
-      </span>
+      <div v-html={getTime(todoItem)} >
+      </div>
     </li>
   )
 }
