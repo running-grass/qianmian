@@ -18,7 +18,7 @@ import { getDb } from '@/core'
 import { type EntityId } from '@/core'
 import type { RichEntity } from '@/core/type'
 import { useLocalStorage } from '@vueuse/core'
-import { ref, watch, watchEffect } from 'vue'
+import { ref, watch } from 'vue'
 
 // 待办清单
 
@@ -64,7 +64,7 @@ export const orderField = useLocalStorage<OrderField>('orderField', 'priority')
 export const todoItemsByList = ref<TodoItem[]>([])
 
 /** 自动更新待办事项列表 */
-watchEffect(refreshtodoItems)
+watch([selectedTodoList, orderField, showDones], refreshtodoItems)
 
 /** 触发待办事项列表的更新 */
 export async function refreshtodoItems() {
@@ -133,9 +133,10 @@ export const todoListInbox = ref<Readonly<RichEntity>>(undefined!)
 async function fillTodoListInbox() {
   const db = await getDb()
   const [res] = await db.query<[RichEntity[]]>(
-    'SELECT * FROM rich_entity WHERE title = $title LIMIT 1',
+    'SELECT * FROM rich_entity WHERE title = $title AND identity = $identity LIMIT 1',
     {
-      title: _inboxTitle
+      title: _inboxTitle,
+      identity: identityTodoList.value.id
     }
   )
 
