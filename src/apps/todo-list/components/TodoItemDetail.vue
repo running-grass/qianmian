@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { allTodoList, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem, refreshtodoItems } from '../store'
+import { allTodoList, changeBelongListTo, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem } from '../store'
 import {
   attributeDeadline,
   attributePriority,
   attributeSchduledEnd,
   attributeSchduledStart,
-  getDb,
-  relationBelongToTodoList,
-  StringRecordId,
+  entityTable,
   useAutoSaveEntity,
   type TodoItem,
   type TodoItemPriority
 } from '@/core'
 import { getDoneInputClass } from '../util';
+import { RecordId } from 'surrealdb';
 
 const emit = defineEmits(['delete'])
 
@@ -53,18 +52,7 @@ const localBelongs = ref<string | undefined>(
 )
 
 async function changeBelongList(nid: string) {
-  const db = await getDb()
-
-  await db.query('DELETE FROM entity_relations WHERE in = $entity AND relation = $relation', {
-    entity: modelValue.value.entity_id,
-    relation: relationBelongToTodoList.value.id
-  })
-
-  await db.relate(modelValue.value.entity_id, 'entity_relations', new StringRecordId(nid), {
-    relation: relationBelongToTodoList.value.id
-  })
-
-  refreshtodoItems()
+  changeBelongListTo(modelValue.value.entity_id, new RecordId(entityTable.tb, nid))
 }
 </script>
 <template>

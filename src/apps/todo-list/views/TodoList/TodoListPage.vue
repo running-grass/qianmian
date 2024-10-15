@@ -15,8 +15,9 @@ import {
   selectedTodoItem,
   deleteTodoList,
   refreshtodoItems,
+  changeBelongListTo,
 } from '../../store'
-import { type RichEntity, type TodoItem, type TodoList } from '@/core'
+import { StringRecordId, type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
 import { useMediaQuery, useMouse } from '@vueuse/core'
 import {
@@ -91,10 +92,46 @@ async function changeOrderField(of: OrderField) {
   orderField.value = of
 }
 
+function onItemDragStart(e: DragEvent) {
+  const target = e.target
+  if (!(target instanceof HTMLLIElement) || !e.dataTransfer) {
+    return
+  }
+
+  const itemId = target.dataset.id
+  if (!itemId) {
+    console.warn('no item id')
+    return
+  }
+  e.dataTransfer.dropEffect = "move";
+
+
+  // e.dataTransfer.setData('text/plain', itemId)
+  e.dataTransfer.setData(itemId, itemId)
+
+  target.classList.add('drop-shadow')
+  // e.preventDefault()
+
+}
+
+function onItemDragEnd(e: DragEvent) {
+
+  const target = e.target
+  if (!(target instanceof HTMLLIElement)) {
+    return
+  }
+
+  target.classList.remove('drop-shadow')
+}
+
 function TodoItemRow({ todoItem }: { todoItem: TodoItem }) {
   return (
     <li
       onClick={() => changeCurrentObject(todoItem)}
+      draggable={true}
+      onDragstart={onItemDragStart}
+      onDragend={onItemDragEnd}
+      data-id={todoItem.entity_id.toString()}
       class={[
         'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
         ...(selectedTodoItem.value?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
@@ -252,7 +289,6 @@ const todoListContentMenuPosition = reactive({ left: '0', top: '0', padding: 0 }
 const { x, y } = useMouse()
 
 const openTodoListContentMenu = (todoList: TodoList) => {
-  console.log(x.value, y.value)
   todoListContentMenuPosition.left = x.value + 'px'
   todoListContentMenuPosition.top = y.value + 'px'
 
@@ -265,11 +301,79 @@ const closeTodoListContentMenu = () => {
   todoListContextMenuTarget.value = undefined
 }
 
+const onListDropEnter = (ev: DragEvent) => {
+
+  const target = ev.target
+  if (!(target instanceof HTMLLIElement) || !ev.dataTransfer) {
+    return
+  }
+  target.classList.remove('bg-green-300', 'cursor-alias', 'cursor-no-drop')
+
+  const listId = target.dataset.id
+
+  const itemId = ev.dataTransfer.types[0]
+  if (!itemId) {
+    console.warn('no item id')
+    return
+  }
+
+  const item = todoItemsByList.value.find((i) => i.entity_id.toString() === itemId)
+
+  if (!item) {
+    console.warn('no item')
+    return
+  }
+  if (item.belong_to.find((i) => i.id.toString() === listId)) {
+    return
+  }
+
+  target.classList.add('bg-green-300')
+  ev.dataTransfer.dropEffect = "move";
+  ev.preventDefault()
+}
+
+
+const clearDragClass = (ev: DragEvent) => {
+  const target = ev.target
+  if (!(target instanceof HTMLLIElement)) {
+    return
+  }
+  target.classList.remove('bg-green-300', 'cursor-alias', 'cursor-no-drop')
+  ev.preventDefault()
+}
+
+function onItemDrop(e: DragEvent) {
+  const target = e.target
+
+  clearDragClass(e)
+
+  if (!(target instanceof HTMLLIElement) || !e.dataTransfer) {
+    return
+  }
+
+  const listId = target.dataset.id
+
+  const itemId = e.dataTransfer.types[0]
+
+  if (!itemId || !listId) {
+    console.warn('no item id')
+    return
+  }
+
+  const tlid = new StringRecordId(listId)
+  const tiid = new StringRecordId(itemId)
+
+  changeBelongListTo(tiid, tlid)
+}
+
 function TodoListRow({ todoList }: { todoList: RichEntity }) {
   return (
     <li
       onClick={() => selectTodoList(todoList)}
       onDblclick={() => editTodoList(todoList)}
+      onDragover={onListDropEnter}
+      onDragleave={clearDragClass}
+      onDrop={onItemDrop}
       onContextmenu={withModifiers(() => {
         openTodoListContentMenu(todoList)
       }, ['stop', 'prevent'])}
@@ -277,6 +381,7 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
         'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
         ...(selectedTodoList.value?.entity_id.id === todoList.entity_id.id ? ['bg-green-100'] : [])
       ]}
+      data-id={todoList.entity_id.toString()}
     >
       {todoList.title}
     </li>
