@@ -18,7 +18,7 @@ import { getDb } from '@/core'
 import { type EntityId } from '@/core'
 import type { RichEntity } from '@/core/type'
 import { useLocalStorage } from '@vueuse/core'
-import { ref, watch, watchEffect } from 'vue'
+import { ref, watch } from 'vue'
 
 // 待办清单
 
@@ -64,14 +64,47 @@ export const orderField = useLocalStorage<OrderField>('orderField', 'priority')
 export const todoItemsByList = ref<TodoItem[]>([])
 
 /** 自动更新待办事项列表 */
-watchEffect(refreshtodoItems)
+watch([selectedTodoList, orderField, showDones], refreshtodoItems)
 
 /** 触发待办事项列表的更新 */
 export async function refreshtodoItems() {
   const _orderField = orderField.value
   const _showDones = showDones.value
 
-  let sql = `SELECT * FROM ${todoItemView.tb}`
+  let sqlOrderField = 'created_at'
+  let sqlOrderFieldOrder = 'DESC'
+  switch (_orderField) {
+    case 'priority':
+      sqlOrderField = 'priority_order'
+      sqlOrderFieldOrder = 'DESC'
+      break
+    case 'created_at':
+      sqlOrderField = 'created_at'
+      sqlOrderFieldOrder = 'DESC'
+      break
+    case 'updated_at':
+      sqlOrderField = 'updated_at'
+      sqlOrderFieldOrder = 'DESC'
+      break
+    case 'title':
+      sqlOrderField = 'title'
+      sqlOrderFieldOrder = 'ASC'
+      break
+    case 'scheduled_start':
+      sqlOrderField = 'scheduled_start'
+      sqlOrderFieldOrder = 'ASC'
+      break
+    case 'scheduled_end':
+      sqlOrderField = 'scheduled_end'
+      sqlOrderFieldOrder = 'ASC'
+      break
+    case 'deadline':
+      sqlOrderField = 'deadline'
+      sqlOrderFieldOrder = 'ASC'
+      break
+  }
+
+  let sql = `SELECT *,${sqlOrderField} == null as ordered_field_is_null FROM ${todoItemView.tb}`
 
   sql += ` WHERE true`
   if (!_showDones) {
@@ -82,36 +115,11 @@ export async function refreshtodoItems() {
     sql += ` AND belong_to.id CONTAINS ${selectedTodoList.value.entity_id}`
   }
 
-  let sqlOrderField = 'created_at'
-  switch (_orderField) {
-    case 'priority':
-      sqlOrderField = 'priority_order'
-      break
-    case 'created_at':
-      sqlOrderField = 'created_at'
-      break
-    case 'updated_at':
-      sqlOrderField = 'updated_at'
-      break
-    case 'title':
-      sqlOrderField = 'title'
-      break
-    case 'scheduled_start':
-      sqlOrderField = 'scheduled_start'
-      break
-    case 'scheduled_end':
-      sqlOrderField = 'scheduled_end'
-      break
-    case 'deadline':
-      sqlOrderField = 'deadline'
-      break
-  }
-
-  sql += ` ORDER BY ${sqlOrderField} DESC,created_at DESC`
+  sql += ` ORDER BY ordered_field_is_null,${sqlOrderField} ${sqlOrderFieldOrder},created_at DESC`
 
   // TODO 暂定一个 1000 条的限制
   sql += ` LIMIT 1000`
-
+  console.debug('refreshtodoItems', sql)
   const db = await getDb()
 
   const [list] = await db.query<[TodoItem[]]>(sql)
@@ -125,9 +133,10 @@ export const todoListInbox = ref<Readonly<RichEntity>>(undefined!)
 async function fillTodoListInbox() {
   const db = await getDb()
   const [res] = await db.query<[RichEntity[]]>(
-    'SELECT * FROM rich_entity WHERE title = $title LIMIT 1',
+    'SELECT * FROM rich_entity WHERE title = $title AND identity = $identity LIMIT 1',
     {
-      title: _inboxTitle
+      title: _inboxTitle,
+      identity: identityTodoList.value.id
     }
   )
 

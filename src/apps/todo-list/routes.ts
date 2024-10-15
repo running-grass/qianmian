@@ -6,9 +6,10 @@ export const todoListRoutes: RouteRecordRaw = {
   component: () => import('./TodoListLayout.vue'),
   children: [
     {
-      path: '',
+      path: ':todoListId?',
       name: 'todo-list',
-      component: () => import('./views/TodoList/TodoListPage.vue')
+      component: () => import('./views/TodoList/TodoListPage.vue'),
+      props: true
     }
   ]
 }

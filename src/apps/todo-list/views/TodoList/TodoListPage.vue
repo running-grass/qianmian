@@ -14,6 +14,7 @@ import {
   selectedTodoList,
   selectedTodoItem,
   deleteTodoList,
+  refreshtodoItems,
 } from '../../store'
 import { type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
@@ -30,10 +31,23 @@ import { ElDialog } from 'element-plus'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
 import { getDoneInputClass, getTime } from '../../util'
+import { useRouter } from 'vue-router'
 
+const props = defineProps<{
+  todoListId: string | undefined
+}>()
 
 await refreshAllTodoList()
 
+// 如果有待办事项,则选中
+if (props.todoListId) {
+  const item = allTodoList.value.find((i) => i.entity_id.toString() === props.todoListId)
+  if (item) {
+    selectedTodoList.value = item
+  }
+}
+
+refreshtodoItems()
 // 非移动端，等同于tailwindcss 的md
 const isPcScreen = useMediaQuery('(min-width: 768px)')
 const isMobileScreen = computed(() => !isPcScreen.value)
@@ -49,8 +63,6 @@ async function changeCurrentObject(entity: TodoItem) {
   selectedTodoItem.value = entity
   mobileDrawer.value = true
 }
-
-
 
 async function createTodoItemUI() {
   const id = await createTodoItem(newTitle.value)
@@ -224,10 +236,14 @@ function deleteTodoListUI(todoList: TodoList) {
   }
 }
 
+const router = useRouter()
 function selectTodoList(todoList: TodoList | null) {
   selectedTodoList.value = todoList
   todoItemsByList.value = []
   todoListDrawer.value = false
+
+  router.push({ name: 'todo-list', params: { todoListId: todoList?.entity_id?.toString() ?? '' } })
+
 }
 
 const todoListContextMenuTarget = ref<TodoList>()
