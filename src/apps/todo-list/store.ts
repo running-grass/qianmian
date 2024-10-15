@@ -12,7 +12,8 @@ import {
   todoListView,
   todoItemView,
   entityRelationsTable,
-  relationBelongToTodoList
+  relationBelongToTodoList,
+  StringRecordId
 } from '@/core'
 import { getDb } from '@/core'
 import { type EntityId } from '@/core'
@@ -251,4 +252,22 @@ export async function deleteTodoList(eid: EntityId): Promise<void> {
   const db = await getDb()
   await db.delete(eid)
   refreshAllTodoList()
+}
+
+export async function changeBelongListTo(
+  todoItemId: EntityId | StringRecordId,
+  todoListId: EntityId | StringRecordId
+) {
+  const db = await getDb()
+
+  await db.query('DELETE FROM entity_relations WHERE in = $entity AND relation = $relation', {
+    entity: todoItemId,
+    relation: relationBelongToTodoList.value.id
+  })
+
+  await db.relate(todoItemId, 'entity_relations', todoListId, {
+    relation: relationBelongToTodoList.value.id
+  })
+
+  refreshtodoItems()
 }
