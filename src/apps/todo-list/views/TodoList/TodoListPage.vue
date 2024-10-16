@@ -133,7 +133,7 @@ function TodoItemRow({ todoItem }: { todoItem: TodoItem }) {
       onDragend={onItemDragEnd}
       data-id={todoItem.entity_id.toString()}
       class={[
-        'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
+        'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer break-all	',
         ...(selectedTodoItem.value?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
       ]}
     >
@@ -419,27 +419,26 @@ function TodoListSection() {
 </script>
 <template>
   <div class="flex w-full h-full border-green-100">
-    <section v-if="isPcScreen" class="w-80 border-r-2 p-2">
+    <aside v-if="isPcScreen" class="w-40 grow-[1] shrink-0 border-r-2 p-2">
       <TodoListSection />
-    </section>
+    </aside>
 
-    <aside class="min-w-80 flex-1 flex flex-col p-4 border-r-2">
+    <section class="w-80 grow-[2] shrink-0 flex flex-col p-4 border-r-2">
       <TodoItemCreateRow></TodoItemCreateRow>
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
         <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem">
         </TodoItemRow>
       </TransitionGroup>
-    </aside>
+    </section>
 
-    <el-divider v-if="isPcScreen" direction="vertical" class="h-full hidden md:inline-block" />
-    <article v-if="isPcScreen" class="flex-1 p-2 flex-col hidden md:flex todo-item-detail-host">
+    <article v-if="isPcScreen" class="grow-[3]  p-2 flex-col hidden md:flex todo-item-detail-host">
       <el-empty v-if="!selectedTodoItem" description="未选择事项" class="w-full h-full" />
       <TodoItemDetail v-else v-model="selectedTodoItem" :key="selectedTodoItem.entity_id.id.toString()"
         @delete="deleteSelectedTodoItem" />
     </article>
   </div>
 
-  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="60%"
+  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="90%"
     :with-header="false" destroy-on-close direction="btt">
     <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
       @delete="deleteSelectedTodoItem" />

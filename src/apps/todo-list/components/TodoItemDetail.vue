@@ -57,7 +57,7 @@ async function changeBelongList(nid: string) {
 </script>
 <template>
   <section class="w-full h-full p-2 flex flex-col todo-item-detail">
-    <header class="flex items-center gap-2">
+    <header class="flex items-center gap-2 flex-wrap">
       <input type="checkbox" :class="getDoneInputClass(modelValue)" :checked="modelValue.done ?? false"
         @change="changeTodoItemDone(modelValue, !modelValue.done)" />
       <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="
