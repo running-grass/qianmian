@@ -45,7 +45,7 @@ async function register() {
 
 <template>
   <div>
-    <h1>注册帐户</h1>
+    <h1>注册账号</h1>
     <el-input type="text" v-model="username" placeholder="用户名" />
     <el-input type="password" v-model="password" placeholder="密码" />
     <el-button @click="register">注册</el-button>

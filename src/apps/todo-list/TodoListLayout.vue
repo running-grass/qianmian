@@ -4,10 +4,10 @@ import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
   ListBulletIcon,
-  MagnifyingGlassCircleIcon,
-  MagnifyingGlassIcon
+  QuestionMarkCircleIcon
 } from '@heroicons/vue/24/solid'
 import { initData } from './store'
+import { CalendarDaysIcon, MagnifyingGlassIcon, } from '@heroicons/vue/16/solid';
 
 await initData()
 
@@ -17,6 +17,10 @@ const handleOpen = (key: string, keyPath: string[]) => {
 }
 const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
+}
+
+const gotoDocs = () => {
+  window.open('https://qianmian-docs.netlify.app', '_blank')
 }
 </script>
 <template>
@@ -33,10 +37,18 @@ const handleClose = (key: string, keyPath: string[]) => {
         <ListBulletIcon class="min-w-6 min-h-6 size-6 mr-2" />
         <template #title>清单视图</template>
       </el-menu-item>
-      <!-- <el-menu-item index="/todo-list/search/">
+      <el-menu-item disabled>
+        <CalendarDaysIcon class="min-w-6 min-h-6 size-6 mr-2" />
+        <template #title>日历视图</template>
+      </el-menu-item>
+      <el-menu-item disabled index="/todo-list/search/">
         <MagnifyingGlassIcon class="min-w-6 min-h-6 size-6 mr-2" />
         <template #title>搜索</template>
-      </el-menu-item> -->
+      </el-menu-item>
+      <el-menu-item @click="gotoDocs">
+        <QuestionMarkCircleIcon class="min-w-6 min-h-6 size-6 mr-2" />
+        <template #title>文档</template>
+      </el-menu-item>
     </el-menu>
     <main class="flex-1 h-full">
       <RouterView />

@@ -15,8 +15,9 @@ export default {
   plugins: {
     '@release-it/conventional-changelog': {
       preset: {
-        name: 'angular'
+        name: 'writer'
       },
+      header: '# 更新日志',
       infile: 'CHANGELOG.md',
       strictSemVer: false,
       ignoreRecommendedBump: true
