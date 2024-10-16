@@ -1,4 +1,3 @@
-import { he } from 'element-plus/es/locales.mjs'
 import type { Config } from 'release-it'
 
 export default {
