@@ -259,7 +259,6 @@ export async function changeBelongListTo(
   todoListId: EntityId | StringRecordId
 ) {
   const db = await getDb()
-
   await db.query('DELETE FROM entity_relations WHERE in = $entity AND relation = $relation', {
     entity: todoItemId,
     relation: relationBelongToTodoList.value.id
