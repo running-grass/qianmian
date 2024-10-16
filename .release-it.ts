@@ -1,3 +1,4 @@
+import { he } from 'element-plus/es/locales.mjs'
 import type { Config } from 'release-it'
 
 export default {
@@ -15,9 +16,9 @@ export default {
   plugins: {
     '@release-it/conventional-changelog': {
       preset: {
-        name: 'angular'
+        name: 'writer'
       },
-      header: '# Changelog',
+      header: '# 更新日志',
       infile: 'CHANGELOG.md',
       strictSemVer: false,
       ignoreRecommendedBump: true

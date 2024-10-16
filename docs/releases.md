@@ -1,1 +1,1 @@
-markdown-examples.md
+<!--@include: ../CHANGELOG.md-->
