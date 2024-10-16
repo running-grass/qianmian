@@ -17,6 +17,7 @@ export default {
       preset: {
         name: 'angular'
       },
+      header: '# Changelog',
       infile: 'CHANGELOG.md',
       strictSemVer: false,
       ignoreRecommendedBump: true
