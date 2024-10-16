@@ -20,6 +20,7 @@ init-db:
 
 # 代码静态检查+类型检查
 lint:
+  treefmt
   bun lint
   bun type-check
 
@@ -30,6 +31,9 @@ prod-db-shell:
 # 构建前端代码
 build:
   bun run build
+
+nix-build:
+  nix build .  --option sandbox false
 
 # Release
 release:

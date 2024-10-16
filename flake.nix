@@ -4,51 +4,55 @@
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
-        # To import a flake module
-        # 1. Add foo to inputs
-        # 2. Add foo as a parameter to the outputs function
-        # 3. Add here: foo.flakeModule
+        inputs.treefmt-nix.flakeModule
       ];
       systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
-      perSystem = { config, self', inputs', pkgs, system, ... }: {
-        # Per-system attributes can be defined here. The self' and inputs'
-        # module parameters provide easy access to attributes of the same
-        # system.
 
-        # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
-        packages.default = pkgs.hello;
+      perSystem = { config, self', inputs', pkgs, lib, system, ... }: {
+        treefmt.config = {
+          projectRootFile = "flake.nix";
+          programs.nixpkgs-fmt.enable = true;
+        };
+
+        packages.web = pkgs.stdenv.mkDerivation {
+          pname = "qianmian-web";
+          src = ./.;
+          version = "0.1.2";
+          nativeBuildInputs = with pkgs; [ bun nodejs ];
+          buildPhase = ''
+            bun install --frozen-lockfile
+            bun run build
+            mkdir -p $out/web
+            cp -r dist/* $out/web
+          '';
+        };
+
+
+        packages.default = config.packages.web;
 
         devShells = {
           dev = pkgs.mkShell {
+            name = "qianmian";
 
-            SURREAL_USER = "root";
-            SURREAL_PASS = "root";
-            SURREAL_PATH = "surrealkv:.db/surrealkv";
             packages = with pkgs; [
               bun
               nodejs
 
-              railway
               surrealdb
               surrealdb-migrations
             ];
-          };
-          # 生产环境运维
-          prod-db = pkgs.mkShell {
-
-            packages = with pkgs; [
-              railway
+            # See https://community.flake.parts/haskell-flake/devshell#composing-devshells
+            inputsFrom = [
+              config.treefmt.build.devShell
             ];
-            shellHook = ''
-
-            '';
           };
-
         };
       };
       flake = {
