@@ -3,7 +3,9 @@ import { ref } from 'vue'
 import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
-  ListBulletIcon
+  ListBulletIcon,
+  MagnifyingGlassCircleIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/vue/24/solid'
 import { initData } from './store'
 
@@ -27,10 +29,14 @@ const handleClose = (key: string, keyPath: string[]) => {
         <template #title>{{ isCollapse ? '展开' : '收起' }}</template>
       </el-menu-item>
 
-      <el-menu-item index="/todo-list">
+      <el-menu-item index="/todo-list/list">
         <ListBulletIcon class="min-w-6 min-h-6 size-6 mr-2" />
         <template #title>清单视图</template>
       </el-menu-item>
+      <!-- <el-menu-item index="/todo-list/search/">
+        <MagnifyingGlassIcon class="min-w-6 min-h-6 size-6 mr-2" />
+        <template #title>搜索</template>
+      </el-menu-item> -->
     </el-menu>
     <main class="flex-1 h-full">
       <RouterView />
