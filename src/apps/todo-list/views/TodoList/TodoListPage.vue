@@ -9,7 +9,6 @@ import {
   type OrderField,
   allTodoList,
   todoItemsByList,
-  refreshAllTodoList,
   selectedTodoList,
   selectedTodoItem,
   deleteTodoList,
@@ -37,7 +36,6 @@ const props = defineProps<{
   todoListId: string | undefined
 }>()
 
-await refreshAllTodoList()
 
 // 如果有待办事项,则选中
 if (props.todoListId) {

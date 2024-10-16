@@ -6,15 +6,14 @@ import {
   attributePriority,
   attributeSchduledEnd,
   attributeSchduledStart,
-  entityTable,
   useAutoSaveEntity,
   type TodoItem,
   type TodoItemPriority
 } from '@/core'
 import { getDoneInputClass } from '../util';
-import { RecordId } from 'surrealdb';
+import { StringRecordId } from 'surrealdb';
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'update'])
 
 
 const modelValue = defineModel<TodoItem>({ required: true })
@@ -52,47 +51,69 @@ const localBelongs = ref<string | undefined>(
 )
 
 async function changeBelongList(nid: string) {
-  changeBelongListTo(modelValue.value.entity_id, new RecordId(entityTable.tb, nid))
+  await changeBelongListTo(modelValue.value.entity_id, new StringRecordId(nid))
+  emit('update', modelValue.value.entity_id)
 }
+
+async function changePriority($event: TodoItemPriority | '') {
+  await changeTodoItemAttribute(
+    modelValue.value.entity_id,
+    attributePriority.value.id,
+    $event ?? null
+  );
+  emit('update', modelValue.value.entity_id)
+}
+
+async function changeScheduleStart($event: Date | null) {
+  await changeTodoItemAttribute(
+    modelValue.value.entity_id,
+    attributeSchduledStart.value.id,
+    $event ?? null
+  );
+  emit('update', modelValue.value.entity_id)
+}
+
+async function changeScheduleEnd($event: Date | null) {
+  await changeTodoItemAttribute(
+    modelValue.value.entity_id,
+    attributeSchduledEnd.value.id,
+    $event ?? null
+  );
+  emit('update', modelValue.value.entity_id)
+}
+
+async function changeDeadline($event: Date | null) {
+  await changeTodoItemAttribute(
+    modelValue.value.entity_id,
+    attributeDeadline.value.id,
+    $event ?? null
+  );
+  emit('update', modelValue.value.entity_id)
+}
+
+async function changeTodoItemDoneLocal() {
+  console.log('done', modelValue.value.done)
+  await changeTodoItemDone(modelValue.value, modelValue.value.done)
+  emit('update', modelValue.value.entity_id)
+}
+
 </script>
 <template>
   <section class="w-full h-full p-2 flex flex-col todo-item-detail">
     <header class="flex items-center gap-2 flex-wrap">
-      <input type="checkbox" :class="getDoneInputClass(modelValue)" :checked="modelValue.done ?? false"
-        @change="changeTodoItemDone(modelValue, !modelValue.done)" />
-      <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="
-        changeTodoItemAttribute(
-          modelValue.entity_id,
-          attributePriority.id,
-          ($event as TodoItemPriority | '') ? $event : null
-        )
-        " placeholder=" 无优先级">
+      <input type="checkbox" :class="getDoneInputClass(modelValue)" v-model="modelValue.done"
+        @change="changeTodoItemDoneLocal" />
+      <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="changePriority"
+        placeholder=" 无优先级">
         <el-option v-for="item in ['', '低', '中', '高']" :key="item" :label="(item ? item : '无') + '优先级'" :value="item" />
       </el-select>
       <el-date-picker v-model="currentScheduleStart" type="datetime" size="small" placeholder="计划开始时间" class="!w-44"
-        @change="
-          changeTodoItemAttribute(
-            modelValue.entity_id,
-            attributeSchduledStart.id,
-            $event ? $event : null
-          )
-          " />
+        @change="changeScheduleStart" />
       <el-date-picker v-model="currentScheduleEnd" type="datetime" size="small" placeholder="计划结束时间" class="!w-44"
-        @change="
-          changeTodoItemAttribute(
-            modelValue.entity_id,
-            attributeSchduledEnd.id,
-            $event ? $event : null
-          )
-          " />
+        @change="changeScheduleEnd" />
 
-      <el-date-picker v-model="currentDeadline" type="datetime" size="small" placeholder="截止时间" class="!w-44" @change="
-        changeTodoItemAttribute(
-          modelValue.entity_id,
-          attributeDeadline.id,
-          $event ? $event : null
-        )
-        " />
+      <el-date-picker v-model="currentDeadline" type="datetime" size="small" placeholder="截止时间" class="!w-44"
+        @change="changeDeadline" />
     </header>
     <el-input tabindex="1" class="my-4" type="text" v-model="modelValue.title" @input="triggerInput"
       @change="triggerChange" />

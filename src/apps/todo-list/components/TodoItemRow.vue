@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { TodoItem } from '@/core';
 import { getDoneInputClass, getTime } from '../util';
 import { changeTodoItemDone } from '../store';
 
-const { todoItem } = defineProps<{ todoItem: TodoItem }>()
+const { todoItem, showList } = defineProps<{ todoItem: TodoItem, showList?: boolean }>()
+
+const timeText = computed(() => getTime(todoItem))
 </script>
 
 <template>
@@ -16,7 +19,8 @@ const { todoItem } = defineProps<{ todoItem: TodoItem }>()
     <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
       {{ todoItem.title }}
     </div>
-    <div v-html="getTime(todoItem)">
+    <div v-if="showList" class="text-sm ml-4 text-gray-400">{{ todoItem.belong_to[0]?.title }}</div>
+    <div v-if="timeText" class="ml-4" v-html="timeText">
     </div>
   </li>
 </template>

@@ -6,10 +6,11 @@ import {
   ListBulletIcon,
   QuestionMarkCircleIcon
 } from '@heroicons/vue/24/solid'
-import { initData } from './store'
+import { initData, refreshAllTodoList } from './store'
 import { CalendarDaysIcon, MagnifyingGlassIcon, } from '@heroicons/vue/16/solid';
 
 await initData()
+await refreshAllTodoList()
 
 const isCollapse = ref(true)
 const handleOpen = (key: string, keyPath: string[]) => {
