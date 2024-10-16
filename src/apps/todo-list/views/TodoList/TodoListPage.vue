@@ -399,8 +399,8 @@ function TodoListSection() {
       <TodoItemCreateRow></TodoItemCreateRow>
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
         <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem"
-          @click="changeCurrentObject(todoItem)" :draggable="true" @dragstart="onItemDragStart" @dragend="onItemDragEnd"
-          :class="[
+          :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)" :draggable="true"
+          @dragstart="onItemDragStart" @dragend="onItemDragEnd" :class="[
             ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
           ]">
         </TodoItemRow>

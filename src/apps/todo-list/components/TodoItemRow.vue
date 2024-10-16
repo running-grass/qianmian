@@ -19,7 +19,7 @@ const timeText = computed(() => getTime(todoItem))
     <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
       {{ todoItem.title }}
     </div>
-    <div v-if="showList" class="text-sm ml-4 text-gray-400">{{ todoItem.belong_to[0]?.title }}</div>
+    <div v-if="showList && todoItem.belong_to[0]" class="badge badge-neutral">{{ todoItem.belong_to[0]?.title }}</div>
     <div v-if="timeText" class="ml-4" v-html="timeText">
     </div>
   </li>
