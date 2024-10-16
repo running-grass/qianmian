@@ -41,7 +41,7 @@ const gotoDocs = () => {
         <CalendarDaysIcon class="min-w-6 min-h-6 size-6 mr-2" />
         <template #title>日历视图</template>
       </el-menu-item>
-      <el-menu-item disabled index="/todo-list/search/">
+      <el-menu-item index="/todo-list/search/">
         <MagnifyingGlassIcon class="min-w-6 min-h-6 size-6 mr-2" />
         <template #title>搜索</template>
       </el-menu-item>
