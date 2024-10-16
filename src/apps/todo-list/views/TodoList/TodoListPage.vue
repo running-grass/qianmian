@@ -3,14 +3,12 @@ import { computed, reactive, ref, withKeys, withModifiers } from 'vue'
 import { vOnClickOutside } from '@vueuse/components'
 
 import {
-  changeTodoItemDone,
   createTodoItem,
   showDones,
   orderField,
   type OrderField,
   allTodoList,
   todoItemsByList,
-  refreshAllTodoList,
   selectedTodoList,
   selectedTodoItem,
   deleteTodoList,
@@ -31,14 +29,13 @@ import { useExportData, useImportData } from './importExport'
 import { ElDialog } from 'element-plus'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
-import { getDoneInputClass, getTime } from '../../util'
 import { useRouter } from 'vue-router'
+import TodoItemRow from '../../components/TodoItemRow.vue'
 
 const props = defineProps<{
   todoListId: string | undefined
 }>()
 
-await refreshAllTodoList()
 
 // 如果有待办事项,则选中
 if (props.todoListId) {
@@ -98,9 +95,10 @@ function onItemDragStart(e: DragEvent) {
     return
   }
 
-  const itemId = target.dataset.id
+  const itemId = target.dataset.entityId
+  console.log(target)
   if (!itemId) {
-    console.warn('no item id')
+    console.warn('onstart: no item id')
     return
   }
   e.dataTransfer.dropEffect = "move";
@@ -122,32 +120,6 @@ function onItemDragEnd(e: DragEvent) {
   }
 
   target.classList.remove('drop-shadow')
-}
-
-function TodoItemRow({ todoItem }: { todoItem: TodoItem }) {
-  return (
-    <li
-      onClick={() => changeCurrentObject(todoItem)}
-      draggable={true}
-      onDragstart={onItemDragStart}
-      onDragend={onItemDragEnd}
-      data-id={todoItem.entity_id.toString()}
-      class={[
-        'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer break-all	',
-        ...(selectedTodoItem.value?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
-      ]}
-    >
-      <input type="checkbox" class={getDoneInputClass(todoItem)}
-        checked={todoItem.done}
-        onClick={withModifiers(() => { changeTodoItemDone(todoItem, !todoItem.done); }, ['stop'])}
-      />
-      <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
-        {todoItem.title}
-      </div>
-      <div v-html={getTime(todoItem)} >
-      </div>
-    </li>
-  )
 }
 
 const exportAllEntity = useExportData()
@@ -426,7 +398,11 @@ function TodoListSection() {
     <section class="w-80 grow-[2] shrink-0 flex flex-col p-4 border-r-2">
       <TodoItemCreateRow></TodoItemCreateRow>
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
-        <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem">
+        <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem"
+          :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)" :draggable="true"
+          @dragstart="onItemDragStart" @dragend="onItemDragEnd" :class="[
+            ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
+          ]">
         </TodoItemRow>
       </TransitionGroup>
     </section>

@@ -6,10 +6,11 @@ import {
   ListBulletIcon,
   QuestionMarkCircleIcon
 } from '@heroicons/vue/24/solid'
-import { initData } from './store'
+import { initData, refreshAllTodoList } from './store'
 import { CalendarDaysIcon, MagnifyingGlassIcon, } from '@heroicons/vue/16/solid';
 
 await initData()
+await refreshAllTodoList()
 
 const isCollapse = ref(true)
 const handleOpen = (key: string, keyPath: string[]) => {
@@ -41,7 +42,7 @@ const gotoDocs = () => {
         <CalendarDaysIcon class="min-w-6 min-h-6 size-6 mr-2" />
         <template #title>日历视图</template>
       </el-menu-item>
-      <el-menu-item disabled index="/todo-list/search/">
+      <el-menu-item index="/todo-list/search/">
         <MagnifyingGlassIcon class="min-w-6 min-h-6 size-6 mr-2" />
         <template #title>搜索</template>
       </el-menu-item>
