@@ -7,8 +7,7 @@ export * from './type'
 export * from './datapool'
 export { StringRecordId } from 'surrealdb'
 export * from './const'
-export * from './utils/nodeHook'
-export * from './utils/import'
+export * from './utils/'
 
 // sql
 export * from './sql/node'

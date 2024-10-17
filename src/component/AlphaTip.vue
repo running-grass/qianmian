@@ -7,7 +7,7 @@ const readTip = useSessionStorage('readTip', false)
 
 if (!readTip.value) {
   ElMessageBox.alert(
-    `本项目处于开发早期，仅用于测试目的。数据结构可能会改变，数据存储随时可能会被清除，请勿记录重要数据。<br/><br/><b>当前版本为 ${APP_VERSION}</b>`,
+    `本项目处于开发早期，仅用于内部测试。数据备份周期为1小时，如有数据丢失请联系开发者反馈。<br/><br/><b>当前版本为 ${APP_VERSION}</b>`,
     '警告',
     {
       confirmButtonText: '我知道了',

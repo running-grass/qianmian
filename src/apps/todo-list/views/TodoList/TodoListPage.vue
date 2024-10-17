@@ -1,23 +1,17 @@
 <script setup lang="tsx">
-import { computed, reactive, ref, withKeys, withModifiers } from 'vue'
+import { reactive, ref, withKeys, withModifiers } from 'vue'
 import { vOnClickOutside } from '@vueuse/components'
 
 import {
-  createTodoItem,
-  showDones,
-  orderField,
   type OrderField,
   allTodoList,
-  todoItemsByList,
-  selectedTodoList,
-  selectedTodoItem,
-  deleteTodoList,
-  refreshtodoItems,
   changeBelongListTo,
+  deleteTodoList,
+  todoListInbox,
 } from '../../store'
-import { StringRecordId, type RichEntity, type TodoItem, type TodoList } from '@/core'
+import { createEntity, entityRelationsTable, getDb, identityTodoItem, relationBelongToTodoList, StringRecordId, useMobile, type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
-import { useMediaQuery, useMouse } from '@vueuse/core'
+import { useMouse } from '@vueuse/core'
 import {
   CheckIcon,
   EllipsisHorizontalIcon,
@@ -31,11 +25,11 @@ import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
 import { useRouter } from 'vue-router'
 import TodoItemRow from '../../components/TodoItemRow.vue'
+import { selectedTodoList, refreshtodoItems, todoItemsByList, orderField, showDones, selectedTodoItem } from './store'
 
 const props = defineProps<{
   todoListId: string | undefined
 }>()
-
 
 // 如果有待办事项,则选中
 if (props.todoListId) {
@@ -46,9 +40,7 @@ if (props.todoListId) {
 }
 
 refreshtodoItems()
-// 非移动端，等同于tailwindcss 的md
-const isPcScreen = useMediaQuery('(min-width: 768px)')
-const isMobileScreen = computed(() => !isPcScreen.value)
+const isMobileScreen = useMobile()
 
 const newTitle = ref<string>('')
 
@@ -62,8 +54,22 @@ async function changeCurrentObject(entity: TodoItem) {
   mobileDrawer.value = true
 }
 
+/**
+ * 创建一个新的待办事项
+ *
+ * @param title 待办事项的标题
+ * @returns 新创建的待办事项的 RecordId
+ */
 async function createTodoItemUI() {
-  const id = await createTodoItem(newTitle.value)
+  const id = await createEntity(identityTodoItem.value.id, newTitle.value)
+  const todoList = selectedTodoList.value ?? todoListInbox.value
+
+  const db = await getDb()
+  await db.relate(id, entityRelationsTable.tb, todoList.entity_id, {
+    relation: relationBelongToTodoList.value.id
+  })
+
+  await refreshtodoItems()
 
   const item = todoItemsByList.value.find((i) => i.entity_id.id === id.id)
   selectedTodoItem.value = item ?? null
@@ -204,8 +210,8 @@ function TodoItemCreateRow() {
                 <el-dropdown-item onClick={() => (showDones.value = !showDones.value)}>
                   {showDones.value ? '隐藏已完成' : '显示已完成'}
                 </el-dropdown-item>
-                <el-dropdown-item onClick={exportAllEntity}>导出所有节点</el-dropdown-item>
-                <el-dropdown-item onClick={openImportData}>导入数据</el-dropdown-item>
+                <el-dropdown-item onClick={exportAllEntity}>导出数据(json)</el-dropdown-item>
+                <el-dropdown-item onClick={openImportData} disabled>导入数据(json)</el-dropdown-item>
               </el-dropdown-menu>
             )
           }}
@@ -335,7 +341,9 @@ function onItemDrop(e: DragEvent) {
   const tlid = new StringRecordId(listId)
   const tiid = new StringRecordId(itemId)
 
-  changeBelongListTo(tiid, tlid)
+  changeBelongListTo(tiid, tlid).then(() => {
+    refreshtodoItems()
+  })
 }
 
 function TodoListRow({ todoList }: { todoList: RichEntity }) {
@@ -391,7 +399,7 @@ function TodoListSection() {
 </script>
 <template>
   <div class="flex w-full h-full border-green-100">
-    <aside v-if="isPcScreen" class="w-40 grow-[1] shrink-0 border-r-2 p-2">
+    <aside v-if="!isMobileScreen" class="w-40 grow-[1] shrink-0 border-r-2 p-2">
       <TodoListSection />
     </aside>
 
@@ -407,7 +415,7 @@ function TodoListSection() {
       </TransitionGroup>
     </section>
 
-    <article v-if="isPcScreen" class="grow-[3]  p-2 flex-col hidden md:flex todo-item-detail-host">
+    <article v-if="!isMobileScreen" class="grow-[3]  p-2 flex-col hidden md:flex todo-item-detail-host">
       <el-empty v-if="!selectedTodoItem" description="未选择事项" class="w-full h-full" />
       <TodoItemDetail v-else v-model="selectedTodoItem" :key="selectedTodoItem.entity_id.id.toString()"
         @delete="deleteSelectedTodoItem" />
