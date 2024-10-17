@@ -8,6 +8,8 @@ import {
 } from '@heroicons/vue/24/solid'
 import { initData, refreshAllTodoList } from './store'
 import { CalendarDaysIcon, MagnifyingGlassIcon, } from '@heroicons/vue/16/solid';
+import { useMobile } from '@/core';
+import { useRoute, useRouter } from 'vue-router';
 
 await initData()
 await refreshAllTodoList()
@@ -23,11 +25,67 @@ const handleClose = (key: string, keyPath: string[]) => {
 const gotoDocs = () => {
   window.open('https://qianmian-docs.netlify.app', '_blank')
 }
+
+const isMobile = useMobile()
+const route = useRoute()
+const router = useRouter()
+const mobbileData = [
+  {
+    text: '清单',
+    icon: ListBulletIcon,
+    disabled: false,
+    routeName: 'todo-list',
+    click: () => {
+      router.push({ name: 'todo-list' })
+    }
+  },
+  {
+    text: '日历',
+    icon: CalendarDaysIcon,
+    disabled: true,
+    routeName: 'calendar',
+    click: () => {
+      router.push({ name: 'calendar' })
+    }
+  },
+  {
+    text: '搜索',
+    icon: MagnifyingGlassIcon,
+    disabled: false,
+    routeName: 'todo-item-search',
+    click: () => {
+      router.push({ name: 'todo-item-search' })
+    },
+  },
+  {
+    text: '帮助文档',
+    icon: QuestionMarkCircleIcon,
+    disabled: false,
+    routeName: 'help',
+    click: () => {
+      gotoDocs()
+    }
+  }
+]
+
 </script>
 <template>
-  <div class="w-screen h-screen overflow-hidden flex">
-    <el-menu class="el-menu-vertical-demo hidden md:block" router :collapse="isCollapse" @open="handleOpen"
-      @close="handleClose">
+  <div v-if="isMobile" class="w-screen h-screen flex flex-col overflow-hidden ">
+    <section class="flex-1 w-full overflow-y-hidden">
+      <RouterView />
+    </section>
+    <ul class="shrink-0 grow-0 h-12 w-full border-t flex justify-between px-4">
+      <li class="flex-1 flex flex-col justify-center items-center"
+        :class="{ 'text-gray-400': item.disabled, 'pointer-events-none': item.disabled, 'text-green-700': item.routeName === route.name }"
+        v-for="item of mobbileData" :key="item.text" @click="item.click">
+        <component :is="item.icon" class="min-w-6 min-h-6 size-6" />
+        <span>{{ item.text }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <div v-else class="w-screen h-screen overflow-hidden flex">
+    <el-menu router :collapse="isCollapse" @open="handleOpen" @close="handleClose">
       <el-menu-item @click="isCollapse = !isCollapse">
         <ChevronDoubleRightIcon v-if="isCollapse" class="min-w-6 min-h-6 size-6 mr-2" />
         <ChevronDoubleLeftIcon v-else class="min-w-6 min-h-6 size-6 mr-2" />
