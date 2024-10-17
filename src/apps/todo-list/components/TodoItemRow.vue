@@ -5,8 +5,14 @@ import { getDoneInputClass, getTime } from '../util';
 import { changeTodoItemDone } from '../store';
 
 const { todoItem, showList } = defineProps<{ todoItem: TodoItem, showList?: boolean }>()
+const emit = defineEmits(['update'])
 
 const timeText = computed(() => getTime(todoItem))
+
+async function changeTodoItemDoneLocal(todoItem: TodoItem, done: boolean) {
+  await changeTodoItemDone(todoItem, done)
+  emit('update', todoItem.entity_id)
+}
 </script>
 
 <template>
@@ -15,7 +21,7 @@ const timeText = computed(() => getTime(todoItem))
     'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer break-all ',
   ]">
     <input type="checkbox" :class="getDoneInputClass(todoItem)" :checked="todoItem.done"
-      @click.stop="changeTodoItemDone(todoItem, !todoItem.done)" />
+      @click.stop="changeTodoItemDoneLocal(todoItem, !todoItem.done)" />
     <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
       {{ todoItem.title }}
     </div>

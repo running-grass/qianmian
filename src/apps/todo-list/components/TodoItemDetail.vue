@@ -40,7 +40,6 @@ watch(modelValue, () => {
  */
 async function deleteSelectedTodoItem() {
   await deleteTodoItem(modelValue.value.entity_id)
-
   emit('delete', modelValue.value.entity_id)
 }
 

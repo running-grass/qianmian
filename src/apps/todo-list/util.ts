@@ -55,7 +55,11 @@ export function getTime(
     str += myDayjs(value).fromNow() + surfix
   }
 
-  return `<span class="${clsBase} ${cls}">${str}</span>`
+  if (str) {
+    return `<span class="${clsBase} ${cls}">${str}</span>`
+  } else {
+    return ''
+  }
 }
 
 if (import.meta.vitest) {
@@ -66,6 +70,7 @@ if (import.meta.vitest) {
   const time3 = myDayjs().add(1, 'day').toDate()
   describe('getTime', () => {
     test.each([
+      [null, null, null, ''],
       [time1, null, null, '<span class="text-sm text-green-600">1天前开始</span>'],
       [null, time1, null, '<span class="text-sm text-blue-600">1天前结束</span>'],
       [null, null, time1, '<span class="text-sm text-red-600">1天前截止</span>'],
