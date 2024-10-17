@@ -15,7 +15,7 @@ export default {
   plugins: {
     '@release-it/conventional-changelog': {
       preset: {
-        name: 'writer'
+        name: 'conventionalcommits'
       },
       header: '# 更新日志',
       infile: 'CHANGELOG.md',
