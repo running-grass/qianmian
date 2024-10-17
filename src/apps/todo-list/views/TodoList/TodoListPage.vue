@@ -320,7 +320,7 @@ const clearDragClass = (ev: DragEvent) => {
   ev.preventDefault()
 }
 
-function onItemDrop(e: DragEvent) {
+async function onItemDrop(e: DragEvent) {
   const target = e.target
 
   clearDragClass(e)
@@ -341,9 +341,9 @@ function onItemDrop(e: DragEvent) {
   const tlid = new StringRecordId(listId)
   const tiid = new StringRecordId(itemId)
 
-  changeBelongListTo(tiid, tlid).then(() => {
-    refreshtodoItems()
-  })
+  await changeBelongListTo(tiid, tlid)
+  await refreshtodoItems()
+
 }
 
 function TodoListRow({ todoList }: { todoList: RichEntity }) {
