@@ -79,18 +79,6 @@ async function createTodoItemUI() {
 
 const todoListDrawer = ref(false)
 
-/**
- * 删除当前选择的待办事项
- *
- * 如果当前未选择待办事项，则什么也不做
- */
-async function deleteSelectedTodoItem() {
-  if (!selectedTodoItem.value) {
-    return
-  }
-  selectedTodoItem.value = null
-}
-
 async function changeOrderField(of: OrderField) {
   orderField.value = of
 }
@@ -408,7 +396,7 @@ function TodoListSection() {
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
         <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem"
           :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)" :draggable="true"
-          @dragstart="onItemDragStart" @dragend="onItemDragEnd" :class="[
+          @dragstart="onItemDragStart" @dragend="onItemDragEnd" @update="refreshtodoItems" :class="[
             ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
           ]">
         </TodoItemRow>
@@ -418,14 +406,14 @@ function TodoListSection() {
     <article v-if="!isMobileScreen" class="grow-[3]  p-2 flex-col hidden md:flex todo-item-detail-host">
       <el-empty v-if="!selectedTodoItem" description="未选择事项" class="w-full h-full" />
       <TodoItemDetail v-else v-model="selectedTodoItem" :key="selectedTodoItem.entity_id.id.toString()"
-        @delete="deleteSelectedTodoItem" />
+        @update="refreshtodoItems" @delete="refreshtodoItems" />
     </article>
   </div>
 
   <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="90%"
     :with-header="false" destroy-on-close direction="btt">
     <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
-      @delete="deleteSelectedTodoItem" />
+      @update="refreshtodoItems" @delete="refreshtodoItems" />
   </el-drawer>
 
   <el-drawer v-if="isMobileScreen" v-model="todoListDrawer" size="80%" :with-header="false" destroy-on-close
