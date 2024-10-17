@@ -1,5 +1,13 @@
 # 更新日志
 
+## <small>0.1.3 (2024-10-17)</small>
+
+* feat(todolist): 增加搜索页面 (#13) ([f5e37d0](https://github.com/running-grass/qianmian/commit/f5e37d0)), closes [#13](https://github.com/running-grass/qianmian/issues/13)
+* feat(todolist): 增加移动端的底部Tab导航 (#14) ([165a5ae](https://github.com/running-grass/qianmian/commit/165a5ae)), closes [#14](https://github.com/running-grass/qianmian/issues/14)
+* chore: 支持nix build (#11) ([ea91d3e](https://github.com/running-grass/qianmian/commit/ea91d3e)), closes [#11](https://github.com/running-grass/qianmian/issues/11)
+* docs: 引入vitepress，增加文档 (#10) ([0569333](https://github.com/running-grass/qianmian/commit/0569333)), closes [#10](https://github.com/running-grass/qianmian/issues/10)
+* style(todolist): 优化窄屏幕下的视觉效果 (#9) ([416d171](https://github.com/running-grass/qianmian/commit/416d171)), closes [#9](https://github.com/running-grass/qianmian/issues/9)
+
 ## [0.1.2](https://github.com/running-grass/qianmian/compare/0.1.1...0.1.2) (2024-10-15)
 
 ### Features
