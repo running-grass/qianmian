@@ -23,7 +23,7 @@ const handleClose = (key: string, keyPath: string[]) => {
 }
 
 const gotoDocs = () => {
-  window.open('https://qianmian-docs.netlify.app', '_blank')
+  window.open('https://docs.qianmian.space/', '_blank')
 }
 
 const isMobile = useMobile()

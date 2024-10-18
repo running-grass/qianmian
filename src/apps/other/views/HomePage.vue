@@ -12,7 +12,7 @@
       </p>
     </section>
     <footer class="w-full text-center py-4 bg-gray-400">
-      <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2024089620号-1 </a>
+      <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2024089620号-2</a>
     </footer>
   </div>
 </template>
