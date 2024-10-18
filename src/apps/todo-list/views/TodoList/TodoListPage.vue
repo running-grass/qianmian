@@ -33,10 +33,18 @@ const props = defineProps<{
 
 // 如果有待办事项,则选中
 if (props.todoListId) {
-  const item = allTodoList.value.find((i) => i.entity_id.toString() === props.todoListId)
-  if (item) {
-    selectedTodoList.value = item
+  if (props.todoListId === 'all' || props.todoListId === 'today' || props.todoListId === 'tomorrow' || props.todoListId === 'today_done') {
+    {
+      selectedTodoList.value = props.todoListId
+    }
+  } else {
+    const item = allTodoList.value.find((i) => i.entity_id.toString() === props.todoListId)
+    if (item) {
+      selectedTodoList.value = item
+    }
+
   }
+
 }
 
 refreshtodoItems()
@@ -44,11 +52,10 @@ const isMobileScreen = useMobile()
 
 const newTitle = ref<string>('')
 
-// const editingTitle = ref<string>('')
-
 /** 移动端抽屉 */
 const mobileDrawer = ref(false)
 
+/** 切换当前选中的待办事项 */
 async function changeCurrentObject(entity: TodoItem) {
   selectedTodoItem.value = entity
   mobileDrawer.value = true
@@ -62,7 +69,7 @@ async function changeCurrentObject(entity: TodoItem) {
  */
 async function createTodoItemUI() {
   const id = await createEntity(identityTodoItem.value.id, newTitle.value)
-  const todoList = selectedTodoList.value ?? todoListInbox.value
+  const todoList = typeof selectedTodoList.value === 'string' ? todoListInbox.value : selectedTodoList.value
 
   const db = await getDb()
   await db.relate(id, entityRelationsTable.tb, todoList.entity_id, {
@@ -77,7 +84,6 @@ async function createTodoItemUI() {
   newTitle.value = ''
 }
 
-const todoListDrawer = ref(false)
 
 async function changeOrderField(of: OrderField) {
   orderField.value = of
@@ -90,20 +96,15 @@ function onItemDragStart(e: DragEvent) {
   }
 
   const itemId = target.dataset.entityId
-  console.log(target)
   if (!itemId) {
     console.warn('onstart: no item id')
     return
   }
   e.dataTransfer.dropEffect = "move";
 
-
-  // e.dataTransfer.setData('text/plain', itemId)
   e.dataTransfer.setData(itemId, itemId)
 
   target.classList.add('drop-shadow')
-  // e.preventDefault()
-
 }
 
 function onItemDragEnd(e: DragEvent) {
@@ -122,6 +123,22 @@ function openImportData() {
   startImportDialog()
 }
 
+const todoListDrawer = ref(false)
+
+function getTodoListTitle(todoList: typeof selectedTodoList.value) {
+  let title = ''
+  switch (todoList) {
+    case 'all': title = '所有事项'; break
+    case 'today': title = '今天'; break
+    case 'tomorrow': title = '明天'; break
+    // case '3_day': title = '最近3天'; break
+    case 'today_done': title = '今天已完成'; break
+    default: title = todoList.title
+  }
+
+  return title
+}
+
 function TodoItemCreateRow() {
   return (
     <>
@@ -130,7 +147,7 @@ function TodoItemCreateRow() {
           class="w-6 h-6 mr-4"
           onClick={() => (todoListDrawer.value = !todoListDrawer.value)}
         />
-        <span class={''}>{selectedTodoList.value?.title}</span>
+        <span class={''}>{getTodoListTitle(selectedTodoList.value)}</span>
       </div>
       <div class="mb-4 flex items-center">
         <el-input
@@ -172,12 +189,12 @@ function TodoItemCreateRow() {
                   计划开始时间
                 </el-dropdown-item>
 
-                <el-dropdown-item
+                {/* <el-dropdown-item
                   icon={orderField.value === 'scheduled_end' ? CheckIcon : ''}
                   command="scheduled_end"
                 >
                   计划结束时间
-                </el-dropdown-item>
+                </el-dropdown-item> */}
 
                 <el-dropdown-item
                   icon={orderField.value === 'deadline' ? CheckIcon : ''}
@@ -240,13 +257,13 @@ function deleteTodoListUI(todoList: TodoList) {
 }
 
 const router = useRouter()
-function selectTodoList(todoList: TodoList | null) {
+function selectTodoList(todoList: typeof selectedTodoList.value) {
   selectedTodoList.value = todoList
   todoItemsByList.value = []
   todoListDrawer.value = false
 
-  router.push({ name: 'todo-list', params: { todoListId: todoList?.entity_id?.toString() ?? '' } })
-
+  const todoListId = typeof todoList === 'string' ? todoList : todoList?.entity_id?.toString()
+  router.push({ name: 'todo-list', params: { todoListId } })
 }
 
 const todoListContextMenuTarget = ref<TodoList>()
@@ -334,6 +351,7 @@ async function onItemDrop(e: DragEvent) {
 
 }
 
+
 function TodoListRow({ todoList }: { todoList: RichEntity }) {
   return (
     <li
@@ -347,7 +365,7 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
       }, ['stop', 'prevent'])}
       class={[
         'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
-        ...(selectedTodoList.value?.entity_id.id === todoList.entity_id.id ? ['bg-green-100'] : [])
+        ...(typeof selectedTodoList.value === 'object' && selectedTodoList.value?.entity_id.id === todoList.entity_id.id ? ['bg-green-100'] : [])
       ]}
       data-id={todoList.entity_id.toString()}
     >
@@ -357,19 +375,27 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
   )
 }
 
+type VList = typeof selectedTodoList.value
+const vLists: VList[] = ['all', 'today', 'tomorrow', 'today_done']
+
 function TodoListSection() {
   return (
     <>
       <ul>
-        <li
-          class={[
-            'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
-            ...(selectedTodoList.value == null ? ['bg-green-100'] : [])
-          ]}
-          onClick={() => selectTodoList(null)}
-        >
-          全部待办事项
-        </li>
+        {
+          vLists.map((vList) => (
+            <li
+              class={[
+                'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
+                ...(selectedTodoList.value == vList ? ['bg-green-100'] : [])
+              ]}
+              onClick={() => selectTodoList(vList)}
+            >
+              {getTodoListTitle(vList)}
+            </li>
+          ))
+        }
+
       </ul>
 
       <p class="text-md my-2 text-gray-600 flex justify-between">

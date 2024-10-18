@@ -108,8 +108,8 @@ async function changeTodoItemDoneLocal() {
       </el-select>
       <el-date-picker v-model="currentScheduleStart" type="datetime" size="small" placeholder="计划开始时间" class="!w-44"
         @change="changeScheduleStart" />
-      <el-date-picker v-model="currentScheduleEnd" type="datetime" size="small" placeholder="计划结束时间" class="!w-44"
-        @change="changeScheduleEnd" />
+      <!-- <el-date-picker v-model="currentScheduleEnd" type="datetime" size="small" placeholder="计划结束时间" class="!w-44"
+        @change="changeScheduleEnd" /> -->
 
       <el-date-picker v-model="currentDeadline" type="datetime" size="small" placeholder="截止时间" class="!w-44"
         @change="changeDeadline" />
