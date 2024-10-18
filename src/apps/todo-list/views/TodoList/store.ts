@@ -71,7 +71,7 @@ export async function refreshtodoItems() {
       break
     case 'today':
       // 今天
-      sql += ` AND ((scheduled_start >= ${today} AND scheduled_start < ${tomorrow}) OR (scheduled_end >= ${today} AND scheduled_end < ${tomorrow}) OR (deadline >= ${today} AND deadline < ${tomorrow}))`
+      sql += ` AND ((scheduled_start IS NOT null AND scheduled_start <= ${tomorrow}) OR (scheduled_end IS NOT null AND scheduled_end <= ${tomorrow}) OR (deadline IS NOT null AND deadline <= ${tomorrow}))`
       break
     case 'tomorrow':
       sql += ` AND ((scheduled_start >= ${tomorrow} AND scheduled_start < ${tomorrow2}) OR (scheduled_end >= ${tomorrow} AND scheduled_end < ${tomorrow2}) OR (deadline >= ${tomorrow} AND deadline < ${tomorrow2}))`
