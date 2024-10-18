@@ -2,12 +2,15 @@ import { getDb, todoItemView, type RichEntity, type TodoItem } from '@/core'
 import { allTodoList, type OrderField } from '../../store'
 import { useLocalStorage } from '@vueuse/core'
 import { ref, watch } from 'vue'
+import { myDayjs } from '@/plugins/dayjs'
 
 /** 选中的待办清单 */
-export const selectedTodoList = ref<RichEntity | null>(null)
+export const selectedTodoList = ref<RichEntity | 'all' | 'today' | 'tomorrow' | 'today_done'>(
+  'today'
+)
 
 /** 是否显示已完成的待办事项 */
-export const showDones = useLocalStorage('showDones', true)
+export const showDones = useLocalStorage('showDones', false)
 
 /** 设置排序字段 */
 export const orderField = useLocalStorage<OrderField>('orderField', 'priority')
@@ -60,8 +63,24 @@ export async function refreshtodoItems() {
     sql += ` AND done = false`
   }
 
-  if (selectedTodoList.value) {
-    sql += ` AND belong_to.id CONTAINS ${selectedTodoList.value.entity_id}`
+  const today = `d"${myDayjs().startOf('day').toJSON()}"`
+  const tomorrow = `d"${myDayjs().add(1, 'day').startOf('day').toJSON()}"`
+  const tomorrow2 = `d"${myDayjs().add(2, 'day').startOf('day').toJSON()}"`
+  switch (selectedTodoList.value) {
+    case 'all':
+      break
+    case 'today':
+      // 今天
+      sql += ` AND ((scheduled_start IS NOT null AND scheduled_start <= ${tomorrow}) OR (scheduled_end IS NOT null AND scheduled_end <= ${tomorrow}) OR (deadline IS NOT null AND deadline <= ${tomorrow}))`
+      break
+    case 'tomorrow':
+      sql += ` AND ((scheduled_start >= ${tomorrow} AND scheduled_start < ${tomorrow2}) OR (scheduled_end >= ${tomorrow} AND scheduled_end < ${tomorrow2}) OR (deadline >= ${tomorrow} AND deadline < ${tomorrow2}))`
+      break
+    case 'today_done':
+      sql += ` AND done_time >= ${today}`
+      break
+    default:
+      sql += ` AND belong_to.id CONTAINS ${selectedTodoList.value.entity_id}`
   }
 
   sql += ` ORDER BY ordered_field_is_null,${sqlOrderField} ${sqlOrderFieldOrder},created_at DESC`
@@ -78,10 +97,14 @@ export async function refreshtodoItems() {
 
 watch(allTodoList, (lists) => {
   // 如果当前选中的不对清单不在里面，则自动取消选中
-  const list = lists.find((item) => item.entity_id.id === selectedTodoList.value?.entity_id?.id)
+  const list = lists.find(
+    (item) =>
+      typeof selectedTodoList.value === 'object' &&
+      item.entity_id.id === selectedTodoList.value?.entity_id?.id
+  )
 
   if (!list) {
-    selectedTodoList.value = null
+    selectedTodoList.value = 'today'
   }
 })
 
