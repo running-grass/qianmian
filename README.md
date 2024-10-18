@@ -11,7 +11,7 @@
 <p align="center">
     <a href="https://github.com/running-grass/qianmian"><img src="https://img.shields.io/github/v/release/running-grass/qianmian?color=ff00a0&include_prereleases&label=version&sort=semver&style=flat-square"></a>
     &nbsp;
-    <a href="https://devil-fruits.top"><img src="https://api.netlify.com/api/v1/badges/615ff6ff-355d-4e11-9d3f-64fbe8747ef3/deploy-status"></a>
+    <a href="https://qianmian.space"><img src="https://api.netlify.com/api/v1/badges/615ff6ff-355d-4e11-9d3f-64fbe8747ef3/deploy-status"></a>
 
 </p>
 
@@ -19,7 +19,7 @@
 
 同一个实体，具有多种表现形式
 
-[文档](https://qianmian-docs.netlify.app/)
+[文档](https://docs.qianmian.space/)
 
 ## 已经实现的应用
 
