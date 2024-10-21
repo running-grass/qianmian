@@ -59,7 +59,8 @@ export async function refreshtodoItems() {
   let sql = `SELECT *,${sqlOrderField} == null as ordered_field_is_null FROM ${todoItemView.tb}`
 
   sql += ` WHERE true`
-  if (!_showDones) {
+  // 今日已完成始终显示已完成的事项
+  if (!_showDones && selectedTodoList.value !== 'today_done') {
     sql += ` AND done = false`
   }
 
@@ -71,7 +72,7 @@ export async function refreshtodoItems() {
       break
     case 'today':
       // 今天
-      sql += ` AND ((scheduled_start IS NOT null AND scheduled_start <= ${tomorrow}) OR (scheduled_end IS NOT null AND scheduled_end <= ${tomorrow}) OR (deadline IS NOT null AND deadline <= ${tomorrow}))`
+      sql += ` AND ((scheduled_start IS NOT null AND scheduled_start < ${tomorrow}) OR (scheduled_end IS NOT null AND scheduled_end < ${tomorrow}) OR (deadline IS NOT null AND deadline < ${tomorrow}))`
       break
     case 'tomorrow':
       sql += ` AND ((scheduled_start >= ${tomorrow} AND scheduled_start < ${tomorrow2}) OR (scheduled_end >= ${tomorrow} AND scheduled_end < ${tomorrow2}) OR (deadline >= ${tomorrow} AND deadline < ${tomorrow2}))`
