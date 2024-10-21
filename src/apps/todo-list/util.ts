@@ -31,32 +31,71 @@ if (import.meta.vitest) {
   })
 }
 
-/** 获取待办事项的时间 */
-export function getTime(
-  todoItem: Pick<TodoItem, 'scheduled_start' | 'scheduled_end' | 'deadline'>
-): string {
+/**
+ * 获取待办事项的时间
+ *
+ * @description 今日和已过期的为红色,明后天的为黄色，3-7天为蓝色，7天以上为绿色
+ */
+export function getTime(todoItem: Pick<TodoItem, 'scheduled_start' | 'deadline'>): string {
+  let field = 'scheduled_start' as keyof Pick<TodoItem, 'scheduled_start' | 'deadline'>
+  let fieldValue = null
+  // 一般来说，时间顺序为 计划开始 -> 计划结束 -> 截止时间
+  const now = myDayjs().toDate()
+  // 时间处于计划开始时间之前
+  if (todoItem.scheduled_start && todoItem.deadline) {
+    if (now < todoItem.scheduled_start && now < todoItem.deadline) {
+      if (todoItem.scheduled_start < todoItem.deadline) {
+        field = 'scheduled_start'
+        fieldValue = todoItem.scheduled_start
+      } else {
+        field = 'deadline'
+        fieldValue = todoItem.deadline
+      }
+    } else if (now > todoItem.scheduled_start && now < todoItem.deadline) {
+      field = 'deadline'
+      fieldValue = todoItem.deadline
+    } else if (now > todoItem.deadline) {
+      field = 'deadline'
+      fieldValue = todoItem.deadline
+    } else {
+      return ''
+    }
+  } else if (todoItem.scheduled_start) {
+    field = 'scheduled_start'
+    fieldValue = todoItem.scheduled_start
+  } else if (todoItem.deadline) {
+    field = 'deadline'
+    fieldValue = todoItem.deadline
+  } else {
+    return ''
+  }
+
+  const timeRelText = myDayjs(fieldValue).fromNow()
+
   let str = ''
 
-  const clsBase = 'text-sm'
-  const list = [
-    { surfix: '开始', value: todoItem.scheduled_start, cls: 'text-green-600' },
-    { surfix: '结束', value: todoItem.scheduled_end, cls: 'text-blue-600' },
-    { surfix: '截止', value: todoItem.deadline, cls: 'text-red-600' }
-  ]
-  list.sort((a, b) => {
-    if (!a.value) return 1
-    if (!b.value) return -1
-    return a.value > b.value ? 1 : -1
-  })
+  if (field === 'scheduled_start') {
+    str = `${timeRelText}开始`
+  } else if (field === 'deadline') {
+    str = `截止至${timeRelText}`
+  }
 
-  const [{ surfix, value, cls }] = list
+  let clsStr = 'text-sm'
 
-  if (value) {
-    str += myDayjs(value).fromNow() + surfix
+  const nowDayJs = myDayjs().add(1, 'day').startOf('day')
+
+  if (myDayjs(fieldValue).isBefore(nowDayJs)) {
+    clsStr += ' text-red-600'
+  } else if (myDayjs(fieldValue).isBefore(nowDayJs.add(2, 'day'))) {
+    clsStr += ' text-yellow-600'
+  } else if (myDayjs(fieldValue).isBefore(nowDayJs.add(7, 'day'))) {
+    clsStr += ' text-blue-600'
+  } else {
+    clsStr += ' text-green-600'
   }
 
   if (str) {
-    return `<span class="${clsBase} ${cls}">${str}</span>`
+    return `<span class="${clsStr}">${str}</span>`
   } else {
     return ''
   }
@@ -64,32 +103,85 @@ export function getTime(
 
 if (import.meta.vitest) {
   const { test, expect, describe } = import.meta.vitest
-
-  const time1 = myDayjs().subtract(1, 'day').toDate()
-  const time2 = myDayjs().toDate()
-  const time3 = myDayjs().add(1, 'day').toDate()
+  const prevWeek = myDayjs().subtract(2, 'week').toDate()
+  const yestday = myDayjs().subtract(1, 'day').toDate()
+  const now = myDayjs().toDate()
+  const tomoarrow = myDayjs().add(1, 'day').toDate()
+  const days4 = myDayjs().add(4, 'day').toDate()
+  const nextWeek = myDayjs().add(2, 'week').toDate()
   describe('getTime', () => {
     test.each([
-      [null, null, null, ''],
-      [time1, null, null, '<span class="text-sm text-green-600">1天前开始</span>'],
-      [null, time1, null, '<span class="text-sm text-blue-600">1天前结束</span>'],
-      [null, null, time1, '<span class="text-sm text-red-600">1天前截止</span>'],
-      [time3, null, null, '<span class="text-sm text-green-600">1天后开始</span>'],
-      [null, time3, null, '<span class="text-sm text-blue-600">1天后结束</span>'],
-      [null, null, time3, '<span class="text-sm text-red-600">1天后截止</span>'],
-      [time1, time2, null, '<span class="text-sm text-green-600">1天前开始</span>'],
-      [null, time2, time3, '<span class="text-sm text-blue-600">1秒前结束</span>'],
-      [time1, null, time3, '<span class="text-sm text-green-600">1天前开始</span>'],
-      [time1, time2, time3, '<span class="text-sm text-green-600">1天前开始</span>']
+      ['无时间', null, null, ''],
+      // 单独的开始时间
+      ['开始时间为昨天', yestday, null, '<span class="text-sm text-red-600">1天前开始</span>'],
+      ['开始时间为今天', now, null, '<span class="text-sm text-red-600">1秒前开始</span>'],
+      ['开始时间为明天', tomoarrow, null, '<span class="text-sm text-yellow-600">1天后开始</span>'],
+      ['开始时间为4天后', days4, null, '<span class="text-sm text-blue-600">4天后开始</span>'],
+      ['开始时间为下周', nextWeek, null, '<span class="text-sm text-green-600">14天后开始</span>'],
+      // 单独的截止时间
+      ['截止时间为昨天', null, yestday, '<span class="text-sm text-red-600">截止至1天前</span>'],
+      ['截止时间为今天', null, now, '<span class="text-sm text-red-600">截止至1秒前</span>'],
+      [
+        '截止时间为明天',
+        null,
+        tomoarrow,
+        '<span class="text-sm text-yellow-600">截止至1天后</span>'
+      ],
+      ['截止时间为4天后', null, days4, '<span class="text-sm text-blue-600">截止至4天后</span>'],
+      [
+        '截止时间为下周',
+        null,
+        nextWeek,
+        '<span class="text-sm text-green-600">截止至14天后</span>'
+      ],
+      // 开始时间和截止时间 正序
+      [
+        '开始时间为昨天，截止时间为今天',
+        tomoarrow,
+        nextWeek,
+        '<span class="text-sm text-yellow-600">1天后开始</span>'
+      ],
+      [
+        '开始时间为今天，截止时间为明天',
+        now,
+        tomoarrow,
+        '<span class="text-sm text-yellow-600">截止至1天后</span>'
+      ],
+      [
+        '开始时间为明天，截止时间为4天后',
+        tomoarrow,
+        days4,
+        '<span class="text-sm text-yellow-600">1天后开始</span>'
+      ],
+      [
+        '开始时间为4天后，截止时间为下周',
+        prevWeek,
+        yestday,
+        '<span class="text-sm text-red-600">截止至1天前</span>'
+      ],
+      // 开始时间和截止时间 倒序
+      [
+        '开始时间为下周，截止时间为4天后',
+        nextWeek,
+        days4,
+        '<span class="text-sm text-blue-600">截止至4天后</span>'
+      ],
+      [
+        '开始时间为4天后，截止时间为昨天',
+        days4,
+        yestday,
+        '<span class="text-sm text-red-600">截止至1天前</span>'
+      ],
+      [
+        '开始时间为昨天，截止时间为上周',
+        yestday,
+        prevWeek,
+        '<span class="text-sm text-red-600">截止至14天前</span>'
+      ]
     ])(
-      'getTime %#',
-      (
-        scheduled_start: Date | null,
-        scheduled_end: Date | null,
-        deadline: Date | null,
-        res: string
-      ) => {
-        expect(getTime({ scheduled_start, scheduled_end, deadline })).toBe(res)
+      'getTime %# %s',
+      (name, scheduled_start: Date | null, deadline: Date | null, res: string) => {
+        expect(getTime({ scheduled_start, deadline })).toBe(res)
       }
     )
   })
