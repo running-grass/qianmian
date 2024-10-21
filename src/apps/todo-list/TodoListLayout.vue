@@ -35,6 +35,7 @@ const mobbileData = [
     icon: ListBulletIcon,
     disabled: false,
     routeName: 'todo-list',
+    menuIndex: '/todo-list/list',
     click: () => {
       router.push({ name: 'todo-list' })
     }
@@ -43,9 +44,10 @@ const mobbileData = [
     text: '日历',
     icon: CalendarDaysIcon,
     disabled: false,
-    routeName: 'calendar',
+    routeName: 'todo-item-calendar',
+    menuIndex: '/todo-list/calendar',
     click: () => {
-      router.push({ name: 'calendar' })
+      router.push({ name: 'todo-item-calendar' })
     }
   },
   {
@@ -53,6 +55,7 @@ const mobbileData = [
     icon: MagnifyingGlassIcon,
     disabled: false,
     routeName: 'todo-item-search',
+    menuIndex: '/todo-list/search',
     click: () => {
       router.push({ name: 'todo-item-search' })
     },
@@ -92,21 +95,9 @@ const mobbileData = [
         <template #title>{{ isCollapse ? '展开' : '收起' }}</template>
       </el-menu-item>
 
-      <el-menu-item index="/todo-list/list">
-        <ListBulletIcon class="min-w-6 min-h-6 size-6 mr-2" />
-        <template #title>清单视图</template>
-      </el-menu-item>
-      <el-menu-item disabled>
-        <CalendarDaysIcon class="min-w-6 min-h-6 size-6 mr-2" />
-        <template #title>日历视图</template>
-      </el-menu-item>
-      <el-menu-item index="/todo-list/search/">
-        <MagnifyingGlassIcon class="min-w-6 min-h-6 size-6 mr-2" />
-        <template #title>搜索</template>
-      </el-menu-item>
-      <el-menu-item @click="gotoDocs">
-        <QuestionMarkCircleIcon class="min-w-6 min-h-6 size-6 mr-2" />
-        <template #title>文档</template>
+      <el-menu-item v-for="item of mobbileData" :key="item.routeName" :index="item.menuIndex" :disabled="item.disabled">
+        <component :is="item.icon" class="min-w-6 min-h-6 size-6" />
+        <template #title>{{ item.text }}</template>
       </el-menu-item>
     </el-menu>
     <main class="flex-1 h-full">
