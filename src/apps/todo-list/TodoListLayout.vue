@@ -42,7 +42,7 @@ const mobbileData = [
   {
     text: '日历',
     icon: CalendarDaysIcon,
-    disabled: true,
+    disabled: false,
     routeName: 'calendar',
     click: () => {
       router.push({ name: 'calendar' })
