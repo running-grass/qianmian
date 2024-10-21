@@ -6,10 +6,11 @@ import {
   type OrderField,
   allTodoList,
   changeBelongListTo,
+  changeTodoItemAttribute,
   deleteTodoList,
   todoListInbox,
 } from '../../store'
-import { createEntity, entityRelationsTable, getDb, identityTodoItem, relationBelongToTodoList, StringRecordId, useMobile, type RichEntity, type TodoItem, type TodoList } from '@/core'
+import { attributeSchduledStart, createEntity, entityRelationsTable, getDb, identityTodoItem, relationBelongToTodoList, StringRecordId, useMobile, type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
 import { useMouse } from '@vueuse/core'
 import {
@@ -26,6 +27,7 @@ import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
 import { useRouter } from 'vue-router'
 import TodoItemRow from '../../components/TodoItemRow.vue'
 import { selectedTodoList, refreshtodoItems, todoItemsByList, orderField, showDones, selectedTodoItem } from './store'
+import { myDayjs } from '@/plugins/dayjs'
 
 const props = defineProps<{
   todoListId: string | undefined
@@ -75,6 +77,20 @@ async function createTodoItemUI() {
   await db.relate(id, entityRelationsTable.tb, todoList.entity_id, {
     relation: relationBelongToTodoList.value.id
   })
+
+  if (selectedTodoList.value === 'today') {
+    await changeTodoItemAttribute(
+      id,
+      attributeSchduledStart.value.id,
+      myDayjs().startOf('day').toDate()
+    );
+  } else if (selectedTodoList.value === 'tomorrow') {
+    await changeTodoItemAttribute(
+      id,
+      attributeSchduledStart.value.id,
+      myDayjs().add(1, 'day').startOf('day').toDate()
+    );
+  }
 
   await refreshtodoItems()
 
