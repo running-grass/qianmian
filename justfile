@@ -12,7 +12,7 @@ start-vue:
 
 # 启动本地的数据库
 start-db:
-  surreal start -u root -p root -b 0.0.0.0:8000 surrealkv:.local/surrealkv
+  surreal start -u root -p root -b 0.0.0.0:8000 rocksdb:.local/rocksdb
 
 # 初始化本地数据库
 init-db:
