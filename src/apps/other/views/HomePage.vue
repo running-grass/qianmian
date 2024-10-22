@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center w-screen h-screen">
+  <div class="flex flex-col items-center w-full h-full">
 
     <h1 class="py-20 text-5xl">千面知识管理系统</h1>
     <section class="flex-1 text-center">

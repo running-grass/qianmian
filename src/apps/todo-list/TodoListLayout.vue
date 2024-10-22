@@ -70,7 +70,7 @@ const mobbileData = [
 
 </script>
 <template>
-  <div v-if="isMobile" class="w-screen h-screen flex flex-col overflow-hidden ">
+  <div v-if="isMobile" class="w-full h-full flex flex-col overflow-hidden ">
     <section class="flex-1 w-full overflow-y-hidden">
       <RouterView />
     </section>
@@ -84,7 +84,7 @@ const mobbileData = [
     </ul>
   </div>
 
-  <div v-else class="w-screen h-screen overflow-hidden flex">
+  <div v-else class="w-full h-full overflow-hidden flex">
     <el-menu router :collapse="isCollapse" @open="handleOpen" @close="handleClose">
       <el-menu-item @click="isCollapse = !isCollapse">
         <ChevronDoubleRightIcon v-if="isCollapse" class="min-w-6 min-h-6 size-6 mr-2" />

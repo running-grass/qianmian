@@ -8,11 +8,11 @@ dev:
 
 # 启动本地的前端
 start-vue:
-  bun run dev
+  bun run dev --host 0.0.0.0
 
 # 启动本地的数据库
 start-db:
-  surreal start -u root -p root surrealkv:.local/surrealkv
+  surreal start -u root -p root -b 0.0.0.0:8000 surrealkv:.local/surrealkv
 
 # 初始化本地数据库
 init-db:

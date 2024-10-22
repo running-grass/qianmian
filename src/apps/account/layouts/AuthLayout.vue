@@ -8,7 +8,7 @@ if (token.value) {
 }
 </script>
 <template>
-  <div class="flex w-screen h-screen overflow-hidden justify-center items-center flex-col">
+  <div class="flex w-full h-full overflow-hidden justify-center items-center flex-col">
     <RouterView class="flex-1" />
   </div>
 </template>
