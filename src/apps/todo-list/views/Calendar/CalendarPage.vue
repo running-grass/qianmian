@@ -2,12 +2,13 @@
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import { getDb, todoItemView, useMobile, type TodoItem } from '@/core';
+import { attributeSchduledEnd, attributeSchduledStart, getDb, todoItemView, useMobile, type TodoItem } from '@/core';
 import { myDayjs } from '@/plugins/dayjs';
 import type { CalendarOptions, EventInput } from '@fullcalendar/core/index.js';
 import zhLocale from '@fullcalendar/core/locales/zh-cn';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import TodoItemDetail from '../../components/TodoItemDetail.vue';
+import { changeTodoItemAttribute } from '../../store';
 
 const isMobileScreen = useMobile()
 const mobileDrawer = ref(false)
@@ -27,7 +28,7 @@ async function refreshtodoItems() {
       title: item.title,
       todoItem: item,
       start: myDayjs(item.scheduled_start).format('YYYY-MM-DD'),
-      end: myDayjs(item.scheduled_end ?? item.scheduled_start).format('YYYY-MM-DD'), // item.scheduled_end ?? item.scheduled_end!
+      end: item.scheduled_end ? myDayjs(item.scheduled_end).format('YYYY-MM-DD') : undefined// item.scheduled_end ?? item.scheduled_end!
     }
   })
 }
@@ -50,9 +51,34 @@ const calendarOptions = computed<CalendarOptions>(() => ({
     selectedTodoItem.value = item
     console.log(item)
     mobileDrawer.value = true
+  },
+
+  eventDrop: async function (info) {
+    const item: TodoItem = info.event.extendedProps.todoItem
+    console.info(info.event.title + " was dropped on " + myDayjs(info.event.start).toDate(), info.event.end);
+
+    if (info.event.start) {
+      await changeTodoItemAttribute(
+        item.entity_id,
+        attributeSchduledStart.value.id,
+        info.event.start
+      )
+    }
+
+    if (info.event.end) {
+      await changeTodoItemAttribute(
+        item.entity_id,
+        attributeSchduledEnd.value.id,
+        info.event.end
+      )
+    }
+    refreshtodoItems()
   }
 }))
 
+watch(events, () => {
+  console.debug('events', events.value)
+})
 </script>
 <template>
   <section class="p-2 w-full h-full">
