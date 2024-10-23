@@ -37,3 +37,6 @@ interface ImportMeta {
 
 /** 应用版本 */
 declare const __APP_VERSION__: string
+
+/** 最新更新日志 */
+declare const __APP_LATEST_UPDATE_LOG__: string

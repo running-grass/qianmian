@@ -18,3 +18,6 @@ export const SURREAL_TOKEN_KEY = 'surreal_token'
 
 /** 应用版本 */
 export const APP_VERSION = __APP_VERSION__
+
+/** 应用最新更新日志 */
+export const LATEST_UPDATE_LOG = __APP_LATEST_UPDATE_LOG__
