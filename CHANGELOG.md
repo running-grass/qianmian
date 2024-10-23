@@ -2,37 +2,35 @@
 
 ## [0.2.0](https://github.com/running-grass/qianmian/compare/0.1.3...0.2.0) (2024-10-23)
 
-
 ### Features
 
-* **todolist:** 在智能清单中增加的事项自动添加计划时间 ([#19](https://github.com/running-grass/qianmian/issues/19)) ([9efb327](https://github.com/running-grass/qianmian/commit/9efb327337317165b7b59f4a4d2b770012df0a83))
-* **todolist:** 增加日历视图 ([#21](https://github.com/running-grass/qianmian/issues/21)) ([ba01754](https://github.com/running-grass/qianmian/commit/ba017544eba5917fab64899e4c17c5c2285b2ebe))
-* **todolist:** 增加虚拟清单 ([#17](https://github.com/running-grass/qianmian/issues/17)) ([6cb4da2](https://github.com/running-grass/qianmian/commit/6cb4da2e610c82ec9732e865ab99dd572fd6d73c))
-
+- **todolist:** 在智能清单中增加的事项自动添加计划时间 ([#19](https://github.com/running-grass/qianmian/issues/19)) ([9efb327](https://github.com/running-grass/qianmian/commit/9efb327337317165b7b59f4a4d2b770012df0a83))
+- **todolist:** 增加日历视图 ([#21](https://github.com/running-grass/qianmian/issues/21)) ([ba01754](https://github.com/running-grass/qianmian/commit/ba017544eba5917fab64899e4c17c5c2285b2ebe))
+- **todolist:** 增加虚拟清单 ([#17](https://github.com/running-grass/qianmian/issues/17)) ([6cb4da2](https://github.com/running-grass/qianmian/commit/6cb4da2e610c82ec9732e865ab99dd572fd6d73c))
 
 ### Bug Fixes
 
-* **todolist:** 手机端浏览器不显示底部Tab ([#22](https://github.com/running-grass/qianmian/issues/22)) ([3f76ebd](https://github.com/running-grass/qianmian/commit/3f76ebdcc790dff1fdf705e3dd1ed3b1c5cc56e5))
-* **todolist:** 修复修改待办事项后不及时刷新的问题 ([#15](https://github.com/running-grass/qianmian/issues/15)) ([96be1b1](https://github.com/running-grass/qianmian/commit/96be1b155456abe4f5111d4f0ec03162633aa873))
+- **todolist:** 手机端浏览器不显示底部Tab ([#22](https://github.com/running-grass/qianmian/issues/22)) ([3f76ebd](https://github.com/running-grass/qianmian/commit/3f76ebdcc790dff1fdf705e3dd1ed3b1c5cc56e5))
+- **todolist:** 修复修改待办事项后不及时刷新的问题 ([#15](https://github.com/running-grass/qianmian/issues/15)) ([96be1b1](https://github.com/running-grass/qianmian/commit/96be1b155456abe4f5111d4f0ec03162633aa873))
 
 ## [0.1.3](https://github.com/running-grass/qianmian/compare/0.1.2...0.1.3) (2024-10-17)
 
 ### Features
 
-- **todolist:** : 增加搜索页面 (#13) ([f5e37d0](https://github.com/running-grass/qianmian/commit/f5e37d0))
-- **todolist:** : 增加移动端的底部Tab导航 (#14) ([165a5ae](https://github.com/running-grass/qianmian/commit/165a5ae))
+- **todolist:** : 增加搜索页面 ([#13](https://github.com/running-grass/qianmian/issues/13)) ([f5e37d0](https://github.com/running-grass/qianmian/commit/f5e37d0))
+- **todolist:** : 增加移动端的底部Tab导航 ([#14](https://github.com/running-grass/qianmian/issues/14)) ([165a5ae](https://github.com/running-grass/qianmian/commit/165a5ae))
 
 ### Style Changes
 
-- **todolist:**: 优化窄屏幕下的视觉效果 (#9) ([416d171](https://github.com/running-grass/qianmian/commit/416d171))
+- **todolist:**: 优化窄屏幕下的视觉效果 ([#9](https://github.com/running-grass/qianmian/issues/9)) ([416d171](https://github.com/running-grass/qianmian/commit/416d171))
 
 ### Chores
 
-- 支持nix build (#11) ([ea91d3e](https://github.com/running-grass/qianmian/commit/ea91d3e))
+- 支持nix build ([#11](https://github.com/running-grass/qianmian/issues/11)) ([ea91d3e](https://github.com/running-grass/qianmian/commit/ea91d3e))
 
 ### Docs
 
-- 引入vitepress，增加文档 (#10) ([0569333](https://github.com/running-grass/qianmian/commit/0569333))
+- 引入vitepress，增加文档 ([#10](https://github.com/running-grass/qianmian/issues/10)) ([0569333](https://github.com/running-grass/qianmian/commit/0569333))
 
 ## [0.1.2](https://github.com/running-grass/qianmian/compare/0.1.1...0.1.2) (2024-10-15)
 

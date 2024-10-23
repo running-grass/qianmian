@@ -1,6 +1,5 @@
 <script setup lang="tsx">
-import { reactive, ref, withKeys, withModifiers } from 'vue'
-import { vOnClickOutside } from '@vueuse/components'
+import { ref, withKeys, withModifiers } from 'vue'
 
 import {
   type OrderField,
@@ -12,7 +11,6 @@ import {
 } from '../../store'
 import { attributeSchduledStart, createEntity, entityRelationsTable, getDb, identityTodoItem, relationBelongToTodoList, StringRecordId, useMobile, type RichEntity, type TodoItem, type TodoList } from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
-import { useMouse } from '@vueuse/core'
 import {
   CheckIcon,
   EllipsisHorizontalIcon,
@@ -28,6 +26,7 @@ import { useRouter } from 'vue-router'
 import TodoItemRow from '../../components/TodoItemRow.vue'
 import { selectedTodoList, refreshtodoItems, todoItemsByList, orderField, showDones, selectedTodoItem } from './store'
 import { myDayjs } from '@/plugins/dayjs'
+import FloatPopover from '@/component/FloatPopover.vue'
 
 const props = defineProps<{
   todoListId: string | undefined
@@ -284,13 +283,8 @@ function selectTodoList(todoList: typeof selectedTodoList.value) {
 
 const todoListContextMenuTarget = ref<TodoList>()
 const todoListContextMenuVisible = ref(false)
-const todoListContentMenuPosition = reactive({ left: '0', top: '0', padding: 0 })
-const { x, y } = useMouse()
 
 const openTodoListContentMenu = (todoList: TodoList) => {
-  todoListContentMenuPosition.left = x.value + 'px'
-  todoListContentMenuPosition.top = y.value + 'px'
-
   todoListContextMenuTarget.value = todoList
   todoListContextMenuVisible.value = true
 }
@@ -467,12 +461,10 @@ function TodoListSection() {
     <TodoListEditPanel @close="createTodoListDialog = false" v-model="createTodoListDialogModeValue"
       :mode="createTodoListDialogMode" />
   </el-dialog>
-
-  <el-popover v-if="todoListContextMenuTarget" :visible="todoListContextMenuVisible" virtual-triggering
-    placement="right" :popper-style="todoListContentMenuPosition" :show-arrow="false">
-    <TodoListContextMenu v-on-click-outside="closeTodoListContentMenu" :todoList="todoListContextMenuTarget"
-      @edit="editTodoList" @delete="deleteTodoListUI" />
-  </el-popover>
+  <FloatPopover v-model="todoListContextMenuVisible">
+    <TodoListContextMenu v-if="todoListContextMenuTarget" :todoList="todoListContextMenuTarget" @edit="editTodoList"
+      @delete="deleteTodoListUI" />
+  </FloatPopover>
 </template>
 
 <style lang="css" scoped>

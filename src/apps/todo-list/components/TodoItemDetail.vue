@@ -102,17 +102,16 @@ async function changeTodoItemDoneLocal() {
     <header class="flex items-center gap-2 flex-wrap">
       <input type="checkbox" :class="getDoneInputClass(modelValue)" v-model="modelValue.done"
         @change="changeTodoItemDoneLocal" />
-      <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="changePriority"
-        placeholder=" 无优先级">
+      <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="changePriority" placeholder="无优先级"
+        :teleported="false">
         <el-option v-for="item in ['', '低', '中', '高']" :key="item" :label="(item ? item : '无') + '优先级'" :value="item" />
       </el-select>
-      <el-date-picker v-model="currentScheduleStart" type="datetime" size="small" placeholder="计划开始时间" class="!w-44"
-        @change="changeScheduleStart" />
-      <!-- <el-date-picker v-model="currentScheduleEnd" type="datetime" size="small" placeholder="计划结束时间" class="!w-44"
-        @change="changeScheduleEnd" /> -->
-
-      <el-date-picker v-model="currentDeadline" type="datetime" size="small" placeholder="截止时间" class="!w-44"
-        @change="changeDeadline" />
+      <el-date-picker v-model="currentScheduleStart" type="date" size="small" placeholder="计划开始时间" class="!w-44"
+        @change="changeScheduleStart" :teleported="false" />
+      <!-- <el-date-picker v-model="currentScheduleEnd" type="date" size="small" placeholder="计划结束时间" class="!w-44"
+        @change="changeScheduleEnd" :teleported="false" /> -->
+      <el-date-picker v-model="currentDeadline" type="date" size="small" placeholder="截止时间" class="!w-44"
+        @change="changeDeadline" :teleported="false" />
     </header>
     <el-input tabindex="1" class="my-4" type="text" v-model="modelValue.title" @input="triggerInput"
       @change="triggerChange" />

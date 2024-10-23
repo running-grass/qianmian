@@ -9,6 +9,7 @@ import zhLocale from '@fullcalendar/core/locales/zh-cn';
 import { computed, ref, watch } from 'vue';
 import TodoItemDetail from '../../components/TodoItemDetail.vue';
 import { changeTodoItemAttribute } from '../../store';
+import FloatPopover from '@/component/FloatPopover.vue';
 
 const isMobileScreen = useMobile()
 const mobileDrawer = ref(false)
@@ -88,9 +89,17 @@ watch(events, () => {
     </template> -->
     </FullCalendar>
   </section>
-  <el-drawer v-if="selectedTodoItem" modal-class="todo-item-detail-drawer" v-model="mobileDrawer"
+
+  <!-- 详情 -->
+  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer"
     :size="isMobileScreen ? '90%' : '40%'" :with-header="false" destroy-on-close
     :direction="isMobileScreen ? 'btt' : 'rtl'" @close="refreshtodoItems">
     <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()" />
   </el-drawer>
+  <FloatPopover v-else v-model="mobileDrawer" hideOnClickOutside>
+    <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
+      class="min-w-[400px] min-h-[300px] bg-white shadow-xl border" @update="refreshtodoItems"
+      @delete="refreshtodoItems" />
+  </FloatPopover>
+
 </template>
