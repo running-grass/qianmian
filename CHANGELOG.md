@@ -1,5 +1,20 @@
 # 更新日志
 
+## [0.2.0](https://github.com/running-grass/qianmian/compare/0.1.3...0.2.0) (2024-10-23)
+
+
+### Features
+
+* **todolist:** 在智能清单中增加的事项自动添加计划时间 ([#19](https://github.com/running-grass/qianmian/issues/19)) ([9efb327](https://github.com/running-grass/qianmian/commit/9efb327337317165b7b59f4a4d2b770012df0a83))
+* **todolist:** 增加日历视图 ([#21](https://github.com/running-grass/qianmian/issues/21)) ([ba01754](https://github.com/running-grass/qianmian/commit/ba017544eba5917fab64899e4c17c5c2285b2ebe))
+* **todolist:** 增加虚拟清单 ([#17](https://github.com/running-grass/qianmian/issues/17)) ([6cb4da2](https://github.com/running-grass/qianmian/commit/6cb4da2e610c82ec9732e865ab99dd572fd6d73c))
+
+
+### Bug Fixes
+
+* **todolist:** 手机端浏览器不显示底部Tab ([#22](https://github.com/running-grass/qianmian/issues/22)) ([3f76ebd](https://github.com/running-grass/qianmian/commit/3f76ebdcc790dff1fdf705e3dd1ed3b1c5cc56e5))
+* **todolist:** 修复修改待办事项后不及时刷新的问题 ([#15](https://github.com/running-grass/qianmian/issues/15)) ([96be1b1](https://github.com/running-grass/qianmian/commit/96be1b155456abe4f5111d4f0ec03162633aa873))
+
 ## [0.1.3](https://github.com/running-grass/qianmian/compare/0.1.2...0.1.3) (2024-10-17)
 
 ### Features
