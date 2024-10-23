@@ -4,7 +4,7 @@ import { allTodoList, changeBelongListTo, changeTodoItemAttribute, changeTodoIte
 import {
   attributeDeadline,
   attributePriority,
-  attributeSchduledEnd,
+  // attributeSchduledEnd,
   attributeSchduledStart,
   useAutoSaveEntity,
   type TodoItem,
@@ -72,14 +72,14 @@ async function changeScheduleStart($event: Date | null) {
   emit('update', modelValue.value.entity_id)
 }
 
-async function changeScheduleEnd($event: Date | null) {
-  await changeTodoItemAttribute(
-    modelValue.value.entity_id,
-    attributeSchduledEnd.value.id,
-    $event ?? null
-  );
-  emit('update', modelValue.value.entity_id)
-}
+// async function changeScheduleEnd($event: Date | null) {
+//   await changeTodoItemAttribute(
+//     modelValue.value.entity_id,
+//     attributeSchduledEnd.value.id,
+//     $event ?? null
+//   );
+//   emit('update', modelValue.value.entity_id)
+// }
 
 async function changeDeadline($event: Date | null) {
   await changeTodoItemAttribute(
