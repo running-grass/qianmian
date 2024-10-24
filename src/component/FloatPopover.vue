@@ -4,6 +4,7 @@ import { reactive, watch } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components'
 
+const emit = defineEmits(['close'])
 
 const visible = defineModel<boolean>({
   default: false
@@ -22,6 +23,12 @@ watch(visible, (val) => {
 function closePopover() {
   visible.value = false
 }
+
+watch(visible, (val) => {
+  if (!val) {
+    emit('close')
+  }
+})
 
 </script>
 <template>
