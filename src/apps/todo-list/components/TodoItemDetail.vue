@@ -26,7 +26,6 @@ const currentDeadline = ref<Date | ''>(modelValue.value.deadline ?? '')
 const selectedPriority = ref<TodoItemPriority | ''>(modelValue.value.priority ?? '')
 
 watch(modelValue, () => {
-  console.debug('modelValue', modelValue.value)
   currentScheduleStart.value = modelValue.value.scheduled_start ?? ''
   currentScheduleEnd.value = modelValue.value.scheduled_end ?? ''
   currentDeadline.value = modelValue.value.deadline ?? ''
@@ -55,10 +54,11 @@ async function changeBelongList(nid: string) {
 }
 
 async function changePriority($event: TodoItemPriority | '') {
+  console.log('changePriority', $event)
   await changeTodoItemAttribute(
     modelValue.value.entity_id,
     attributePriority.value.id,
-    $event ?? null
+    $event ? $event : null
   );
   emit('update', modelValue.value.entity_id)
 }
@@ -102,8 +102,8 @@ async function changeTodoItemDoneLocal() {
     <header class="flex items-center gap-2 flex-wrap">
       <input type="checkbox" :class="getDoneInputClass(modelValue)" v-model="modelValue.done"
         @change="changeTodoItemDoneLocal" />
-      <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" @change="changePriority" placeholder="无优先级"
-        :teleported="false">
+      <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" clearable @change="changePriority"
+        placeholder="无优先级" :teleported="false">
         <el-option v-for="item in ['', '低', '中', '高']" :key="item" :label="(item ? item : '无') + '优先级'" :value="item" />
       </el-select>
       <el-date-picker v-model="currentScheduleStart" type="date" size="small" placeholder="计划开始时间" class="!w-44"
