@@ -19,9 +19,6 @@ export async function createEntity(
   })
   if (!created) throw new Error('Failed to create entity')
 
-  // FIXME 由于live查询暂时不触发create，手动更新节点池
-  // await refreshEntityById(created.id)
-
   return created.id
 }
 

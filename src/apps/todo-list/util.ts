@@ -31,12 +31,64 @@ if (import.meta.vitest) {
   })
 }
 
+export function getScheduledStartHtml(todoItem: Pick<TodoItem, 'scheduled_start'>) {
+  const scheduled_start = todoItem.scheduled_start
+
+  if (!scheduled_start) {
+    return ''
+  }
+
+  const time = myDayjs(scheduled_start)
+
+  let clsStr = 'text-sm'
+  let str = ''
+
+  const todayStart = myDayjs().startOf('day')
+  const tomorrowStart = myDayjs().add(1, 'day').startOf('day')
+  const tomorro2Start = myDayjs().add(2, 'day').startOf('day')
+  const tomorro3Start = myDayjs().add(3, 'day').startOf('day')
+  const yestdayStart = myDayjs().subtract(1, 'day').startOf('day')
+  const yestday2Start = myDayjs().subtract(1, 'day').startOf('day')
+
+  if (time.isBefore(yestday2Start)) {
+    str = time.format('YYYY-MM-DD')
+  } else if (time.isBefore(yestdayStart)) {
+    str = '前天'
+  } else if (time.isBefore(todayStart)) {
+    str = '昨天'
+  } else if (time.isBefore(tomorrowStart)) {
+    str = '今天'
+  } else if (time.isBefore(tomorro2Start)) {
+    str = '明天'
+  } else if (time.isBefore(tomorro3Start)) {
+    str = '后天'
+  } else {
+    str = time.format('YYYY-MM-DD')
+  }
+
+  if (time.isBefore(tomorrowStart)) {
+    clsStr += ' text-red-600'
+  } else if (time.isBefore(tomorrowStart.add(2, 'day'))) {
+    clsStr += ' text-yellow-600'
+  } else if (time.isBefore(tomorrowStart.add(7, 'day'))) {
+    clsStr += ' text-blue-600'
+  } else {
+    clsStr += ' text-green-600'
+  }
+
+  if (str) {
+    return `<span class="${clsStr}">${str}</span>`
+  } else {
+    return ''
+  }
+}
+
 /**
  * 获取待办事项的时间
  *
  * @description 今日和已过期的为红色,明后天的为黄色，3-7天为蓝色，7天以上为绿色
  */
-export function getTime(todoItem: Pick<TodoItem, 'scheduled_start' | 'deadline'>): string {
+export function getTimeHtml(todoItem: Pick<TodoItem, 'scheduled_start' | 'deadline'>): string {
   let field = 'scheduled_start' as keyof Pick<TodoItem, 'scheduled_start' | 'deadline'>
   let fieldValue = null
   // 一般来说，时间顺序为 计划开始 -> 计划结束 -> 截止时间
@@ -181,7 +233,7 @@ if (import.meta.vitest) {
     ])(
       'getTime %# %s',
       (name, scheduled_start: Date | null, deadline: Date | null, res: string) => {
-        expect(getTime({ scheduled_start, deadline })).toBe(res)
+        expect(getTimeHtml({ scheduled_start, deadline })).toBe(res)
       }
     )
   })

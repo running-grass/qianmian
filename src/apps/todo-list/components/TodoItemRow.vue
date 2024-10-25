@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { TodoItem } from '@/core';
-import { getDoneInputClass, getTime } from '../util';
+import { getDoneInputClass, getScheduledStartHtml } from '../util';
 import { changeTodoItemDone } from '../store';
 
 const { todoItem, showList } = defineProps<{ todoItem: TodoItem, showList?: boolean }>()
 const emit = defineEmits(['update'])
 
-const timeText = computed(() => getTime(todoItem))
+const timeText = computed(() => getScheduledStartHtml(todoItem))
 
 async function changeTodoItemDoneLocal(todoItem: TodoItem, done: boolean) {
   await changeTodoItemDone(todoItem, done)
