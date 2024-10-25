@@ -80,6 +80,7 @@ const mobbileData = [
     <ul class="shrink-0 grow-0 h-12 w-full border-t flex justify-between px-4">
       <li class="flex-1 flex flex-col justify-center items-center"
         :class="{ 'text-gray-400': item.disabled, 'pointer-events-none': item.disabled, 'text-green-700': item.routeName === route.name }"
+        data-track-category="todo-switch-view" :data-track-id="'todo-goto-' + item.routeName"
         v-for="item of mobbileData" :key="item.text" @click="item.click">
         <component :is="item.icon" class="min-w-6 min-h-6 size-6" />
         <span>{{ item.text }}</span>
@@ -94,8 +95,8 @@ const mobbileData = [
         <ChevronDoubleLeftIcon v-else class="min-w-6 min-h-6 size-6 mr-2" />
         <template #title>{{ isCollapse ? '展开' : '收起' }}</template>
       </el-menu-item>
-
-      <el-menu-item v-for="item of mobbileData" :key="item.routeName" :index="item.menuIndex" :disabled="item.disabled">
+      <el-menu-item v-for="item of mobbileData" :key="item.routeName" :index="item.menuIndex" :disabled="item.disabled"
+        data-track-category="todo-switch-view" :data-track-id="'todo-goto-' + item.routeName">
         <component :is="item.icon" class="min-w-6 min-h-6 size-6" />
         <template #title>{{ item.text }}</template>
       </el-menu-item>

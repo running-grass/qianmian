@@ -8,7 +8,7 @@
       <p>构建多个上层应用，可以做到数据互通</p>
 
       <p class="py-4">
-        <RouterLink :to="{ name: 'login' }" class="text-blue-500">去登录</RouterLink>
+        <RouterLink :to="{ name: 'login' }" class="text-blue-500" data-track-id="goto-login">去登录</RouterLink>
       </p>
     </section>
     <footer class="w-full text-center py-4 bg-gray-400 flex justify-center">

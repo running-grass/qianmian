@@ -54,7 +54,7 @@ async function login() {
     <el-input type="password" v-model="password" placeholder="密码" />
     <div class="flex items-center">
       <el-button @click="login">登录</el-button>
-      <el-button link @click="router.push({ name: 'register' })">去注册</el-button>
+      <el-button link @click="router.push({ name: 'register' })" data-track-id="goto-register">去注册</el-button>
     </div>
   </div>
 </template>
