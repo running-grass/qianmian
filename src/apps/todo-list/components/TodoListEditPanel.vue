@@ -50,7 +50,7 @@ const submitForm = () => {
     <header class="text-xl mb-4">{{ props.mode === 'create' ? '创建清单' : '编辑清单' }}</header>
     <el-form ref="formRef" :model="todoListModel" label-width="auto" style="max-width: 600px">
       <el-form-item label="清单名称">
-        <el-input v-model="todoListModel.title" />
+        <el-input v-model="todoListModel.title" @keydown.enter.prevent="submitForm" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">{{ props.mode === 'create' ? '创建' : '保存' }}</el-button>

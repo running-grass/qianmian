@@ -47,6 +47,10 @@ refreshtodoItems()
 const createMode = ref(false)
 
 async function select(info: DateSelectArg) {
+  if (detailPanelVisible.value) {
+    detailPanelVisible.value = false
+    return
+  }
   const id = await createEntity(identityTodoItem.value.id, '')
   await changeTodoItemAttribute(
     id,
@@ -173,7 +177,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   // 自定义按钮
   customButtons,
   headerToolbar: {
-    end: 'scheduleTask today prev,next'
+    end: isMobileScreen.value ? 'today prev,next' : 'scheduleTask today prev,next'
   }
 }))
 
@@ -231,7 +235,7 @@ function onItemDragEnd(e: DragEvent) {
       <b>{{ arg.event.title }}</b>
     </template> -->
     </FullCalendar>
-    <section class="p-2 flex flex-col w-32 transition-[width] duration-1000" v-if="scheduleTodoItemPanel">
+    <section class="p-2 flex flex-col w-auto min-w-80 transition-[width] duration-1000" v-if="scheduleTodoItemPanel">
       <header class="flex flex-row justify-end mb-2">
         <XCircleIcon class="w-6 h-6 cursor-pointer hover:fill-green-900" @click="scheduleTodoItemPanel = false" />
       </header>
