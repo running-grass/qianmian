@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import { allTodoList, changeBelongListTo, changeTodoItemAttribute, changeTodoItemDone, deleteTodoItem } from '../store'
 import {
-  attributeDeadline,
+  // attributeDeadline,
   attributePriority,
   // attributeSchduledEnd,
   attributeSchduledStart,
@@ -81,14 +81,14 @@ async function changeScheduleStart($event: Date | null) {
 //   emit('update', modelValue.value.entity_id)
 // }
 
-async function changeDeadline($event: Date | null) {
-  await changeTodoItemAttribute(
-    modelValue.value.entity_id,
-    attributeDeadline.value.id,
-    $event ?? null
-  );
-  emit('update', modelValue.value.entity_id)
-}
+// async function changeDeadline($event: Date | null) {
+//   await changeTodoItemAttribute(
+//     modelValue.value.entity_id,
+//     attributeDeadline.value.id,
+//     $event ?? null
+//   );
+//   emit('update', modelValue.value.entity_id)
+// }
 
 async function changeTodoItemDoneLocal() {
   console.log('done', modelValue.value.done)
@@ -110,8 +110,8 @@ async function changeTodoItemDoneLocal() {
         @change="changeScheduleStart" :teleported="false" />
       <!-- <el-date-picker v-model="currentScheduleEnd" type="date" size="small" placeholder="计划结束时间" class="!w-44"
         @change="changeScheduleEnd" :teleported="false" /> -->
-      <el-date-picker v-model="currentDeadline" type="date" size="small" placeholder="截止时间" class="!w-44"
-        @change="changeDeadline" :teleported="false" />
+      <!-- <el-date-picker v-model="currentDeadline" type="date" size="small" placeholder="截止时间" class="!w-44"
+        @change="changeDeadline" :teleported="false" /> -->
     </header>
     <el-input tabindex="1" class="my-4" type="text" v-model="modelValue.title" @input="triggerInput"
       @change="triggerChange" />
