@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import { ref, withKeys, withModifiers } from 'vue'
+import { nextTick, ref, withKeys, withModifiers } from 'vue'
 
 import {
   type OrderField,
@@ -27,6 +27,7 @@ import TodoItemRow from '../../components/TodoItemRow.vue'
 import { selectedTodoList, refreshtodoItems, todoItemsByList, orderField, showDones, selectedTodoItem } from './store'
 import { myDayjs } from '@/plugins/dayjs'
 import FloatPopover from '@/component/FloatPopover.vue'
+import TodoItemContextMenu from '../../components/TodoItemContextMenu.vue'
 
 const props = defineProps<{
   todoListId: string | undefined
@@ -284,7 +285,12 @@ function selectTodoList(todoList: typeof selectedTodoList.value) {
 const todoListContextMenuTarget = ref<TodoList>()
 const todoListContextMenuVisible = ref(false)
 
-const openTodoListContentMenu = (todoList: TodoList) => {
+const openTodoListContentMenu = async (todoList: TodoList) => {
+  if (todoListContextMenuVisible.value) {
+    todoListContextMenuVisible.value = false
+    await nextTick()
+  }
+
   todoListContextMenuTarget.value = todoList
   todoListContextMenuVisible.value = true
 }
@@ -420,6 +426,20 @@ function TodoListSection() {
     </>
   )
 }
+
+
+const todoItemContextMenuVisible = ref(false)
+const todoItemContextMenuTarget = ref<TodoItem | undefined>(undefined)
+async function openTodoItemContextMenu(item: TodoItem) {
+
+  if (todoItemContextMenuVisible.value) {
+    todoItemContextMenuVisible.value = false
+    await nextTick()
+  }
+
+  todoItemContextMenuTarget.value = item
+  todoItemContextMenuVisible.value = true
+}
 </script>
 <template>
   <div class="flex w-full h-full border-green-100">
@@ -432,7 +452,8 @@ function TodoListSection() {
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
         <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem"
           :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)" :draggable="true"
-          @dragstart="onItemDragStart" @dragend="onItemDragEnd" @update="refreshtodoItems" :class="[
+          @contextmenu.stop.prevent="openTodoItemContextMenu(todoItem)" @dragstart="onItemDragStart"
+          @dragend="onItemDragEnd" @update="refreshtodoItems" :class="[
             ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
           ]">
         </TodoItemRow>
@@ -464,6 +485,10 @@ function TodoListSection() {
   <FloatPopover v-model="todoListContextMenuVisible">
     <TodoListContextMenu v-if="todoListContextMenuTarget" :todoList="todoListContextMenuTarget" @edit="editTodoList"
       @delete="deleteTodoListUI" />
+  </FloatPopover>
+  <FloatPopover v-model="todoItemContextMenuVisible">
+    <TodoItemContextMenu v-if="todoItemContextMenuTarget" :todoItem="todoItemContextMenuTarget"
+      @executed="refreshtodoItems(); todoItemContextMenuVisible = false" />
   </FloatPopover>
 </template>
 
