@@ -1,5 +1,20 @@
 # 更新日志
 
+## [0.2.1](https://github.com/running-grass/qianmian/compare/0.2.0...0.2.1) (2024-10-25)
+
+
+### Features
+
+* Tip中增加最近一次更新说明 ([#23](https://github.com/running-grass/qianmian/issues/23)) ([058f51f](https://github.com/running-grass/qianmian/commit/058f51fc4a75b2e182eecd2ad3cf34c22cc1ab78))
+* **todolist:** 待办事项右击菜单删除 ([#27](https://github.com/running-grass/qianmian/issues/27)) ([b64364f](https://github.com/running-grass/qianmian/commit/b64364f2d898277aefc6bc54f2daeb7b08dbcaef))
+* **todolist:** 单击/选择日历日期创建事项 ([#25](https://github.com/running-grass/qianmian/issues/25)) ([05be9e5](https://github.com/running-grass/qianmian/commit/05be9e560403e2d0f1c404f087cb7f1729bbc3df))
+* **todolist:** 日历视图增加安排任务的机制 ([#26](https://github.com/running-grass/qianmian/issues/26)) ([e35f632](https://github.com/running-grass/qianmian/commit/e35f63275e5c1c826a81ce4cf0e02669acf30671))
+
+
+### Bug Fixes
+
+* **todolist:** 不能取消优先级的bug ([#24](https://github.com/running-grass/qianmian/issues/24)) ([83a4fb9](https://github.com/running-grass/qianmian/commit/83a4fb9fe67c63ef0df602a2d3b8a009b17968b6))
+
 ## [0.2.0](https://github.com/running-grass/qianmian/compare/0.1.3...0.2.0) (2024-10-23)
 
 ### Features
