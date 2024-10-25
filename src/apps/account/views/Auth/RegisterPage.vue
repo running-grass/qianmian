@@ -48,6 +48,9 @@ async function register() {
     <h1>注册账号</h1>
     <el-input type="text" v-model="username" placeholder="用户名" />
     <el-input type="password" v-model="password" placeholder="密码" />
-    <el-button @click="register">注册</el-button>
+    <div class="flex items-center">
+      <el-button @click="register">注册</el-button>
+      <el-button link @click="router.push({ name: 'login' })">返回登录</el-button>
+    </div>
   </div>
 </template>

@@ -376,6 +376,8 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
       onDragover={onListDropEnter}
       onDragleave={clearDragClass}
       onDrop={onItemDrop}
+      data-trace-category="todo-switch-todo-list"
+
       onContextmenu={withModifiers(() => {
         openTodoListContentMenu(todoList)
       }, ['stop', 'prevent'])}
@@ -406,6 +408,9 @@ function TodoListSection() {
                 ...(selectedTodoList.value == vList ? ['bg-green-100'] : [])
               ]}
               onClick={() => selectTodoList(vList)}
+              key={vList.toString()}
+              data-trace-category="todo-switch-virtual-list"
+              data-trace-id={'todo-switch-virtual-list-' + vList}
             >
               {getTodoListTitle(vList)}
             </li>
