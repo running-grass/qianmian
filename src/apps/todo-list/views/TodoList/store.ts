@@ -5,9 +5,9 @@ import { ref, watch } from 'vue'
 import { myDayjs } from '@/plugins/dayjs'
 
 /** 选中的待办清单 */
-export const selectedTodoList = ref<RichEntity | 'all' | 'today' | 'tomorrow' | 'today_done'>(
-  'today'
-)
+export const selectedTodoList = ref<
+  RichEntity | 'all' | 'today' | 'tomorrow' | 'today_done' | 'unorganized' | 'unscheduled'
+>('today')
 
 /** 是否显示已完成的待办事项 */
 export const showDones = useLocalStorage('showDones', false)
@@ -79,6 +79,12 @@ export async function refreshtodoItems() {
       break
     case 'today_done':
       sql += ` AND done_time >= ${today}`
+      break
+    case 'unorganized':
+      sql += ` AND array::is_empty(belong_to)`
+      break
+    case 'unscheduled':
+      sql += ` AND (scheduled_start IS NULL)`
       break
     default:
       sql += ` AND belong_to.id CONTAINS ${selectedTodoList.value.entity_id}`

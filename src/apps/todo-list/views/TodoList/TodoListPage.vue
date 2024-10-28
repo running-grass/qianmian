@@ -149,6 +149,9 @@ function getTodoListTitle(todoList: typeof selectedTodoList.value) {
     case 'tomorrow': title = '明天'; break
     // case '3_day': title = '最近3天'; break
     case 'today_done': title = '今天已完成'; break
+    case 'unorganized': title = '未归类'; break
+    case 'unscheduled': title = '未排期'; break
+
     default: title = todoList.title
   }
 
@@ -394,7 +397,7 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
 }
 
 type VList = typeof selectedTodoList.value
-const vLists: VList[] = ['all', 'today', 'tomorrow', 'today_done']
+const vLists: VList[] = ['all', 'today', 'tomorrow', 'today_done', 'unorganized', 'unscheduled']
 
 function TodoListSection() {
   return (
