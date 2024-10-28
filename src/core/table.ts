@@ -111,3 +111,15 @@ export type EntityRelation = {
   out: EntityId
   relation: RelationId
 }
+
+export const entityEventLogTable = new Table('entity_event_log')
+export type EntityEventLogId = RecordId<'entity_event_log'>
+
+/** 实体事件 */
+export type EntityEventLog = {
+  id: EntityEventLogId
+  slug: string
+  payload: object
+  entity: EntityId
+  created_at: Date
+}

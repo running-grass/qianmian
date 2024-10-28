@@ -11,6 +11,7 @@ DEFINE FIELD OVERWRITE slug ON TABLE workspace TYPE string
 	COMMENT "工作空间标识";
 DEFINE FIELD OVERWRITE description ON TABLE workspace TYPE string DEFAULT "" COMMENT "工作空间描述";
 DEFINE FIELD OVERWRITE config ON TABLE workspace FLEXIBLE TYPE object DEFAULT {} COMMENT "工作空间配置项";
+DEFINE FIELD OVERWRITE created_at ON TABLE workspace TYPE datetime READONLY DEFAULT time::now() COMMENT "创建时间";
 
 DEFINE INDEX OVERWRITE slug_uniq ON TABLE workspace FIELDS slug UNIQUE COMMENT "工作空间标识唯一索引";
 

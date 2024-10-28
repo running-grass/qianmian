@@ -419,7 +419,7 @@ function TodoListRow({ todoList }: { todoList: TodoList }) {
       onDragover={onListDropEnter}
       onDragleave={clearDragClass}
       onDrop={onItemDrop}
-      data-trace-category="todo-switch-todo-list"
+      data-track-category="todo-switch-todo-list"
       onContextmenu={withModifiers(() => {
         openTodoListContentMenu(todoList)
       }, ['stop', 'prevent'])}
@@ -457,8 +457,8 @@ function TodoListSection() {
             ]}
             onClick={() => selectTodoList(vList)}
             key={vList.toString()}
-            data-trace-category="todo-switch-virtual-list"
-            data-trace-id={'todo-switch-virtual-list-' + vList}
+            data-track-category="todo-switch-virtual-list"
+            data-track-id={'todo-switch-virtual-list-' + vList}
           >
             {getTodoListTitle(vList)}
           </li>

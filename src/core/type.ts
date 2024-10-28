@@ -20,6 +20,11 @@ export type RichEntity = Omit<
 
     attributes: Map<Attribute, SimpleEntityAttribute>
     relations: Map<Relation, SimpleEntityRelation[]>
+    event_logs: Array<{
+      slug: string
+      payload: object
+      created_at: Date
+    }>
   },
   'id'
 >
