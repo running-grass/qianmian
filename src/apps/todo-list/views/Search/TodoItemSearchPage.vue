@@ -28,6 +28,11 @@ doSearch()
 
 const isMobileScreen = useMobile()
 const mobileDrawer = ref(false)
+
+function onClockItemRow(todoItem: TodoItem) {
+  selectedTodoItem.value = todoItem
+  mobileDrawer.value = true
+}
 </script>
 <template>
   <div class="flex h-full">
@@ -49,10 +54,7 @@ const mobileDrawer = ref(false)
           v-for="todoItem of todoItemList"
           :key="todoItem.entity_id.id.toString()"
           :todoItem="todoItem"
-          @click="
-            selectedTodoItem = todoItem
-            mobileDrawer = true
-          "
+          @click="onClockItemRow(todoItem)"
           :class="[
             ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
           ]"
