@@ -11,7 +11,7 @@ DEFINE TABLE OVERWRITE todo_item  TYPE NORMAL
 		, workspace
 		-- rich_entity attrs
 		, entity_id
-
+		-- todo_item attrs
 		, attributes.find(|$attr| $attr.out.slug == "done").data ?? false as done
 		, attributes.find(|$attr| $attr.out.slug == "done_time").data ?? null as done_time
 		, attributes.find(|$attr| $attr.out.slug == "priority").data ?? null as priority

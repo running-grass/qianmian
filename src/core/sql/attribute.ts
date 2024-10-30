@@ -100,7 +100,8 @@ export async function changeAttribute(
   entityAttributesId: EntityAttributesId | null | undefined,
   entityId: EntityId,
   attrId: AttributeId,
-  data: AttributeDataType | null
+  // TODO 逐步取代 null
+  data: AttributeDataType | null | undefined
 ) {
   const db = await getDb()
 

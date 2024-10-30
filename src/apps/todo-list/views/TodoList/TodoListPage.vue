@@ -7,9 +7,22 @@ import {
   changeBelongListTo,
   changeTodoItemAttribute,
   deleteTodoList,
-  todoListInbox,
+  todoListInbox
 } from '../../store'
-import { attributeSchduledStart, createEntity, entityRelationsTable, getDb, identityTodoItem, relationBelongToTodoList, StringRecordId, useMobile, type RichEntity, type TodoItem, type TodoList } from '@/core'
+import {
+  attributeSchduledStart,
+  createEntity,
+  entityRelationsTable,
+  entityTable,
+  getDb,
+  identityTodoItem,
+  relationBelongToTodoList,
+  StringRecordId,
+  useMobile,
+  type RichEntity,
+  type TodoItem,
+  type TodoList
+} from '@/core'
 import TodoItemDetail from '@/apps/todo-list/components/TodoItemDetail.vue'
 import {
   CheckIcon,
@@ -24,10 +37,18 @@ import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
 import { useRouter } from 'vue-router'
 import TodoItemRow from '../../components/TodoItemRow.vue'
-import { selectedTodoList, refreshtodoItems, todoItemsByList, orderField, showDones, selectedTodoItem } from './store'
+import {
+  selectedTodoList,
+  refreshtodoItems,
+  todoItemsByList,
+  orderField,
+  showDones,
+  selectedTodoItem
+} from './store'
 import { myDayjs } from '@/plugins/dayjs'
 import FloatPopover from '@/component/FloatPopover.vue'
 import TodoItemContextMenu from '../../components/TodoItemContextMenu.vue'
+import { RecordId } from 'surrealdb'
 
 const props = defineProps<{
   todoListId: string | undefined
@@ -35,7 +56,12 @@ const props = defineProps<{
 
 // 如果有待办事项,则选中
 if (props.todoListId) {
-  if (props.todoListId === 'all' || props.todoListId === 'today' || props.todoListId === 'tomorrow' || props.todoListId === 'today_done') {
+  if (
+    props.todoListId === 'all' ||
+    props.todoListId === 'today' ||
+    props.todoListId === 'tomorrow' ||
+    props.todoListId === 'today_done'
+  ) {
     {
       selectedTodoList.value = props.todoListId
     }
@@ -44,9 +70,7 @@ if (props.todoListId) {
     if (item) {
       selectedTodoList.value = item
     }
-
   }
-
 }
 
 refreshtodoItems()
@@ -71,7 +95,8 @@ async function changeCurrentObject(entity: TodoItem) {
  */
 async function createTodoItemUI() {
   const id = await createEntity(identityTodoItem.value.id, newTitle.value)
-  const todoList = typeof selectedTodoList.value === 'string' ? todoListInbox.value : selectedTodoList.value
+  const todoList =
+    typeof selectedTodoList.value === 'string' ? todoListInbox.value : selectedTodoList.value
 
   const db = await getDb()
   await db.relate(id, entityRelationsTable.tb, todoList.entity_id, {
@@ -83,13 +108,13 @@ async function createTodoItemUI() {
       id,
       attributeSchduledStart.value.id,
       myDayjs().startOf('day').toDate()
-    );
+    )
   } else if (selectedTodoList.value === 'tomorrow') {
     await changeTodoItemAttribute(
       id,
       attributeSchduledStart.value.id,
       myDayjs().add(1, 'day').startOf('day').toDate()
-    );
+    )
   }
 
   await refreshtodoItems()
@@ -100,13 +125,12 @@ async function createTodoItemUI() {
   newTitle.value = ''
 }
 
-
 async function changeOrderField(of: OrderField) {
   orderField.value = of
 }
 
 function onItemDragStart(e: DragEvent) {
-  const target = e.target
+  const target = e.currentTarget
   if (!(target instanceof HTMLLIElement) || !e.dataTransfer) {
     return
   }
@@ -116,7 +140,7 @@ function onItemDragStart(e: DragEvent) {
     console.warn('onstart: no item id')
     return
   }
-  e.dataTransfer.dropEffect = "move";
+  e.dataTransfer.dropEffect = 'move'
 
   e.dataTransfer.setData(itemId, itemId)
 
@@ -124,8 +148,7 @@ function onItemDragStart(e: DragEvent) {
 }
 
 function onItemDragEnd(e: DragEvent) {
-
-  const target = e.target
+  const target = e.currentTarget
   if (!(target instanceof HTMLLIElement)) {
     return
   }
@@ -144,15 +167,28 @@ const todoListDrawer = ref(false)
 function getTodoListTitle(todoList: typeof selectedTodoList.value) {
   let title = ''
   switch (todoList) {
-    case 'all': title = '所有事项'; break
-    case 'today': title = '今天'; break
-    case 'tomorrow': title = '明天'; break
+    case 'all':
+      title = '所有事项'
+      break
+    case 'today':
+      title = '今天'
+      break
+    case 'tomorrow':
+      title = '明天'
+      break
     // case '3_day': title = '最近3天'; break
-    case 'today_done': title = '今天已完成'; break
-    case 'unorganized': title = '未归类'; break
-    case 'unscheduled': title = '未排期'; break
+    case 'today_done':
+      title = '今天已完成'
+      break
+    case 'unorganized':
+      title = '未归类'
+      break
+    case 'unscheduled':
+      title = '未排期'
+      break
 
-    default: title = todoList.title
+    default:
+      title = todoList.title
   }
 
   return title
@@ -235,7 +271,9 @@ function TodoItemCreateRow() {
                   {showDones.value ? '隐藏已完成' : '显示已完成'}
                 </el-dropdown-item>
                 <el-dropdown-item onClick={exportAllEntity}>导出数据(json)</el-dropdown-item>
-                <el-dropdown-item onClick={openImportData} disabled>导入数据(json)</el-dropdown-item>
+                <el-dropdown-item onClick={openImportData} disabled>
+                  导入数据(json)
+                </el-dropdown-item>
               </el-dropdown-menu>
             )
           }}
@@ -264,7 +302,6 @@ function editTodoList(todoList: TodoList) {
   createTodoListDialogMode.value = 'edit'
   createTodoListDialog.value = true
   closeTodoListContentMenu()
-
 }
 
 function deleteTodoListUI(todoList: TodoList) {
@@ -304,9 +341,9 @@ const closeTodoListContentMenu = () => {
 }
 
 const onListDropEnter = (ev: DragEvent) => {
-
-  const target = ev.target
+  const target = ev.currentTarget
   if (!(target instanceof HTMLLIElement) || !ev.dataTransfer) {
+    console.warn('no target', target, ev.currentTarget)
     return
   }
   target.classList.remove('bg-green-300', 'cursor-alias', 'cursor-no-drop')
@@ -319,24 +356,29 @@ const onListDropEnter = (ev: DragEvent) => {
     return
   }
 
-  const item = todoItemsByList.value.find((i) => i.entity_id.toString() === itemId)
+  const item = todoItemsByList.value.find((i) => i.entity_id.id.toString() === itemId)
 
   if (!item) {
     console.warn('no item')
     return
   }
+
+  console.log(
+    item.belong_to.find((i) => i.id.toString() === listId),
+    item.belong_to
+  )
   if (item.belong_to.find((i) => i.id.toString() === listId)) {
+    console.log('already in list')
     return
   }
 
   target.classList.add('bg-green-300')
-  ev.dataTransfer.dropEffect = "move";
+  ev.dataTransfer.dropEffect = 'move'
   ev.preventDefault()
 }
 
-
 const clearDragClass = (ev: DragEvent) => {
-  const target = ev.target
+  const target = ev.currentTarget
   if (!(target instanceof HTMLLIElement)) {
     return
   }
@@ -345,7 +387,7 @@ const clearDragClass = (ev: DragEvent) => {
 }
 
 async function onItemDrop(e: DragEvent) {
-  const target = e.target
+  const target = e.currentTarget
 
   clearDragClass(e)
 
@@ -363,15 +405,13 @@ async function onItemDrop(e: DragEvent) {
   }
 
   const tlid = new StringRecordId(listId)
-  const tiid = new StringRecordId(itemId)
+  const tiid = new RecordId(entityTable.tb, itemId)
 
   await changeBelongListTo(tiid, tlid)
   await refreshtodoItems()
-
 }
 
-
-function TodoListRow({ todoList }: { todoList: RichEntity }) {
+function TodoListRow({ todoList }: { todoList: TodoList }) {
   return (
     <li
       onClick={() => selectTodoList(todoList)}
@@ -380,19 +420,25 @@ function TodoListRow({ todoList }: { todoList: RichEntity }) {
       onDragleave={clearDragClass}
       onDrop={onItemDrop}
       data-trace-category="todo-switch-todo-list"
-
       onContextmenu={withModifiers(() => {
         openTodoListContentMenu(todoList)
       }, ['stop', 'prevent'])}
       class={[
-        'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
-        ...(typeof selectedTodoList.value === 'object' && selectedTodoList.value?.entity_id.id === todoList.entity_id.id ? ['bg-green-100'] : [])
+        'py-2 pl-2 pr-2 hover:bg-green-50 flex items-center cursor-pointer',
+        ...(typeof selectedTodoList.value === 'object' &&
+        selectedTodoList.value?.entity_id.id === todoList.entity_id.id
+          ? ['bg-green-100']
+          : [])
       ]}
       data-id={todoList.entity_id.toString()}
     >
-      {todoList.title}
+      <div class="flex-1"> {todoList.title}</div>
+      {todoList.theme_color && (
+        <span class="w-0.5 h-full mr-2" style={{ backgroundColor: todoList.theme_color }}>
+          &nbsp;
+        </span>
+      )}
     </li>
-
   )
 }
 
@@ -403,28 +449,25 @@ function TodoListSection() {
   return (
     <>
       <ul>
-        {
-          vLists.map((vList) => (
-            <li
-              class={[
-                'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
-                ...(selectedTodoList.value == vList ? ['bg-green-100'] : [])
-              ]}
-              onClick={() => selectTodoList(vList)}
-              key={vList.toString()}
-              data-trace-category="todo-switch-virtual-list"
-              data-trace-id={'todo-switch-virtual-list-' + vList}
-            >
-              {getTodoListTitle(vList)}
-            </li>
-          ))
-        }
-
+        {vLists.map((vList) => (
+          <li
+            class={[
+              'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer',
+              ...(selectedTodoList.value == vList ? ['bg-green-100'] : [])
+            ]}
+            onClick={() => selectTodoList(vList)}
+            key={vList.toString()}
+            data-trace-category="todo-switch-virtual-list"
+            data-trace-id={'todo-switch-virtual-list-' + vList}
+          >
+            {getTodoListTitle(vList)}
+          </li>
+        ))}
       </ul>
 
       <p class="text-md my-2 text-gray-600 flex justify-between">
         <span>待办清单</span>
-        <PlusCircleIcon title='新建清单' onClick={createTodoList} class="w-6 h-6" />
+        <PlusCircleIcon title="新建清单" onClick={createTodoList} class="w-6 h-6" />
       </p>
       <ul>
         {allTodoList.value.map((todoList) => (
@@ -435,11 +478,9 @@ function TodoListSection() {
   )
 }
 
-
 const todoItemContextMenuVisible = ref(false)
 const todoItemContextMenuTarget = ref<TodoItem | undefined>(undefined)
 async function openTodoItemContextMenu(item: TodoItem) {
-
   if (todoItemContextMenuVisible.value) {
     todoItemContextMenuVisible.value = false
     await nextTick()
@@ -458,45 +499,95 @@ async function openTodoItemContextMenu(item: TodoItem) {
     <section class="w-80 grow-[2] shrink-0 flex flex-col p-4 border-r-2">
       <TodoItemCreateRow></TodoItemCreateRow>
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
-        <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem"
-          :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)" :draggable="true"
-          @contextmenu.stop.prevent="openTodoItemContextMenu(todoItem)" @dragstart="onItemDragStart"
-          @dragend="onItemDragEnd" @update="refreshtodoItems" :class="[
+        <TodoItemRow
+          v-for="todoItem of todoItemsByList"
+          :key="todoItem.entity_id.id.toString()"
+          :todoItem="todoItem"
+          :show-list="selectedTodoList === null"
+          @click="changeCurrentObject(todoItem)"
+          :draggable="true"
+          @contextmenu.stop.prevent="openTodoItemContextMenu(todoItem)"
+          @dragstart="onItemDragStart"
+          @dragend="onItemDragEnd"
+          @update="refreshtodoItems"
+          :class="[
             ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
-          ]">
+          ]"
+        >
         </TodoItemRow>
       </TransitionGroup>
     </section>
 
-    <article v-if="!isMobileScreen" class="grow-[3]  p-2 flex-col hidden md:flex todo-item-detail-host">
+    <article
+      v-if="!isMobileScreen"
+      class="grow-[3] p-2 flex-col hidden md:flex todo-item-detail-host"
+    >
       <el-empty v-if="!selectedTodoItem" description="未选择事项" class="w-full h-full" />
-      <TodoItemDetail v-else v-model="selectedTodoItem" :key="selectedTodoItem.entity_id.id.toString()"
-        @update="refreshtodoItems" @delete="refreshtodoItems" />
+      <TodoItemDetail
+        v-else
+        v-model="selectedTodoItem"
+        :key="selectedTodoItem.entity_id.id.toString()"
+        @update="refreshtodoItems"
+        @delete="refreshtodoItems"
+      />
     </article>
   </div>
 
-  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="90%"
-    :with-header="false" destroy-on-close direction="btt">
-    <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
-      @update="refreshtodoItems" @delete="refreshtodoItems" />
+  <el-drawer
+    v-if="isMobileScreen"
+    modal-class="todo-item-detail-drawer"
+    v-model="mobileDrawer"
+    size="90%"
+    :with-header="false"
+    destroy-on-close
+    direction="btt"
+  >
+    <TodoItemDetail
+      v-if="selectedTodoItem"
+      v-model="selectedTodoItem"
+      :key="selectedTodoItem?.entity_id.toString()"
+      @update="refreshtodoItems"
+      @delete="refreshtodoItems"
+    />
   </el-drawer>
 
-  <el-drawer v-if="isMobileScreen" v-model="todoListDrawer" size="80%" :with-header="false" destroy-on-close
-    direction="ltr">
+  <el-drawer
+    v-if="isMobileScreen"
+    v-model="todoListDrawer"
+    size="80%"
+    :with-header="false"
+    destroy-on-close
+    direction="ltr"
+  >
     <TodoListSection />
   </el-drawer>
 
   <el-dialog v-model="createTodoListDialog" :with-header="false" destroy-on-close>
-    <TodoListEditPanel @close="createTodoListDialog = false" v-model="createTodoListDialogModeValue"
-      :mode="createTodoListDialogMode" />
+    <TodoListEditPanel
+      @close="createTodoListDialog = false"
+      v-model="createTodoListDialogModeValue"
+      :mode="createTodoListDialogMode"
+    />
   </el-dialog>
   <FloatPopover v-model="todoListContextMenuVisible">
-    <TodoListContextMenu v-if="todoListContextMenuTarget" :todoList="todoListContextMenuTarget" @edit="editTodoList"
-      @delete="deleteTodoListUI" />
+    <TodoListContextMenu
+      v-if="todoListContextMenuTarget"
+      :todoList="todoListContextMenuTarget"
+      @edit="editTodoList"
+      @delete="deleteTodoListUI"
+    />
   </FloatPopover>
   <FloatPopover v-model="todoItemContextMenuVisible">
-    <TodoItemContextMenu v-if="todoItemContextMenuTarget" :todoItem="todoItemContextMenuTarget"
-      @executed="refreshtodoItems(); todoItemContextMenuVisible = false" />
+    <TodoItemContextMenu
+      v-if="todoItemContextMenuTarget"
+      :todoItem="todoItemContextMenuTarget"
+      @executed="
+        () => {
+          refreshtodoItems()
+          todoItemContextMenuVisible = false
+        }
+      "
+    />
   </FloatPopover>
 </template>
 

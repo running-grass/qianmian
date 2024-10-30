@@ -69,6 +69,7 @@ export type AttributeType =
   | 'date'
   | 'datetime'
   | 'enum'
+  | 'color'
 
 export type AttributeDataType = string | number | boolean | Date
 

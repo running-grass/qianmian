@@ -15,12 +15,21 @@ import {
 import { getDb } from '@/core'
 import { type EntityId } from '@/core'
 import type { RichEntity } from '@/core/type'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 // 待办清单
 
 /** 待办清单列表 */
 export const allTodoList = ref<ReadonlyArray<TodoList>>([])
+
+/** 待办清单列表 map */
+export const allTodoListMap = computed<ReadonlyMap<string, Readonly<TodoList>>>(() => {
+  const map = new Map<string, TodoList>()
+  for (const todoList of allTodoList.value) {
+    map.set(todoList.entity_id.toString(), todoList)
+  }
+  return map
+})
 
 /** 刷新待办清单列表 */
 export async function refreshAllTodoList() {
@@ -114,7 +123,8 @@ export async function deleteTodoList(eid: EntityId): Promise<void> {
 export async function changeTodoItemAttribute(
   entityId: EntityId,
   attrId: AttributeId,
-  data: AttributeDataType | null
+  // TODO 逐步取代 null
+  data: AttributeDataType | null | undefined
 ) {
   await changeAttribute(null, entityId, attrId, data)
 }

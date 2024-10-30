@@ -9,6 +9,7 @@ const priorityAttributeSlug = 'priority'
 const scheduledStartSlug = 'scheduled_start'
 const scheduledEndSlug = 'scheduled_end'
 const deadlineSlug = 'deadline'
+const themeColorSlug = 'theme_color'
 
 /** 优先级类型 */
 export type TodoItemPriority = '低' | '中' | '高'
@@ -106,6 +107,17 @@ async function fillDeadline() {
   )
 }
 
+/** 主题颜色属性 */
+export const attributeThemeColor = ref<Readonly<Attribute>>(undefined!)
+async function fillThemeColor() {
+  attributeThemeColor.value = await getAttributeBySlug(
+    themeColorSlug,
+    '主题颜色',
+    '用于显示定制的主题颜色',
+    'color'
+  )
+}
+
 /** 初始化内置属性 */
 export async function initBuiltInAttributes() {
   await Promise.all([
@@ -114,6 +126,7 @@ export async function initBuiltInAttributes() {
     fillPriority(),
     fillSchduledStart(),
     fillSchduledEnd(),
-    fillDeadline()
+    fillDeadline(),
+    fillThemeColor()
   ])
 }
