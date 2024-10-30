@@ -20,7 +20,12 @@ DEFINE EVENT OVERWRITE trigger_entity_update ON TABLE entity_attributes
 
 -- 断言属性值是否符合类型声明
 DEFINE FUNCTION OVERWRITE fn::assert_attribute_type($aid: record<attribute>, $value: any) {
+  -- TODO 需要统一改为 NONE
   IF ($value == null) {
+    RETURN true;
+  };
+
+  IF ($value == NONE) {
     RETURN true;
   };
 
@@ -43,6 +48,8 @@ DEFINE FUNCTION OVERWRITE fn::assert_attribute_type($aid: record<attribute>, $va
     RETURN type::is::datetime($value);
   } ELSE IF ($attr.type == "enum") {
     RETURN $value in $attr.enums;
+  } ELSE IF ($attr.type == "color") {
+    RETURN string::starts_with($value, "#");
   } ELSE {
     THROW "不支持的类型声明[" + <string>$attr.type + "]";
   };

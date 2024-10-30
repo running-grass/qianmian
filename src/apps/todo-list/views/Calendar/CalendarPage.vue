@@ -1,26 +1,42 @@
 <script setup lang="ts">
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin, { Draggable, type DropArg } from '@fullcalendar/interaction';
+import interactionPlugin, { Draggable, type DropArg } from '@fullcalendar/interaction'
 
-import { attributeSchduledEnd, attributeSchduledStart, createEntity, entityTable, getDb, identityTodoItem, todoItemView, useMobile, type TodoItem } from '@/core';
-import { myDayjs } from '@/plugins/dayjs';
-import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core/index.js';
-import zhLocale from '@fullcalendar/core/locales/zh-cn';
-import { computed, ref, watch } from 'vue';
-import TodoItemDetail from '../../components/TodoItemDetail.vue';
-import { changeTodoItemAttribute, deleteTodoItem } from '../../store';
-import FloatPopover from '@/component/FloatPopover.vue';
-import { getTodoItemById } from '../../function';
-import { XCircleIcon } from '@heroicons/vue/24/solid';
-import { useTemplateRef } from 'vue';
-import { RecordId } from 'surrealdb';
+import {
+  attributeSchduledEnd,
+  attributeSchduledStart,
+  createEntity,
+  entityTable,
+  getDb,
+  identityTodoItem,
+  todoItemView,
+  useMobile,
+  type TodoItem
+} from '@/core'
+import { myDayjs } from '@/plugins/dayjs'
+import type {
+  CalendarOptions,
+  DateSelectArg,
+  EventClickArg,
+  EventDropArg,
+  EventInput
+} from '@fullcalendar/core/index.js'
+import zhLocale from '@fullcalendar/core/locales/zh-cn'
+import { computed, ref, watch } from 'vue'
+import TodoItemDetail from '../../components/TodoItemDetail.vue'
+import { allTodoList, allTodoListMap, changeTodoItemAttribute, deleteTodoItem } from '../../store'
+import FloatPopover from '@/component/FloatPopover.vue'
+import { getTodoItemById } from '../../function'
+import { XCircleIcon } from '@heroicons/vue/24/solid'
+import { useTemplateRef } from 'vue'
+import { RecordId } from 'surrealdb'
+import TodoItemRow from '../../components/TodoItemRow.vue'
 
 const isMobileScreen = useMobile()
 const detailPanelVisible = ref(false)
 
 const selectedTodoItem = ref<TodoItem | null>(null)
-
 
 const fullCalendar = useTemplateRef('full-calendar')
 const draggableElement = useTemplateRef('draggable-element')
@@ -28,18 +44,26 @@ type TodoItemEventInput = EventInput & {
   todoItem: TodoItem
 }
 const events = ref<TodoItemEventInput[]>([])
+
 async function refreshtodoItems() {
   const db = await getDb()
 
-  const [list] = await db.query<[TodoItem[]]>(`SELECT * FROM ${todoItemView.tb} WHERE done = false`, {})
-  events.value = list.filter(it => it.scheduled_start).map(item => {
-    return {
-      title: item.title,
-      todoItem: item,
-      start: myDayjs(item.scheduled_start).format('YYYY-MM-DD'),
-      end: item.scheduled_end ? myDayjs(item.scheduled_end).format('YYYY-MM-DD') : undefined// item.scheduled_end ?? item.scheduled_end!
-    }
-  })
+  const [list] = await db.query<[TodoItem[]]>(
+    `SELECT * FROM ${todoItemView.tb} WHERE done = false`,
+    {}
+  )
+  events.value = list
+    .filter((it) => it.scheduled_start)
+    .map((item) => {
+      const todoList = allTodoListMap.value.get(item.belong_to[0]?.id?.toString())
+      return {
+        title: item.title,
+        todoItem: item,
+        backgroundColor: todoList?.theme_color,
+        start: myDayjs(item.scheduled_start).format('YYYY-MM-DD'),
+        end: item.scheduled_end ? myDayjs(item.scheduled_end).format('YYYY-MM-DD') : undefined // item.scheduled_end ?? item.scheduled_end!
+      }
+    })
 }
 
 refreshtodoItems()
@@ -52,17 +76,9 @@ async function select(info: DateSelectArg) {
     return
   }
   const id = await createEntity(identityTodoItem.value.id, '')
-  await changeTodoItemAttribute(
-    id,
-    attributeSchduledStart.value.id,
-    info.start
-  )
+  await changeTodoItemAttribute(id, attributeSchduledStart.value.id, info.start)
   if (!myDayjs(info.end).isSame(myDayjs(info.start).add(1, 'day'))) {
-    await changeTodoItemAttribute(
-      id,
-      attributeSchduledEnd.value.id,
-      info.end
-    )
+    await changeTodoItemAttribute(id, attributeSchduledEnd.value.id, info.end)
   }
 
   const t = await getTodoItemById(id)
@@ -74,22 +90,17 @@ async function select(info: DateSelectArg) {
 
 async function eventDrop(info: EventDropArg) {
   const item: TodoItem = info.event.extendedProps.todoItem
-  console.info(info.event.title + " was dropped on " + myDayjs(info.event.start).toDate(), info.event.end);
+  console.info(
+    info.event.title + ' was dropped on ' + myDayjs(info.event.start).toDate(),
+    info.event.end
+  )
 
   if (info.event.start) {
-    await changeTodoItemAttribute(
-      item.entity_id,
-      attributeSchduledStart.value.id,
-      info.event.start
-    )
+    await changeTodoItemAttribute(item.entity_id, attributeSchduledStart.value.id, info.event.start)
   }
 
   if (info.event.end) {
-    await changeTodoItemAttribute(
-      item.entity_id,
-      attributeSchduledEnd.value.id,
-      info.event.end
-    )
+    await changeTodoItemAttribute(item.entity_id, attributeSchduledEnd.value.id, info.event.end)
   }
   refreshtodoItems()
 }
@@ -106,7 +117,9 @@ const unScheduleTodoItems = ref<TodoItem[]>([])
 
 async function refreshUnScheduleTodoItems() {
   const db = await getDb()
-  const [res] = await db.query<[TodoItem[]]>(`SELECT * FROM ${todoItemView.tb} WHERE done = false AND scheduled_start IS null AND scheduled_end IS NULL`)
+  const [res] = await db.query<[TodoItem[]]>(
+    `SELECT * FROM ${todoItemView.tb} WHERE done = false AND scheduled_start IS null AND scheduled_end IS NULL`
+  )
   unScheduleTodoItems.value = res
 }
 const customButtons = {
@@ -131,7 +144,7 @@ watch(scheduleTodoItemPanel, (visible) => {
       }
       draggable = new Draggable(draggableElement.value, {
         itemSelector: 'li'
-      });
+      })
     } else {
       draggable && draggable.destroy()
     }
@@ -197,10 +210,8 @@ async function onDetailPanelClose() {
   await refreshtodoItems()
 }
 
-
-
 function onItemDragStart(e: DragEvent) {
-  const target = e.target
+  const target = e.currentTarget
   if (!(target instanceof HTMLLIElement) || !e.dataTransfer) {
     return
   }
@@ -210,7 +221,7 @@ function onItemDragStart(e: DragEvent) {
     console.warn('onstart: no item id')
     return
   }
-  e.dataTransfer.dropEffect = "move";
+  e.dataTransfer.dropEffect = 'move'
 
   e.dataTransfer.setData(itemId, itemId)
 
@@ -218,51 +229,77 @@ function onItemDragStart(e: DragEvent) {
 }
 
 function onItemDragEnd(e: DragEvent) {
-
-  const target = e.target
+  const target = e.currentTarget
   if (!(target instanceof HTMLLIElement)) {
     return
   }
 
   target.classList.remove('drop-shadow')
 }
-
 </script>
 <template>
   <section class="w-full h-full flex">
-    <FullCalendar ref="full-calendar" :options="calendarOptions" class="flex-1">
-      <!-- <template v-slot:eventContent='arg'>
-      <b>{{ arg.event.title }}</b>
-    </template> -->
-    </FullCalendar>
-    <section class="p-2 flex flex-col w-auto min-w-80 transition-[width] duration-1000" v-if="scheduleTodoItemPanel">
+    <FullCalendar ref="full-calendar" :options="calendarOptions" class="flex-1"> </FullCalendar>
+    <section
+      class="p-2 flex flex-col w-auto min-w-80 transition-[width] duration-1000"
+      v-if="scheduleTodoItemPanel"
+    >
       <header class="flex flex-row justify-end mb-2">
-        <XCircleIcon class="w-6 h-6 cursor-pointer hover:fill-green-900" @click="scheduleTodoItemPanel = false" />
+        <XCircleIcon
+          class="w-6 h-6 cursor-pointer hover:fill-green-900"
+          @click="scheduleTodoItemPanel = false"
+        />
       </header>
       <ul ref="draggable-element" class="flex-1 overflow-y-auto flex flex-col">
-        <li v-for="todoItem in unScheduleTodoItems" :key="todoItem.entity_id.toString()" :draggable="true"
-          @dragstart="onItemDragStart" @dragend="onItemDragEnd" :data-entity-id="todoItem.entity_id.id.toString()"
-          :class="[
-            'py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer break-all ',
-          ]">
+        <TodoItemRow
+          v-for="todoItem in unScheduleTodoItems"
+          :key="todoItem.entity_id.toString()"
+          :todoItem="todoItem"
+          :draggable="true"
+          @dragstart="onItemDragStart"
+          @dragend="onItemDragEnd"
+        >
+        </TodoItemRow>
+        <!-- <li
+          v-for="todoItem in unScheduleTodoItems"
+          :key="todoItem.entity_id.toString()"
+          :draggable="true"
+          @dragstart="onItemDragStart"
+          @dragend="onItemDragEnd"
+          :data-entity-id="todoItem.entity_id.id.toString()"
+          :class="['py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer break-all ']"
+        >
           {{ todoItem.title }}
-        </li>
-
+        </li> -->
       </ul>
-
     </section>
   </section>
 
   <!-- 详情 -->
-  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="detailPanelVisible"
-    :size="isMobileScreen ? '90%' : '40%'" :with-header="false" destroy-on-close
-    :direction="isMobileScreen ? 'btt' : 'rtl'" @close="onDetailPanelClose">
-    <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()" />
+  <el-drawer
+    v-if="isMobileScreen"
+    modal-class="todo-item-detail-drawer"
+    v-model="detailPanelVisible"
+    :size="isMobileScreen ? '90%' : '40%'"
+    :with-header="false"
+    destroy-on-close
+    :direction="isMobileScreen ? 'btt' : 'rtl'"
+    @close="onDetailPanelClose"
+  >
+    <TodoItemDetail
+      v-if="selectedTodoItem"
+      v-model="selectedTodoItem"
+      :key="selectedTodoItem?.entity_id.toString()"
+    />
   </el-drawer>
   <FloatPopover v-else v-model="detailPanelVisible" @close="onDetailPanelClose">
-    <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
-      class="min-w-[400px] min-h-[300px] bg-white shadow-xl border" @update="refreshtodoItems"
-      @delete="refreshtodoItems" />
+    <TodoItemDetail
+      v-if="selectedTodoItem"
+      v-model="selectedTodoItem"
+      :key="selectedTodoItem?.entity_id.toString()"
+      class="min-w-[400px] min-h-[300px] bg-white shadow-xl border"
+      @update="refreshtodoItems"
+      @delete="refreshtodoItems"
+    />
   </FloatPopover>
-
 </template>

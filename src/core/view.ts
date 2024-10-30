@@ -26,4 +26,15 @@ export type TodoItem = {
 }
 
 export const todoListView = new Table('todo_list')
-export type TodoList = RichEntity
+export type TodoList = {
+  title: string
+  content: string
+  created_at: Date
+  updated_at: Date
+  creator: AccountId
+  updater: AccountId
+
+  entity_id: EntityId
+
+  theme_color: string | undefined
+}

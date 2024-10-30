@@ -1,4 +1,4 @@
-import { getDb, todoItemView, type RichEntity, type TodoItem } from '@/core'
+import { getDb, todoItemView, type RichEntity, type TodoItem, type TodoList } from '@/core'
 import { allTodoList, type OrderField } from '../../store'
 import { useLocalStorage } from '@vueuse/core'
 import { ref, watch } from 'vue'
@@ -6,7 +6,7 @@ import { myDayjs } from '@/plugins/dayjs'
 
 /** 选中的待办清单 */
 export const selectedTodoList = ref<
-  RichEntity | 'all' | 'today' | 'tomorrow' | 'today_done' | 'unorganized' | 'unscheduled'
+  TodoList | 'all' | 'today' | 'tomorrow' | 'today_done' | 'unorganized' | 'unscheduled'
 >('today')
 
 /** 是否显示已完成的待办事项 */
