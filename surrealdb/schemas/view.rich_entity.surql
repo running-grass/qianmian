@@ -5,7 +5,7 @@ DEFINE TABLE OVERWRITE rich_entity  TYPE NORMAL
 		,id as entity_id
 		,->entity_attributes.{id,out,data} as attributes
 		,->entity_relations.{id,out,relation} as relations
-		,(SELECT slug,payload,created_at FROM entity_event_log WHERE entity == $parent.id) as event_logs
+		,(SELECT slug,payload,created_at FROM entity_event_log WHERE entity = $parent.id ORDER BY created_at DESC) as event_logs
 
 		FROM entity
 	PERMISSIONS

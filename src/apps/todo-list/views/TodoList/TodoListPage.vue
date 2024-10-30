@@ -19,7 +19,6 @@ import {
   relationBelongToTodoList,
   StringRecordId,
   useMobile,
-  type RichEntity,
   type TodoItem,
   type TodoList
 } from '@/core'

@@ -1,7 +1,6 @@
 import { Table } from 'surrealdb'
 import type { TodoItemPriority } from './built-in'
 import type { AccountId, EntityId } from './table'
-import type { RichEntity } from './type'
 
 export const todoItemView = new Table('todo_item')
 
@@ -16,7 +15,7 @@ export type TodoItem = {
   entity_id: EntityId
 
   done: boolean
-  done_time: Date | null
+  last_done_time: Date | null
   priority: TodoItemPriority | null
   scheduled_start: Date | null
   scheduled_end: Date | null

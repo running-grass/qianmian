@@ -16,6 +16,6 @@ DEFINE FIELD OVERWRITE entity ON TABLE entity_event_log TYPE record<entity> READ
 DEFINE INDEX OVERWRITE slug_idx ON TABLE entity_event_log FIELDS slug COMMENT "事件标识索引";
 DEFINE EVENT OVERWRITE trigger_entity_update ON TABLE entity_event_log
 	THEN (
-		UPDATE entity SET updated_at = time::now() WHERE id == $after.enitty
+		UPDATE entity SET updated_at = time::now() WHERE id == $after.entity
 	)
 	COMMENT "触发实体的更新";

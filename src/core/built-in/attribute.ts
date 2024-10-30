@@ -4,7 +4,6 @@ import { createAttribute } from '../sql/attribute'
 import type { Attribute, AttributeType } from '../table'
 
 const doneAttributeSlug = 'done'
-const doneTimeAttributeSlug = 'done_time'
 const priorityAttributeSlug = 'priority'
 const scheduledStartSlug = 'scheduled_start'
 const scheduledEndSlug = 'scheduled_end'
@@ -48,17 +47,6 @@ async function fillDone() {
     '已完成',
     '待办事项已完成的状态',
     'boolean'
-  )
-}
-
-/** 完成时间属性 */
-export const attributeDoneTime = ref<Readonly<Attribute>>(undefined!)
-async function fillDoneTime() {
-  attributeDoneTime.value = await getAttributeBySlug(
-    doneTimeAttributeSlug,
-    '完成时间',
-    '待办事项完成的时间',
-    'datetime'
   )
 }
 
@@ -122,7 +110,6 @@ async function fillThemeColor() {
 export async function initBuiltInAttributes() {
   await Promise.all([
     fillDone(),
-    fillDoneTime(),
     fillPriority(),
     fillSchduledStart(),
     fillSchduledEnd(),

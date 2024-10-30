@@ -1,6 +1,5 @@
 import {
   attributeDone,
-  attributeDoneTime,
   createEntity,
   changeAttribute,
   identityTodoList,
@@ -143,11 +142,6 @@ export async function changeTodoItemDone(
   type: 'finished' | 'abandoned' = 'finished'
 ): Promise<void> {
   await changeTodoItemAttribute(todo.entity_id, attributeDone.value.id, done)
-  await changeTodoItemAttribute(
-    todo.entity_id,
-    attributeDoneTime.value.id,
-    done ? new Date() : null
-  )
   if (done) {
     console.log('done', done)
     await createEntityEventLog(todo.entity_id, doneEventSlug, {
