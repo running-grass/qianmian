@@ -1,6 +1,5 @@
 import {
   attributeDone,
-  attributeDoneTime,
   createEntity,
   changeAttribute,
   identityTodoList,
@@ -14,6 +13,8 @@ import {
 } from '@/core'
 import { getDb } from '@/core'
 import { type EntityId } from '@/core'
+import { doneEventSlug } from '@/core/built-in/entityEvent'
+import { createEntityEventLog } from '@/core/sql/eventLog'
 import type { RichEntity } from '@/core/type'
 import { computed, ref } from 'vue'
 
@@ -135,14 +136,18 @@ export async function changeTodoItemAttribute(
  * @param todo 待办事项
  * @param done 是否完成
  */
-export async function changeTodoItemDone(todo: TodoItem, done: boolean): Promise<void> {
-  // todo.doneAttr.data = done
+export async function changeTodoItemDone(
+  todo: TodoItem,
+  done: boolean,
+  type: 'finished' | 'abandoned' = 'finished'
+): Promise<void> {
   await changeTodoItemAttribute(todo.entity_id, attributeDone.value.id, done)
-  await changeTodoItemAttribute(
-    todo.entity_id,
-    attributeDoneTime.value.id,
-    done ? new Date() : null
-  )
+  if (done) {
+    console.log('done', done)
+    await createEntityEventLog(todo.entity_id, doneEventSlug, {
+      type
+    })
+  }
 }
 
 export async function changeBelongListTo(

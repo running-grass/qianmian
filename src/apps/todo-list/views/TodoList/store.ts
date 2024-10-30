@@ -1,4 +1,4 @@
-import { getDb, todoItemView, type RichEntity, type TodoItem, type TodoList } from '@/core'
+import { getDb, todoItemView, type TodoItem, type TodoList } from '@/core'
 import { allTodoList, type OrderField } from '../../store'
 import { useLocalStorage } from '@vueuse/core'
 import { ref, watch } from 'vue'
@@ -78,7 +78,7 @@ export async function refreshtodoItems() {
       sql += ` AND ((scheduled_start >= ${tomorrow} AND scheduled_start < ${tomorrow2}) OR (scheduled_end >= ${tomorrow} AND scheduled_end < ${tomorrow2}) OR (deadline >= ${tomorrow} AND deadline < ${tomorrow2}))`
       break
     case 'today_done':
-      sql += ` AND done_time >= ${today}`
+      sql += ` AND last_done_time >= ${today}`
       break
     case 'unorganized':
       sql += ` AND array::is_empty(belong_to)`

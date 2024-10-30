@@ -25,7 +25,7 @@ import type {
 import zhLocale from '@fullcalendar/core/locales/zh-cn'
 import { computed, ref, watch } from 'vue'
 import TodoItemDetail from '../../components/TodoItemDetail.vue'
-import { allTodoList, allTodoListMap, changeTodoItemAttribute, deleteTodoItem } from '../../store'
+import { allTodoListMap, changeTodoItemAttribute, deleteTodoItem } from '../../store'
 import FloatPopover from '@/component/FloatPopover.vue'
 import { getTodoItemById } from '../../function'
 import { XCircleIcon } from '@heroicons/vue/24/solid'

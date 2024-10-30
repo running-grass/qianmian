@@ -9,7 +9,8 @@ import {
   type EntityRelation,
   type Relation,
   type Workspace,
-  type WorkspaceId
+  type WorkspaceId,
+  type EntityEventLog
 } from './table'
 import { getDb } from './db'
 import type { RichEntity, SimpleEntityAttribute, SimpleEntityRelation } from './type'
@@ -168,6 +169,7 @@ type EntityQueryResult = Omit<
     entity_id: EntityId
     attributes: Pick<EntityAttribute, 'id' | 'out' | 'data'>[]
     relations: Pick<EntityRelation, 'id' | 'out' | 'relation'>[]
+    event_logs: Pick<EntityEventLog, 'slug' | 'payload' | 'created_at'>[]
   },
   'id'
 >
@@ -216,7 +218,8 @@ function transformEntity(entityResult: EntityQueryResult): RichEntity {
     // identityObj: identityPool_.get(entityResult.identity.toString())!,
 
     relations: relaMap,
-    attributes: attrMap
+    attributes: attrMap,
+    event_logs: entityResult.event_logs
   }
 }
 

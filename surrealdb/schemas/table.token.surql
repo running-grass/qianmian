@@ -20,10 +20,11 @@ DEFINE FIELD OVERWRITE revoked ON TABLE token TYPE bool
 DEFINE FIELD OVERWRITE last_used ON TABLE token TYPE datetime
 	DEFAULT time::now()
 	COMMENT "最后使用时间";
-DEFINE FIELD  OVERWRITE last_ip ON TABLE token TYPE option<string>
+DEFINE FIELD OVERWRITE last_ip ON TABLE token TYPE option<string>
 	DEFAULT NONE
 	ASSERT type::is::none($value) || string::is::ip($value)
 	COMMENT "最后使用IP";
+DEFINE FIELD OVERWRITE created_at ON TABLE token TYPE datetime READONLY DEFAULT time::now() COMMENT "创建时间";
 
 DEFINE FUNCTION OVERWRITE fn::get_token_record() {
 	RETURN type::thing("token", $token.jti);
