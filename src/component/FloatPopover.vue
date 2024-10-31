@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useMouse } from '@vueuse/core';
-import { reactive, watch } from 'vue';
+import { useMouse } from '@vueuse/core'
+import { reactive, watch } from 'vue'
 
 import { vOnClickOutside } from '@vueuse/components'
 
@@ -29,12 +29,17 @@ watch(visible, (val) => {
     emit('close')
   }
 })
-
 </script>
 <template>
   <template v-if="visible">
-    <el-popover :visible="visible" virtual-triggering placement="right" :popper-style="popoverPosition"
-      :show-arrow="false">
+    <el-popover
+      :visible="visible"
+      virtual-triggering
+      placement="right"
+      :popper-style="popoverPosition"
+      popper-class="!w-auto !h-auto"
+      :show-arrow="false"
+    >
       <section v-on-click-outside="closePopover">
         <slot></slot>
       </section>
