@@ -54,6 +54,7 @@ function onClockItemRow(todoItem: TodoItem) {
           v-for="todoItem of todoItemList"
           :key="todoItem.entity_id.id.toString()"
           :todoItem="todoItem"
+          show-tags
           @click="onClockItemRow(todoItem)"
           :class="[
             ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])

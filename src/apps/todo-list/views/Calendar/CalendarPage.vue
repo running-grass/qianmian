@@ -55,7 +55,8 @@ async function refreshtodoItems() {
   events.value = list
     .filter((it) => it.scheduled_start)
     .map((item) => {
-      const todoList = allTodoListMap.value.get(item.belong_to[0]?.id?.toString())
+      const todoListId = item.belong_to?.id?.toString()
+      const todoList = todoListId ? allTodoListMap.value.get(todoListId) : undefined
       return {
         title: item.title,
         todoItem: item,
@@ -256,6 +257,7 @@ function onItemDragEnd(e: DragEvent) {
           :key="todoItem.entity_id.toString()"
           :todoItem="todoItem"
           :draggable="true"
+          show-tags
           @dragstart="onItemDragStart"
           @dragend="onItemDragEnd"
         >

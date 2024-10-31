@@ -6,11 +6,11 @@ import {
   allTodoList,
   changeBelongListTo,
   changeTodoItemAttribute,
-  deleteTodoList,
-  todoListInbox
+  deleteTodoList
 } from '../../store'
 import {
   attributeSchduledStart,
+  attributeTag,
   createEntity,
   entityRelationsTable,
   entityTable,
@@ -94,13 +94,14 @@ async function changeCurrentObject(entity: TodoItem) {
  */
 async function createTodoItemUI() {
   const id = await createEntity(identityTodoItem.value.id, newTitle.value)
-  const todoList =
-    typeof selectedTodoList.value === 'string' ? todoListInbox.value : selectedTodoList.value
+  const todoList = typeof selectedTodoList.value === 'string' ? undefined : selectedTodoList.value
 
   const db = await getDb()
-  await db.relate(id, entityRelationsTable.tb, todoList.entity_id, {
-    relation: relationBelongToTodoList.value.id
-  })
+  if (todoList) {
+    await db.relate(id, entityRelationsTable.tb, todoList.entity_id, {
+      relation: relationBelongToTodoList.value.id
+    })
+  }
 
   if (selectedTodoList.value === 'today') {
     await changeTodoItemAttribute(
@@ -114,6 +115,12 @@ async function createTodoItemUI() {
       attributeSchduledStart.value.id,
       myDayjs().add(1, 'day').startOf('day').toDate()
     )
+  } else if (typeof selectedTodoList.value === 'object') {
+    const listTag = selectedTodoList.value.tags
+
+    if (listTag.length > 0) {
+      await changeTodoItemAttribute(id, attributeTag.value.id, listTag)
+    }
   }
 
   await refreshtodoItems()
@@ -318,6 +325,7 @@ function deleteTodoListUI(todoList: TodoList) {
 
 const router = useRouter()
 function selectTodoList(todoList: typeof selectedTodoList.value) {
+  if (selectedTodoList.value === todoList) return
   selectedTodoList.value = todoList
   todoItemsByList.value = []
   todoListDrawer.value = false
@@ -367,11 +375,7 @@ const onListDropEnter = (ev: DragEvent) => {
     return
   }
 
-  console.log(
-    item.belong_to.find((i) => i.id.toString() === listId),
-    item.belong_to
-  )
-  if (item.belong_to.find((i) => i.id.toString() === listId)) {
+  if (item.belong_to?.id?.toString() === listId) {
     console.log('already in list')
     return
   }
@@ -419,7 +423,6 @@ function TodoListRow({ todoList }: { todoList: TodoList }) {
   return (
     <li
       onClick={() => selectTodoList(todoList)}
-      onDblclick={() => editTodoList(todoList)}
       onDragover={onListDropEnter}
       onDragleave={clearDragClass}
       onDrop={onItemDrop}
@@ -501,6 +504,8 @@ async function openTodoItemContextMenu(item: TodoItem) {
   todoItemContextMenuTarget.value = item
   todoItemContextMenuVisible.value = true
 }
+
+const showItemTags = ref(!isMobileScreen.value)
 </script>
 <template>
   <div class="flex w-full h-full border-green-100">
@@ -518,6 +523,7 @@ async function openTodoItemContextMenu(item: TodoItem) {
           :show-list="selectedTodoList === null"
           @click="changeCurrentObject(todoItem)"
           :draggable="true"
+          :showTags="showItemTags"
           @contextmenu.stop.prevent="openTodoItemContextMenu(todoItem)"
           @dragstart="onItemDragStart"
           @dragend="onItemDragEnd"

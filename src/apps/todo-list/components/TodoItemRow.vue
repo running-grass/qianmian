@@ -4,13 +4,13 @@ import type { TodoItem } from '@/core'
 import { getDoneInputClass, getScheduledStartHtml } from '../util'
 import { allTodoList, changeTodoItemDone } from '../store'
 
-const { todoItem } = defineProps<{ todoItem: TodoItem }>()
+const { todoItem, showTags = false } = defineProps<{ todoItem: TodoItem; showTags: boolean }>()
 const emit = defineEmits(['update'])
 
 const timeText = computed(() => getScheduledStartHtml(todoItem))
 
 const todoListThemeColor = computed<string | undefined>(() => {
-  const todoListId = todoItem.belong_to[0]?.id
+  const todoListId = todoItem.belong_to?.id
   if (!todoListId) return undefined
   const todoListIdStr = todoListId.toString()
   const todoList = allTodoList.value.find(
@@ -40,6 +40,9 @@ async function changeTodoItemDoneLocal(todoItem: TodoItem, done: boolean) {
     />
     <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
       {{ todoItem.title }}
+    </div>
+    <div v-if="showTags && todoItem.tags.length !== 0" class="ml-4">
+      <el-tag v-for="tag of todoItem.tags" :key="tag" type="primary">{{ tag }}</el-tag>
     </div>
     <div v-if="timeText" class="ml-4" v-html="timeText"></div>
   </li>

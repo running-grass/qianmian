@@ -21,7 +21,8 @@ DEFINE TABLE OVERWRITE todo_item  TYPE NORMAL
 		, attributes.find(|$attr| $attr.out.slug == "scheduled_start").data ?? null as scheduled_start
 		, attributes.find(|$attr| $attr.out.slug == "scheduled_end").data ?? null as scheduled_end
 		, attributes.find(|$attr| $attr.out.slug == "deadline").data ?? null as deadline
-		, relations.filter(|$rel| $rel.relation.slug == "belong_to_todo_list").map(|$rel| $rel.out).{id,title} as belong_to
+		, attributes.find(|$attr| $attr.out.slug == "tag").data ?? [] as tags
+		, relations.filter(|$rel| $rel.relation.slug == "belong_to_todo_list").map(|$rel| $rel.out)[0].{id,title} as belong_to
 		FROM rich_entity WHERE identity.slug = "todo_item"
 	PERMISSIONS
 		FOR select WHERE fn::get_current_workspace() == workspace
