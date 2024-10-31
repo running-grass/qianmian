@@ -6,7 +6,7 @@ DEFINE FIELD OVERWRITE workspace ON TABLE entity_attributes TYPE record<workspac
   DEFAULT fn::get_current_workspace()
   ASSERT record::exists($value)
   COMMENT "对象属性值所属工作空间";
-DEFINE FIELD OVERWRITE data ON TABLE entity_attributes TYPE any
+DEFINE FIELD OVERWRITE data ON TABLE entity_attributes FLEXIBLE TYPE any
   ASSERT fn::assert_attribute_type($this.out, $value)
   COMMENT "对象属性值";
 DEFINE INDEX OVERWRITE entity_attributes_unique ON TABLE entity_attributes FIELDS in,out UNIQUE COMMENT "对象属性值关系唯一索引";
@@ -16,7 +16,6 @@ DEFINE EVENT OVERWRITE trigger_entity_update ON TABLE entity_attributes
       UPDATE entity SET updated_at = time::now() WHERE id == $after.in || id == $before.in
     )
   COMMENT "更新对象属性值时触发";
-
 
 -- 断言属性值是否符合类型声明
 DEFINE FUNCTION OVERWRITE fn::assert_attribute_type($aid: record<attribute>, $value: any) {
@@ -48,6 +47,8 @@ DEFINE FUNCTION OVERWRITE fn::assert_attribute_type($aid: record<attribute>, $va
     RETURN type::is::datetime($value);
   } ELSE IF ($attr.type == "enum") {
     RETURN $value in $attr.enums;
+  } ELSE IF ($attr.type == "enums") {
+    RETURN type::is::array($value) && array::is_empty(array::complement($value, $attr.enums));
   } ELSE IF ($attr.type == "color") {
     RETURN string::starts_with($value, "#");
   } ELSE {

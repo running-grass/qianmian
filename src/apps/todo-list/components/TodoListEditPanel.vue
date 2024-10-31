@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { attributeThemeColor, updateEntity, type TodoList } from '@/core'
+import { attributeTag, attributeThemeColor, updateEntity, type TodoList } from '@/core'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { ref } from 'vue'
 import { changeTodoItemAttribute, createTodoList, refreshAllTodoList } from '../store'
@@ -51,6 +51,11 @@ const submitForm = () => {
       )
     }
 
+    if (modelValue.value?.tags.toString() !== todoListModel.value.tags?.toString()) {
+      console.log('tags', todoListModel.value.tags)
+      await changeTodoItemAttribute(todoListId, attributeTag.value.id, todoListModel.value.tags)
+    }
+
     refreshAllTodoList()
     emit('close')
   })
@@ -65,6 +70,11 @@ const submitForm = () => {
       </el-form-item>
       <el-form-item label="颜色">
         <el-color-picker v-model="todoListModel.theme_color" />
+      </el-form-item>
+      <el-form-item label="标签">
+        <el-select v-model="todoListModel.tags" multiple placeholder="请选择" style="width: 100%">
+          <el-option v-for="item in attributeTag.enums" :key="item" :label="item" :value="item" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">{{

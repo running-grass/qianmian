@@ -13,6 +13,7 @@ import {
   attributeSchduledEnd,
   // attributeSchduledEnd,
   attributeSchduledStart,
+  attributeTag,
   useAutoSaveEntity,
   type TodoItem,
   type TodoItemPriority
@@ -37,6 +38,8 @@ watch(modelValue, () => {
   selectedPriority.value = modelValue.value.priority ?? ''
 })
 
+const todoItemModel = ref<Partial<TodoItem>>({ ...modelValue.value })
+
 /**
  * 删除当前选择的待办事项
  *
@@ -50,11 +53,11 @@ async function deleteSelectedTodoItem() {
 const { triggerInput, triggerChange } = useAutoSaveEntity(modelValue)
 
 const localBelongs = ref<string | undefined>(
-  modelValue.value.belong_to[0]?.id?.toString() ?? undefined
+  modelValue.value.belong_to?.id?.toString() ?? undefined
 )
 
-async function changeBelongList(nid: string) {
-  await changeBelongListTo(modelValue.value.entity_id, new StringRecordId(nid))
+async function changeBelongList(nid: string | undefined) {
+  await changeBelongListTo(modelValue.value.entity_id, nid ? new StringRecordId(nid) : undefined)
   emit('update', modelValue.value.entity_id)
 }
 
@@ -98,6 +101,15 @@ async function changeScheduleEnd($event: Date | null) {
 async function changeTodoItemDoneLocal() {
   console.log('done', modelValue.value.done)
   await changeTodoItemDone(modelValue.value.entity_id, modelValue.value.done)
+  emit('update', modelValue.value.entity_id)
+}
+
+async function changeTags() {
+  await changeTodoItemAttribute(
+    modelValue.value.entity_id,
+    attributeTag.value.id,
+    todoItemModel.value.tags
+  )
   emit('update', modelValue.value.entity_id)
 }
 </script>
@@ -144,6 +156,16 @@ async function changeTodoItemDoneLocal() {
         @change="changeScheduleEnd"
         :teleported="false"
       />
+
+      <el-select
+        v-model="todoItemModel.tags"
+        multiple
+        placeholder="标签"
+        class="!w-24"
+        @change="changeTags"
+      >
+        <el-option v-for="item in attributeTag.enums" :key="item" :label="item" :value="item" />
+      </el-select>
       <!-- <el-date-picker v-model="currentDeadline" type="date" size="small" placeholder="截止时间" class="!w-44"
         @change="changeDeadline" :teleported="false" /> -->
     </header>

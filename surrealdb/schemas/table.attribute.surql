@@ -9,7 +9,7 @@ DEFINE FIELD OVERWRITE slug ON TABLE attribute TYPE string ASSERT string::is::as
 DEFINE FIELD OVERWRITE name ON TABLE attribute TYPE string COMMENT "对象属性名称";
 DEFINE FIELD OVERWRITE description ON TABLE attribute TYPE string DEFAULT "" COMMENT "对象属性描述";
 DEFINE FIELD OVERWRITE type ON TABLE attribute
-	TYPE "object" | "string" | "number" | "boolean" |  "datetime" | "date" | "enum" | "color"
+	TYPE "object" | "string" | "number" | "boolean" |  "datetime" | "date" | "enum" | "enums" | "color"
 	DEFAULT "string"
 	COMMENT "对象属性类型";
 DEFINE FIELD OVERWRITE enums ON TABLE attribute TYPE array<string> DEFAULT [] COMMENT "对象属性枚举值";

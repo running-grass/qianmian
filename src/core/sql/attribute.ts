@@ -38,7 +38,7 @@ export async function createAttribute(
     name,
     description,
     type,
-    enums: type === 'enum' ? enums : []
+    enums: type === 'enum' || type === 'enums' ? enums : []
   })
 
   await refreshAttributePool()

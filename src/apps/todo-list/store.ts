@@ -14,7 +14,6 @@ import { getDb } from '@/core'
 import { type EntityId } from '@/core'
 import { doneEventSlug } from '@/core/built-in/entityEvent'
 import { createEntityEventLog } from '@/core/sql/eventLog'
-import type { RichEntity } from '@/core/type'
 import { computed, ref } from 'vue'
 
 // 待办清单
@@ -48,42 +47,7 @@ export type OrderField =
   | 'scheduled_end'
   | 'deadline'
 
-const _inboxTitle = '收集箱'
-export const todoListInbox = ref<Readonly<RichEntity>>(undefined!)
-
-async function fillTodoListInbox() {
-  const db = await getDb()
-  const [res] = await db.query<[RichEntity[]]>(
-    'SELECT * FROM rich_entity WHERE title = $title AND identity = $identity LIMIT 1',
-    {
-      title: _inboxTitle,
-      identity: identityTodoList.value.id
-    }
-  )
-
-  if (res.length !== 1) {
-    await createEntity(identityTodoList.value.id, _inboxTitle)
-
-    const [res] = await db.query<[RichEntity[]]>(
-      'SELECT * FROM rich_entity WHERE title = $title LIMIT 1',
-      {
-        title: _inboxTitle
-      }
-    )
-
-    if (res.length !== 1) {
-      throw new Error('Failed to create inbox')
-    }
-
-    todoListInbox.value = res[0]
-  }
-
-  todoListInbox.value = res[0]
-}
-
-export async function initData() {
-  await fillTodoListInbox()
-}
+export async function initData() {}
 
 /**
  * 创建一个新的待办清单
@@ -151,13 +115,17 @@ export async function changeTodoItemDone(
 
 export async function changeBelongListTo(
   todoItemId: EntityId | StringRecordId,
-  todoListId: EntityId | StringRecordId
+  todoListId: EntityId | StringRecordId | undefined
 ) {
   const db = await getDb()
   await db.query('DELETE FROM entity_relations WHERE in = $entity AND relation = $relation', {
     entity: todoItemId,
     relation: relationBelongToTodoList.value.id
   })
+
+  if (todoListId === undefined) {
+    return
+  }
 
   await db.relate(todoItemId, 'entity_relations', todoListId, {
     relation: relationBelongToTodoList.value.id

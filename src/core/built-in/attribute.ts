@@ -9,6 +9,7 @@ const scheduledStartSlug = 'scheduled_start'
 const scheduledEndSlug = 'scheduled_end'
 const deadlineSlug = 'deadline'
 const themeColorSlug = 'theme_color'
+const tagAttributeSlug = 'tag'
 
 /** 优先级类型 */
 export type TodoItemPriority = '低' | '中' | '高'
@@ -106,9 +107,20 @@ async function fillThemeColor() {
   )
 }
 
+/** 标签属性 */
+export const attributeTag = ref<Readonly<Attribute>>(undefined!)
+async function fillTag() {
+  attributeTag.value = await getAttributeBySlug(tagAttributeSlug, '标签', '待办事项标签', 'enums', [
+    '学习',
+    '工作',
+    '家庭'
+  ])
+}
+
 /** 初始化内置属性 */
 export async function initBuiltInAttributes() {
   await Promise.all([
+    fillTag(),
     fillDone(),
     fillPriority(),
     fillSchduledStart(),

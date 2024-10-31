@@ -20,8 +20,9 @@ export type TodoItem = {
   scheduled_start: Date | null
   scheduled_end: Date | null
   deadline: Date | null
+  tags: Array<string>
 
-  belong_to: { id: EntityId; title: string }[]
+  belong_to: { id: EntityId; title: string } | undefined
 }
 
 export const todoListView = new Table('todo_list')
@@ -36,4 +37,5 @@ export type TodoList = {
   entity_id: EntityId
 
   theme_color: string | undefined
+  tags: Array<string>
 }

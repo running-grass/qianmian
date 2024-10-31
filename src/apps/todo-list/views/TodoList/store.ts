@@ -97,7 +97,7 @@ export async function refreshtodoItems() {
       if (!_showDones) {
         sql += ` AND done = false`
       }
-      sql += ` AND belong_to.id CONTAINS ${selectedTodoList.value.entity_id}`
+      sql += ` AND belong_to.id = ${selectedTodoList.value.entity_id}`
   }
 
   sql += ` ORDER BY ordered_field_is_null,${sqlOrderField} ${sqlOrderFieldOrder},created_at DESC`

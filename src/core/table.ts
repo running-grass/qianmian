@@ -69,9 +69,10 @@ export type AttributeType =
   | 'date'
   | 'datetime'
   | 'enum'
+  | 'enums'
   | 'color'
 
-export type AttributeDataType = string | number | boolean | Date
+export type AttributeDataType = string | number | boolean | Date | Array<string>
 
 export const attributeTable = new Table('attribute')
 export type AttributeId = RecordId<'attribute'>

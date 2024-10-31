@@ -70,6 +70,8 @@ function toAttributeDataType(data: string, type: AttributeType | undefined): Att
     case 'string':
     case 'enum':
       return data
+    case 'enums':
+      return JSON.parse(data)
     case 'number':
       return Number(data)
     case 'boolean':
