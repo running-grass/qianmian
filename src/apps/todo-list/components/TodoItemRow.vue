@@ -20,7 +20,7 @@ const todoListThemeColor = computed<string | undefined>(() => {
 })
 
 async function changeTodoItemDoneLocal(todoItem: TodoItem, done: boolean) {
-  await changeTodoItemDone(todoItem, done)
+  await changeTodoItemDone(todoItem.entity_id, done)
   emit('update', todoItem.entity_id)
 }
 </script>

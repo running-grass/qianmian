@@ -185,7 +185,9 @@ function getTodoListTitle(todoList: typeof selectedTodoList.value) {
     case 'unscheduled':
       title = '未排期'
       break
-
+    case 'abandoned':
+      title = '已放弃'
+      break
     default:
       title = todoList.title
   }
@@ -266,7 +268,10 @@ function TodoItemCreateRow() {
             default: () => <EllipsisHorizontalIcon class="w-6 h-6" />,
             dropdown: () => (
               <el-dropdown-menu>
-                <el-dropdown-item onClick={() => (showDones.value = !showDones.value)}>
+                <el-dropdown-item
+                  disabled={typeof selectedTodoList.value === 'string'}
+                  onClick={() => (showDones.value = !showDones.value)}
+                >
                   {showDones.value ? '隐藏已完成' : '显示已完成'}
                 </el-dropdown-item>
                 <el-dropdown-item onClick={exportAllEntity}>导出数据(json)</el-dropdown-item>
@@ -442,7 +447,15 @@ function TodoListRow({ todoList }: { todoList: TodoList }) {
 }
 
 type VList = typeof selectedTodoList.value
-const vLists: VList[] = ['all', 'today', 'tomorrow', 'today_done', 'unorganized', 'unscheduled']
+const vLists: VList[] = [
+  'all',
+  'today',
+  'tomorrow',
+  'today_done',
+  'unorganized',
+  'unscheduled',
+  'abandoned'
+]
 
 function TodoListSection() {
   return (

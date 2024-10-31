@@ -5,7 +5,6 @@ import {
   identityTodoList,
   type AttributeDataType,
   type AttributeId,
-  type TodoItem,
   type TodoList,
   todoListView,
   relationBelongToTodoList,
@@ -137,14 +136,14 @@ export async function changeTodoItemAttribute(
  * @param done 是否完成
  */
 export async function changeTodoItemDone(
-  todo: TodoItem,
+  todoId: EntityId,
   done: boolean,
   type: 'finished' | 'abandoned' = 'finished'
 ): Promise<void> {
-  await changeTodoItemAttribute(todo.entity_id, attributeDone.value.id, done)
+  await changeTodoItemAttribute(todoId, attributeDone.value.id, done)
   if (done) {
     console.log('done', done)
-    await createEntityEventLog(todo.entity_id, doneEventSlug, {
+    await createEntityEventLog(todoId, doneEventSlug, {
       type
     })
   }
