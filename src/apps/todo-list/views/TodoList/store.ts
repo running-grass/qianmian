@@ -6,7 +6,14 @@ import { myDayjs } from '@/plugins/dayjs'
 
 /** 选中的待办清单 */
 export const selectedTodoList = ref<
-  TodoList | 'all' | 'today' | 'tomorrow' | 'today_done' | 'unorganized' | 'unscheduled'
+  | TodoList
+  | 'all'
+  | 'today'
+  | 'tomorrow'
+  | 'today_done'
+  | 'unorganized'
+  | 'unscheduled'
+  | 'abandoned'
 >('today')
 
 /** 是否显示已完成的待办事项 */
@@ -59,10 +66,6 @@ export async function refreshtodoItems() {
   let sql = `SELECT *,${sqlOrderField} == null as ordered_field_is_null FROM ${todoItemView.tb}`
 
   sql += ` WHERE true`
-  // 今日已完成始终显示已完成的事项
-  if (!_showDones && selectedTodoList.value !== 'today_done') {
-    sql += ` AND done = false`
-  }
 
   const today = `d"${myDayjs().startOf('day').toJSON()}"`
   const tomorrow = `d"${myDayjs().add(1, 'day').startOf('day').toJSON()}"`
@@ -72,21 +75,28 @@ export async function refreshtodoItems() {
       break
     case 'today':
       // 今天
-      sql += ` AND ((scheduled_start IS NOT null AND scheduled_start < ${tomorrow}) OR (scheduled_end IS NOT null AND scheduled_end < ${tomorrow}) OR (deadline IS NOT null AND deadline < ${tomorrow}))`
+      sql += ` AND done = false AND ((scheduled_start IS NOT null AND scheduled_start < ${tomorrow}) OR (scheduled_end IS NOT null AND scheduled_end < ${tomorrow}))`
       break
     case 'tomorrow':
-      sql += ` AND ((scheduled_start >= ${tomorrow} AND scheduled_start < ${tomorrow2}) OR (scheduled_end >= ${tomorrow} AND scheduled_end < ${tomorrow2}) OR (deadline >= ${tomorrow} AND deadline < ${tomorrow2}))`
+      sql += ` AND done = false AND ((scheduled_start >= ${tomorrow} AND scheduled_start < ${tomorrow2}) OR (scheduled_end >= ${tomorrow} AND scheduled_end < ${tomorrow2}) OR (deadline >= ${tomorrow} AND deadline < ${tomorrow2}))`
       break
     case 'today_done':
       sql += ` AND last_done_time >= ${today}`
       break
     case 'unorganized':
-      sql += ` AND array::is_empty(belong_to)`
+      sql += ` AND done = false AND array::is_empty(belong_to)`
       break
     case 'unscheduled':
-      sql += ` AND (scheduled_start IS NULL)`
+      sql += ` AND done = false AND (scheduled_start IS NULL)`
+      break
+    case 'abandoned':
+      sql += ` AND done = true AND entity_id IN (SELECT * FROM entity_event_log WHERE slug = 'done' AND payload.type = 'abandoned').entity`
       break
     default:
+      // 今日已完成始终显示已完成的事项
+      if (!_showDones) {
+        sql += ` AND done = false`
+      }
       sql += ` AND belong_to.id CONTAINS ${selectedTodoList.value.entity_id}`
   }
 
