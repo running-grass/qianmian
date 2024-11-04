@@ -119,7 +119,7 @@ const unScheduleTodoItems = ref<TodoItem[]>([])
 async function refreshUnScheduleTodoItems() {
   const db = await getDb()
   const [res] = await db.query<[TodoItem[]]>(
-    `SELECT * FROM ${todoItemView.tb} WHERE done = false AND scheduled_start IS null AND scheduled_end IS NULL`
+    `SELECT * FROM ${todoItemView.tb} WHERE done = false AND scheduled_start IS null AND scheduled_end IS NULL ORDER BY priority_order DESC, created_at DESC`,
   )
   unScheduleTodoItems.value = res
 }
@@ -241,67 +241,27 @@ function onItemDragEnd(e: DragEvent) {
 <template>
   <section class="w-full h-full flex">
     <FullCalendar ref="full-calendar" :options="calendarOptions" class="flex-1"> </FullCalendar>
-    <section
-      class="p-2 flex flex-col w-auto min-w-80 transition-[width] duration-1000"
-      v-if="scheduleTodoItemPanel"
-    >
+    <section class="p-2 flex flex-col w-auto min-w-80 transition-[width] duration-1000" v-if="scheduleTodoItemPanel">
       <header class="flex flex-row justify-end mb-2">
-        <XCircleIcon
-          class="w-6 h-6 cursor-pointer hover:fill-green-900"
-          @click="scheduleTodoItemPanel = false"
-        />
+        <XCircleIcon class="w-6 h-6 cursor-pointer hover:fill-green-900" @click="scheduleTodoItemPanel = false" />
       </header>
       <ul ref="draggable-element" class="flex-1 overflow-y-auto flex flex-col">
-        <TodoItemRow
-          v-for="todoItem in unScheduleTodoItems"
-          :key="todoItem.entity_id.toString()"
-          :todoItem="todoItem"
-          :draggable="true"
-          show-tags
-          @dragstart="onItemDragStart"
-          @dragend="onItemDragEnd"
-        >
+        <TodoItemRow v-for="todoItem in unScheduleTodoItems" :key="todoItem.entity_id.toString()" show-checkbox
+          :todoItem="todoItem" :draggable="true" show-tags @dragstart="onItemDragStart" @dragend="onItemDragEnd">
         </TodoItemRow>
-        <!-- <li
-          v-for="todoItem in unScheduleTodoItems"
-          :key="todoItem.entity_id.toString()"
-          :draggable="true"
-          @dragstart="onItemDragStart"
-          @dragend="onItemDragEnd"
-          :data-entity-id="todoItem.entity_id.id.toString()"
-          :class="['py-2 px-4 hover:bg-green-50 flex items-center cursor-pointer break-all ']"
-        >
-          {{ todoItem.title }}
-        </li> -->
       </ul>
     </section>
   </section>
 
   <!-- 详情 -->
-  <el-drawer
-    v-if="isMobileScreen"
-    modal-class="todo-item-detail-drawer"
-    v-model="detailPanelVisible"
-    :size="isMobileScreen ? '90%' : '40%'"
-    :with-header="false"
-    destroy-on-close
-    :direction="isMobileScreen ? 'btt' : 'rtl'"
-    @close="onDetailPanelClose"
-  >
-    <TodoItemDetail
-      v-if="selectedTodoItem"
-      v-model="selectedTodoItem"
-      :key="selectedTodoItem?.entity_id.toString()"
-    />
+  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="detailPanelVisible"
+    :size="isMobileScreen ? '90%' : '40%'" :with-header="false" destroy-on-close
+    :direction="isMobileScreen ? 'btt' : 'rtl'" @close="onDetailPanelClose">
+    <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()" />
   </el-drawer>
   <FloatPopover v-else v-model="detailPanelVisible" @close="onDetailPanelClose">
-    <TodoItemDetail
-      v-if="selectedTodoItem"
-      v-model="selectedTodoItem"
-      :key="selectedTodoItem?.entity_id.toString()"
-      class="min-w-[400px] min-h-[300px] bg-white shadow-xl border"
-      @update="refreshtodoItems"
-      @delete="refreshtodoItems"
-    />
+    <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
+      class="min-w-[400px] min-h-[300px] bg-white shadow-xl border" @update="refreshtodoItems"
+      @delete="refreshtodoItems" />
   </FloatPopover>
 </template>

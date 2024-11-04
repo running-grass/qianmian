@@ -4,7 +4,7 @@ import type { TodoItem } from '@/core'
 import { getDoneInputClass, getScheduledStartHtml } from '../util'
 import { allTodoList, changeTodoItemDone } from '../store'
 
-const { todoItem, showTags = false } = defineProps<{ todoItem: TodoItem; showTags: boolean }>()
+const { todoItem, showTags = false, showCheckbox = true } = defineProps<{ todoItem: TodoItem; showTags: boolean, showCheckbox?: boolean }>()
 const emit = defineEmits(['update'])
 
 const timeText = computed(() => getScheduledStartHtml(todoItem))
@@ -26,18 +26,12 @@ async function changeTodoItemDoneLocal(todoItem: TodoItem, done: boolean) {
 </script>
 
 <template>
-  <li
-    :data-entity-id="todoItem.entity_id.id.toString()"
-    :class="['py-2 pl-0 pr-2 hover:bg-green-50 flex items-center cursor-pointer break-all ']"
-  >
+  <li :data-entity-id="todoItem.entity_id.id.toString()"
+    :class="['py-2 pl-0 pr-2 hover:bg-green-50 flex items-center cursor-pointer break-all ']">
     <span class="w-0.5 h-full mr-2" :style="{ backgroundColor: todoListThemeColor }"> &nbsp; </span>
 
-    <input
-      type="checkbox"
-      :class="getDoneInputClass(todoItem)"
-      :checked="todoItem.done"
-      @click.stop="changeTodoItemDoneLocal(todoItem, !todoItem.done)"
-    />
+    <input type="checkbox" v-if="showCheckbox" :class="getDoneInputClass(todoItem)" :checked="todoItem.done"
+      @click.stop="changeTodoItemDoneLocal(todoItem, !todoItem.done)" />
     <div tabindex="-1" class="flex-1 ml-2 focus:outline-none">
       {{ todoItem.title }}
     </div>
