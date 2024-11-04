@@ -1,5 +1,17 @@
 # 更新日志
 
+## [0.2.2](https://github.com/running-grass/qianmian/compare/0.2.1...0.2.2) (2024-11-04)
+
+
+### Features
+
+* **todolist:** 待办清单支持配置主题色 ([#31](https://github.com/running-grass/qianmian/issues/31)) ([e841d08](https://github.com/running-grass/qianmian/commit/e841d088a2dc4b6d944ed1c84550cb089d94553a))
+* **todolist:** 增加标签属性 ([#34](https://github.com/running-grass/qianmian/issues/34)) ([56bd9d0](https://github.com/running-grass/qianmian/commit/56bd9d08bbb9c28682c56981ab090c3cedc8c829))
+* **todolist:** 增加待办事项的放弃操作 ([#33](https://github.com/running-grass/qianmian/issues/33)) ([ad13904](https://github.com/running-grass/qianmian/commit/ad1390472bb2e0e1586eb27cdbf55236b78d92ef))
+* **todolist:** 增加两个虚拟清单 ([#30](https://github.com/running-grass/qianmian/issues/30)) ([c094f4f](https://github.com/running-grass/qianmian/commit/c094f4fbc6556fca4c3b77bce5e9ac292dab61b4))
+* **todolist:** 增加实体事件记录机制 ([#32](https://github.com/running-grass/qianmian/issues/32)) ([7ef2772](https://github.com/running-grass/qianmian/commit/7ef27726bd48055fe8bf3f720e8fa58ade139737))
+* **todolist:** 增加右键移动至清单功能 ([#35](https://github.com/running-grass/qianmian/issues/35)) ([89e63cb](https://github.com/running-grass/qianmian/commit/89e63cbbd2749b754de72d5a4bda08e0e8dc83a1))
+
 ## [0.2.1](https://github.com/running-grass/qianmian/compare/0.2.0...0.2.1) (2024-10-25)
 
 
