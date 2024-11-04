@@ -100,7 +100,18 @@ export async function refreshtodoItems() {
       sql += ` AND belong_to.id = ${selectedTodoList.value.entity_id}`
   }
 
-  sql += ` ORDER BY ordered_field_is_null,${sqlOrderField} ${sqlOrderFieldOrder},created_at DESC`
+  switch (selectedTodoList.value) {
+    case 'today':
+    case 'tomorrow':
+      sql += ` ORDER BY priority_order DESC,created_at DESC`
+      break
+    case 'today_done':
+    case 'abandoned':
+      sql += ` ORDER BY last_done_time DESC,created_at DESC`
+      break
+    default:
+      sql += ` ORDER BY ordered_field_is_null,${sqlOrderField} ${sqlOrderFieldOrder},created_at DESC`
+  }
 
   // TODO 暂定一个 1000 条的限制
   sql += ` LIMIT 1000`

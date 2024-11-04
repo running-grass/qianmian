@@ -202,6 +202,7 @@ function getTodoListTitle(todoList: typeof selectedTodoList.value) {
   return title
 }
 
+const disabledOrderList: typeof selectedTodoList.value[] = ['today', 'tomorrow', 'today_done', 'abandoned']
 function TodoItemCreateRow() {
   return (
     <>
@@ -222,7 +223,7 @@ function TodoItemCreateRow() {
           onKeydown={withKeys(createTodoItemUI, ['enter'])}
           placeholder="添加一个事项"
         />
-        <el-dropdown onCommand={changeOrderField}>
+        <el-dropdown onCommand={changeOrderField} disabled={disabledOrderList.includes(selectedTodoList.value)}>
           {{
             default: () => <ArrowsUpDownIcon class="w-6 h-6 mx-2" />,
             dropdown: () => (
@@ -433,7 +434,7 @@ function TodoListRow({ todoList }: { todoList: TodoList }) {
       class={[
         'py-2 pl-2 pr-2 hover:bg-green-50 flex items-center cursor-pointer',
         ...(typeof selectedTodoList.value === 'object' &&
-        selectedTodoList.value?.entity_id.id === todoList.entity_id.id
+          selectedTodoList.value?.entity_id.id === todoList.entity_id.id
           ? ['bg-green-100']
           : [])
       ]}
@@ -516,96 +517,48 @@ const showItemTags = ref(!isMobileScreen.value)
     <section class="w-80 grow-[2] shrink-0 flex flex-col p-4 border-r-2">
       <TodoItemCreateRow></TodoItemCreateRow>
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
-        <TodoItemRow
-          v-for="todoItem of todoItemsByList"
-          :key="todoItem.entity_id.id.toString()"
-          :todoItem="todoItem"
-          :show-list="selectedTodoList === null"
-          @click="changeCurrentObject(todoItem)"
-          :draggable="true"
-          :showTags="showItemTags"
-          @contextmenu.stop.prevent="openTodoItemContextMenu(todoItem)"
-          @dragstart="onItemDragStart"
-          @dragend="onItemDragEnd"
-          @update="refreshtodoItems"
-          :class="[
+        <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem"
+          :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)" :draggable="true"
+          :showTags="showItemTags" @contextmenu.stop.prevent="openTodoItemContextMenu(todoItem)"
+          @dragstart="onItemDragStart" @dragend="onItemDragEnd" @update="refreshtodoItems" :class="[
             ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
-          ]"
-        >
+          ]">
         </TodoItemRow>
       </TransitionGroup>
     </section>
 
-    <article
-      v-if="!isMobileScreen"
-      class="grow-[3] p-2 flex-col hidden md:flex todo-item-detail-host"
-    >
+    <article v-if="!isMobileScreen" class="grow-[3] p-2 flex-col hidden md:flex todo-item-detail-host">
       <el-empty v-if="!selectedTodoItem" description="未选择事项" class="w-full h-full" />
-      <TodoItemDetail
-        v-else
-        v-model="selectedTodoItem"
-        :key="selectedTodoItem.entity_id.id.toString()"
-        @update="refreshtodoItems"
-        @delete="refreshtodoItems"
-      />
+      <TodoItemDetail v-else v-model="selectedTodoItem" :key="selectedTodoItem.entity_id.id.toString()"
+        @update="refreshtodoItems" @delete="refreshtodoItems" />
     </article>
   </div>
 
-  <el-drawer
-    v-if="isMobileScreen"
-    modal-class="todo-item-detail-drawer"
-    v-model="mobileDrawer"
-    size="90%"
-    :with-header="false"
-    destroy-on-close
-    direction="btt"
-  >
-    <TodoItemDetail
-      v-if="selectedTodoItem"
-      v-model="selectedTodoItem"
-      :key="selectedTodoItem?.entity_id.toString()"
-      @update="refreshtodoItems"
-      @delete="refreshtodoItems"
-    />
+  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="90%"
+    :with-header="false" destroy-on-close direction="btt">
+    <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
+      @update="refreshtodoItems" @delete="refreshtodoItems" />
   </el-drawer>
 
-  <el-drawer
-    v-if="isMobileScreen"
-    v-model="todoListDrawer"
-    size="80%"
-    :with-header="false"
-    destroy-on-close
-    direction="ltr"
-  >
+  <el-drawer v-if="isMobileScreen" v-model="todoListDrawer" size="80%" :with-header="false" destroy-on-close
+    direction="ltr">
     <TodoListSection />
   </el-drawer>
 
   <el-dialog v-model="createTodoListDialog" :with-header="false" destroy-on-close>
-    <TodoListEditPanel
-      @close="createTodoListDialog = false"
-      v-model="createTodoListDialogModeValue"
-      :mode="createTodoListDialogMode"
-    />
+    <TodoListEditPanel @close="createTodoListDialog = false" v-model="createTodoListDialogModeValue"
+      :mode="createTodoListDialogMode" />
   </el-dialog>
   <FloatPopover v-model="todoListContextMenuVisible">
-    <TodoListContextMenu
-      v-if="todoListContextMenuTarget"
-      :todoList="todoListContextMenuTarget"
-      @edit="editTodoList"
-      @delete="deleteTodoListUI"
-    />
+    <TodoListContextMenu v-if="todoListContextMenuTarget" :todoList="todoListContextMenuTarget" @edit="editTodoList"
+      @delete="deleteTodoListUI" />
   </FloatPopover>
   <FloatPopover v-model="todoItemContextMenuVisible">
-    <TodoItemContextMenu
-      v-if="todoItemContextMenuTarget"
-      :todoItem="todoItemContextMenuTarget"
-      @executed="
-        () => {
-          refreshtodoItems()
-          todoItemContextMenuVisible = false
-        }
-      "
-    />
+    <TodoItemContextMenu v-if="todoItemContextMenuTarget" :todoItem="todoItemContextMenuTarget" @executed="() => {
+      refreshtodoItems()
+      todoItemContextMenuVisible = false
+    }
+      " />
   </FloatPopover>
 </template>
 
