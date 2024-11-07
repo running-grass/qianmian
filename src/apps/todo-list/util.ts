@@ -27,7 +27,7 @@ if (import.meta.vitest) {
     expect(getDoneInputClass({ priority: '低' })).toContain('checkbox-info')
     expect(getDoneInputClass({ priority: '中' })).toContain('checkbox-warning')
     expect(getDoneInputClass({ priority: '高' })).toContain('checkbox-error')
-    expect(getDoneInputClass({ priority: null })).toContain('checkbox')
+    expect(getDoneInputClass({ priority: undefined })).toContain('checkbox')
   })
 }
 
@@ -163,26 +163,46 @@ if (import.meta.vitest) {
   const nextWeek = myDayjs().add(2, 'week').toDate()
   describe('getTime', () => {
     test.each([
-      ['无时间', null, null, ''],
+      ['无时间', undefined, undefined, ''],
       // 单独的开始时间
-      ['开始时间为昨天', yestday, null, '<span class="text-sm text-red-600">1天前开始</span>'],
-      ['开始时间为今天', now, null, '<span class="text-sm text-red-600">1秒前开始</span>'],
-      ['开始时间为明天', tomoarrow, null, '<span class="text-sm text-yellow-600">1天后开始</span>'],
-      ['开始时间为4天后', days4, null, '<span class="text-sm text-blue-600">4天后开始</span>'],
-      ['开始时间为下周', nextWeek, null, '<span class="text-sm text-green-600">14天后开始</span>'],
+      ['开始时间为昨天', yestday, undefined, '<span class="text-sm text-red-600">1天前开始</span>'],
+      ['开始时间为今天', now, undefined, '<span class="text-sm text-red-600">1秒前开始</span>'],
+      [
+        '开始时间为明天',
+        tomoarrow,
+        undefined,
+        '<span class="text-sm text-yellow-600">1天后开始</span>'
+      ],
+      ['开始时间为4天后', days4, undefined, '<span class="text-sm text-blue-600">4天后开始</span>'],
+      [
+        '开始时间为下周',
+        nextWeek,
+        undefined,
+        '<span class="text-sm text-green-600">14天后开始</span>'
+      ],
       // 单独的截止时间
-      ['截止时间为昨天', null, yestday, '<span class="text-sm text-red-600">截止至1天前</span>'],
-      ['截止时间为今天', null, now, '<span class="text-sm text-red-600">截止至1秒前</span>'],
+      [
+        '截止时间为昨天',
+        undefined,
+        yestday,
+        '<span class="text-sm text-red-600">截止至1天前</span>'
+      ],
+      ['截止时间为今天', undefined, now, '<span class="text-sm text-red-600">截止至1秒前</span>'],
       [
         '截止时间为明天',
-        null,
+        undefined,
         tomoarrow,
         '<span class="text-sm text-yellow-600">截止至1天后</span>'
       ],
-      ['截止时间为4天后', null, days4, '<span class="text-sm text-blue-600">截止至4天后</span>'],
+      [
+        '截止时间为4天后',
+        undefined,
+        days4,
+        '<span class="text-sm text-blue-600">截止至4天后</span>'
+      ],
       [
         '截止时间为下周',
-        null,
+        undefined,
         nextWeek,
         '<span class="text-sm text-green-600">截止至14天后</span>'
       ],
@@ -230,11 +250,8 @@ if (import.meta.vitest) {
         prevWeek,
         '<span class="text-sm text-red-600">截止至14天前</span>'
       ]
-    ])(
-      'getTime %# %s',
-      (name, scheduled_start: Date | null, deadline: Date | null, res: string) => {
-        expect(getTimeHtml({ scheduled_start, deadline })).toBe(res)
-      }
-    )
+    ])('getTime %# %s', (name, scheduled_start?: Date, deadline?: Date, res?: string) => {
+      expect(getTimeHtml({ scheduled_start, deadline })).toBe(res)
+    })
   })
 }

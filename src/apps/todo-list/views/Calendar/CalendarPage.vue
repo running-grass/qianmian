@@ -119,7 +119,7 @@ const unScheduleTodoItems = ref<TodoItem[]>([])
 async function refreshUnScheduleTodoItems() {
   const db = await getDb()
   const [res] = await db.query<[TodoItem[]]>(
-    `SELECT * FROM ${todoItemView.tb} WHERE done = false AND scheduled_start IS null AND scheduled_end IS NULL ORDER BY priority_order DESC, created_at DESC`,
+    `SELECT * FROM ${todoItemView.tb} WHERE done = false AND scheduled_start IS NONE AND scheduled_end IS NONE ORDER BY priority_order DESC, created_at DESC`,
   )
   unScheduleTodoItems.value = res
 }

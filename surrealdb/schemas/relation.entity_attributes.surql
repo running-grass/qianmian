@@ -19,11 +19,6 @@ DEFINE EVENT OVERWRITE trigger_entity_update ON TABLE entity_attributes
 
 -- 断言属性值是否符合类型声明
 DEFINE FUNCTION OVERWRITE fn::assert_attribute_type($aid: record<attribute>, $value: any) {
-  -- TODO 需要统一改为 NONE
-  IF ($value == null) {
-    RETURN true;
-  };
-
   IF ($value == NONE) {
     RETURN true;
   };
@@ -59,7 +54,7 @@ DEFINE FUNCTION OVERWRITE fn::assert_attribute_type($aid: record<attribute>, $va
 DEFINE FUNCTION OVERWRITE fn::update_attribute_data($naid: option<record<entity_attributes>>, $nid: record<entity>, $aid: record<attribute>, $data: any) {
   IF (!type::is::none($naid)) {
     UPDATE ONLY $naid MERGE { data: $data };
-    RETURN null;
+    RETURN NONE;
   };
   LET $na = (SELECT * FROM ONLY entity_attributes WHERE in = $nid AND out = $aid LIMIT 1);
 
@@ -68,7 +63,4 @@ DEFINE FUNCTION OVERWRITE fn::update_attribute_data($naid: option<record<entity_
   } ELSE {
     RELATE $nid->entity_attributes->$aid CONTENT { data: $data };
   };
-
-  RETURN null;
-
 } COMMENT "更新属性值" PERMISSIONS FULL;

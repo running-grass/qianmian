@@ -87,10 +87,9 @@ export async function deleteTodoList(eid: EntityId): Promise<void> {
 export async function changeTodoItemAttribute(
   entityId: EntityId,
   attrId: AttributeId,
-  // TODO 逐步取代 null
-  data: AttributeDataType | null | undefined
+  data: AttributeDataType | undefined
 ) {
-  await changeAttribute(null, entityId, attrId, data)
+  await changeAttribute(undefined, entityId, attrId, data)
 }
 
 /**

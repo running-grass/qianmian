@@ -66,25 +66,25 @@ async function changePriority($event: TodoItemPriority | '') {
   await changeTodoItemAttribute(
     modelValue.value.entity_id,
     attributePriority.value.id,
-    $event ? $event : null
+    $event ? $event : undefined
   )
   emit('update', modelValue.value.entity_id)
 }
 
-async function changeScheduleStart($event: Date | null) {
+async function changeScheduleStart($event: Date) {
   await changeTodoItemAttribute(
     modelValue.value.entity_id,
     attributeSchduledStart.value.id,
-    $event ?? null
+    $event
   )
   emit('update', modelValue.value.entity_id)
 }
 
-async function changeScheduleEnd($event: Date | null) {
+async function changeScheduleEnd($event?: Date) {
   await changeTodoItemAttribute(
     modelValue.value.entity_id,
     attributeSchduledEnd.value.id,
-    $event ?? null
+    $event
   )
   emit('update', modelValue.value.entity_id)
 }
@@ -116,90 +116,32 @@ async function changeTags() {
 <template>
   <section class="w-full h-full p-2 flex flex-col todo-item-detail">
     <header class="flex items-center gap-2 flex-wrap">
-      <input
-        type="checkbox"
-        :class="getDoneInputClass(modelValue)"
-        v-model="modelValue.done"
-        @change="changeTodoItemDoneLocal"
-      />
-      <el-select
-        v-model="selectedPriority"
-        size="small"
-        class="!w-24 mr-2"
-        clearable
-        @change="changePriority"
-        placeholder="无优先级"
-        :teleported="false"
-      >
-        <el-option
-          v-for="item in ['', '低', '中', '高']"
-          :key="item"
-          :label="(item ? item : '无') + '优先级'"
-          :value="item"
-        />
+      <input type="checkbox" :class="getDoneInputClass(modelValue)" v-model="modelValue.done"
+        @change="changeTodoItemDoneLocal" />
+      <el-select v-model="selectedPriority" size="small" class="!w-24 mr-2" clearable @change="changePriority"
+        placeholder="无优先级" :teleported="false">
+        <el-option v-for="item in ['', '低', '中', '高']" :key="item" :label="(item ? item : '无') + '优先级'" :value="item" />
       </el-select>
-      <el-date-picker
-        v-model="currentScheduleStart"
-        type="date"
-        size="small"
-        placeholder="计划开始时间"
-        class="!w-44"
-        @change="changeScheduleStart"
-        :teleported="false"
-      />
-      <el-date-picker
-        v-model="currentScheduleEnd"
-        type="date"
-        size="small"
-        placeholder="计划结束时间"
-        class="!w-44"
-        @change="changeScheduleEnd"
-        :teleported="false"
-      />
+      <el-date-picker v-model="currentScheduleStart" type="date" size="small" placeholder="计划开始时间" class="!w-44"
+        @change="changeScheduleStart" :teleported="false" />
+      <el-date-picker v-model="currentScheduleEnd" type="date" size="small" placeholder="计划结束时间" class="!w-44"
+        @change="changeScheduleEnd" :teleported="false" />
 
-      <el-select
-        v-model="todoItemModel.tags"
-        multiple
-        placeholder="标签"
-        class="!w-24"
-        @change="changeTags"
-      >
+      <el-select v-model="todoItemModel.tags" multiple placeholder="标签" class="!w-24" @change="changeTags">
         <el-option v-for="item in attributeTag.enums" :key="item" :label="item" :value="item" />
       </el-select>
       <!-- <el-date-picker v-model="currentDeadline" type="date" size="small" placeholder="截止时间" class="!w-44"
         @change="changeDeadline" :teleported="false" /> -->
     </header>
-    <el-input
-      tabindex="1"
-      class="my-4"
-      type="text"
-      v-model="modelValue.title"
-      @input="triggerInput"
-      @change="triggerChange"
-    />
-    <el-input
-      type="textarea"
-      tabindex="2"
-      @input="triggerInput"
-      @change="triggerChange"
-      class="textarea textarea-bordered flex-1 w-full resize-none"
-      v-model="modelValue.content"
-    />
+    <el-input tabindex="1" class="my-4" type="text" v-model="modelValue.title" @input="triggerInput"
+      @change="triggerChange" />
+    <el-input type="textarea" tabindex="2" @input="triggerInput" @change="triggerChange"
+      class="textarea textarea-bordered flex-1 w-full resize-none" v-model="modelValue.content" />
     <footer class="mt-4 justify-between items-center">
-      <el-select
-        v-model="localBelongs"
-        size="small"
-        clearable
-        placeholder="Select"
-        style="width: 240px"
-        @change="changeBelongList"
-      >
-        <el-option
-          v-for="item in allTodoList"
-          :key="item.entity_id.toString()"
-          :label="item.title"
-          :value="item.entity_id.toString()"
-        />
+      <el-select v-model="localBelongs" size="small" clearable placeholder="Select" style="width: 240px"
+        @change="changeBelongList">
+        <el-option v-for="item in allTodoList" :key="item.entity_id.toString()" :label="item.title"
+          :value="item.entity_id.toString()" />
       </el-select>
       <el-button class="ml-4" type="danger" @click="deleteSelectedTodoItem">删除</el-button>
     </footer>
