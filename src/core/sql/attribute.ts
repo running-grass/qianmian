@@ -97,11 +97,10 @@ export async function getAttributesBy(oid: EntityId): Promise<ObjectAttributeMix
 }
 
 export async function changeAttribute(
-  entityAttributesId: EntityAttributesId | null | undefined,
+  entityAttributesId: EntityAttributesId | undefined,
   entityId: EntityId,
   attrId: AttributeId,
-  // TODO 逐步取代 null
-  data: AttributeDataType | null | undefined
+  data: AttributeDataType | undefined
 ) {
   const db = await getDb()
 

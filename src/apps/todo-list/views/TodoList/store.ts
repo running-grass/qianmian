@@ -63,7 +63,7 @@ export async function refreshtodoItems() {
       break
   }
 
-  let sql = `SELECT *,${sqlOrderField} == null as ordered_field_is_null FROM ${todoItemView.tb}`
+  let sql = `SELECT *,${sqlOrderField} == NONE as ordered_field_is_none FROM ${todoItemView.tb}`
 
   sql += ` WHERE true`
 
@@ -75,7 +75,7 @@ export async function refreshtodoItems() {
       break
     case 'today':
       // 今天
-      sql += ` AND done = false AND ((scheduled_start IS NOT null AND scheduled_start < ${tomorrow}) OR (scheduled_end IS NOT null AND scheduled_end < ${tomorrow}))`
+      sql += ` AND done = false AND ((scheduled_start IS NOT NONE AND scheduled_start < ${tomorrow}) OR (scheduled_end IS NOT NONE AND scheduled_end < ${tomorrow}))`
       break
     case 'tomorrow':
       sql += ` AND done = false AND ((scheduled_start >= ${tomorrow} AND scheduled_start < ${tomorrow2}) OR (scheduled_end >= ${tomorrow} AND scheduled_end < ${tomorrow2}) OR (deadline >= ${tomorrow} AND deadline < ${tomorrow2}))`
@@ -87,7 +87,7 @@ export async function refreshtodoItems() {
       sql += ` AND done = false AND array::is_empty(belong_to)`
       break
     case 'unscheduled':
-      sql += ` AND done = false AND (scheduled_start IS NULL)`
+      sql += ` AND done = false AND (scheduled_start IS NONE)`
       break
     case 'abandoned':
       sql += ` AND done = true AND entity_id IN (SELECT * FROM entity_event_log WHERE slug = 'done' AND payload.type = 'abandoned').entity`
@@ -110,7 +110,7 @@ export async function refreshtodoItems() {
       sql += ` ORDER BY last_done_time DESC,created_at DESC`
       break
     default:
-      sql += ` ORDER BY ordered_field_is_null,${sqlOrderField} ${sqlOrderFieldOrder},created_at DESC`
+      sql += ` ORDER BY ordered_field_is_none,${sqlOrderField} ${sqlOrderFieldOrder},created_at DESC`
   }
 
   // TODO 暂定一个 1000 条的限制
