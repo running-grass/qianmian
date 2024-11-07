@@ -72,7 +72,7 @@ export type AttributeType =
   | 'enums'
   | 'color'
 
-export type AttributeDataType = string | number | boolean | Date | Array<string>
+export type AttributeDataType = object | string | number | boolean | Date | Array<string>
 
 export const attributeTable = new Table('attribute')
 export type AttributeId = RecordId<'attribute'>

@@ -20,6 +20,7 @@ DEFINE TABLE OVERWRITE todo_item  TYPE NORMAL
 		, fn::priority_to_order(attributes.find(|$attr| $attr.out.slug == "priority").data ?? NONE) as priority_order
 		, attributes.find(|$attr| $attr.out.slug == "scheduled_start").data ?? NONE as scheduled_start
 		, attributes.find(|$attr| $attr.out.slug == "scheduled_end").data ?? NONE as scheduled_end
+		, attributes.find(|$attr| $attr.out.slug == "scheduled_repeat").data ?? NONE as scheduled_repeat
 		, attributes.find(|$attr| $attr.out.slug == "deadline").data ?? NONE as deadline
 		, attributes.find(|$attr| $attr.out.slug == "tag").data ?? [] as tags
 		, relations.filter(|$rel| $rel.relation.slug == "belong_to_todo_list").map(|$rel| $rel.out)[0].{id,title} as belong_to

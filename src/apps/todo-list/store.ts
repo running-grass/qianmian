@@ -8,12 +8,17 @@ import {
   type TodoList,
   todoListView,
   relationBelongToTodoList,
-  StringRecordId
+  StringRecordId,
+  type TodoItem,
+  ScheduledRepeatValidator,
+  type ScheduledRepeat,
+  attributeSchduledStart
 } from '@/core'
 import { getDb } from '@/core'
 import { type EntityId } from '@/core'
 import { doneEventSlug } from '@/core/built-in/entityEvent'
 import { createEntityEventLog } from '@/core/sql/eventLog'
+import { myDayjs } from '@/plugins/dayjs'
 import { computed, ref } from 'vue'
 
 // 待办清单
@@ -99,16 +104,43 @@ export async function changeTodoItemAttribute(
  * @param done 是否完成
  */
 export async function changeTodoItemDone(
-  todoId: EntityId,
+  todoItem: TodoItem,
   done: boolean,
   type: 'finished' | 'abandoned' = 'finished'
 ): Promise<void> {
-  await changeTodoItemAttribute(todoId, attributeDone.value.id, done)
   if (done) {
-    console.log('done', done)
-    await createEntityEventLog(todoId, doneEventSlug, {
+    await createEntityEventLog(todoItem.entity_id, doneEventSlug, {
       type
     })
+
+    if (!todoItem.scheduled_repeat) {
+      console.log('done', done)
+      // 不需要重复的直接关闭
+      await changeTodoItemAttribute(todoItem.entity_id, attributeDone.value.id, done)
+    } else if (todoItem.scheduled_start) {
+      // 不关闭事项，而是更改下次执行时间
+      const nextDate = getNextDate(
+        todoItem.scheduled_start,
+        ScheduledRepeatValidator.parse(todoItem.scheduled_repeat)
+      )
+      await changeTodoItemAttribute(todoItem.entity_id, attributeSchduledStart.value.id, nextDate)
+    }
+  } else {
+    await changeTodoItemAttribute(todoItem.entity_id, attributeDone.value.id, done)
+  }
+}
+
+function getNextDate(current: Date, repeat: ScheduledRepeat): Date {
+  const curr = myDayjs(current)
+  switch (repeat.unit) {
+    case 'days':
+      return curr.add(repeat.quantity, 'day').toDate()
+    case 'weeks':
+      return curr.add(repeat.quantity, 'week').toDate()
+    case 'months':
+      return curr.add(repeat.quantity, 'month').toDate()
+    case 'years':
+      return curr.add(repeat.quantity, 'year').toDate()
   }
 }
 

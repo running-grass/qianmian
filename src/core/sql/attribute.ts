@@ -21,7 +21,7 @@ export async function createAttribute(
   name: string = '',
   description: string = '',
   type: AttributeType,
-  enums: string[] = []
+  enums: readonly string[] | string[] = []
 ): Promise<Attribute> {
   if (name === '') {
     name = slug
@@ -38,7 +38,7 @@ export async function createAttribute(
     name,
     description,
     type,
-    enums: type === 'enum' || type === 'enums' ? enums : []
+    enums: type === 'enum' || type === 'enums' ? (enums as string[]) : []
   })
 
   await refreshAttributePool()
