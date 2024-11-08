@@ -84,7 +84,7 @@ export async function refreshtodoItems() {
       sql += ` AND last_done_time >= ${today}`
       break
     case 'unorganized':
-      sql += ` AND done = false AND array::is_empty(belong_to)`
+      sql += ` AND done = false AND belong_to IS NONE`
       break
     case 'unscheduled':
       sql += ` AND done = false AND (scheduled_start IS NONE)`
