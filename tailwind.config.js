@@ -1,4 +1,4 @@
-import daisyui from 'daisyui'
+import primeui from 'tailwindcss-primeui'
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -13,11 +13,11 @@ export default {
     // }
   },
   plugins: [
-    daisyui
+    primeui
   ],
+  darkMode: 'selector',
 
   daisyui: {
-
     themes: false, // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
     darkTheme: "dark", // name of one of the included themes for dark mode
     base: false, // applies background color and foreground color for root element by default

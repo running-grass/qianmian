@@ -7,7 +7,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // import { analyzer } from 'vite-bundle-analyzer'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import { ElementPlusResolver, PrimeVueResolver } from 'unplugin-vue-components/resolvers'
 import packageInfo from './package.json'
 
 import { marked } from 'marked'
@@ -49,10 +49,10 @@ export default defineConfig({
     vueJsx(),
     vueDevTools(),
     AutoImport({
-      resolvers: [ElementPlusResolver()]
+      resolvers: [ElementPlusResolver(), PrimeVueResolver()]
     }),
     Components({
-      resolvers: [ElementPlusResolver()]
+      resolvers: [ElementPlusResolver(), PrimeVueResolver()]
     })
     // analyzer()
   ],

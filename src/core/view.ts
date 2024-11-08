@@ -1,5 +1,5 @@
 import { Table } from 'surrealdb'
-import type { TodoItemPriority } from './built-in'
+import type { ScheduledRepeat, TodoItemPriority } from './built-in'
 import type { AccountId, EntityId } from './table'
 
 export const todoItemView = new Table('todo_item')
@@ -19,6 +19,7 @@ export type TodoItem = {
   priority?: TodoItemPriority
   scheduled_start?: Date
   scheduled_end?: Date
+  scheduled_repeat?: ScheduledRepeat
   deadline?: Date
   tags: Array<string>
 

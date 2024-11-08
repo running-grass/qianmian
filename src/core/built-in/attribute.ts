@@ -2,9 +2,12 @@ import { ref } from 'vue'
 import { allAttributeMapBySlug, dataPoolInitPromise } from '../datapool'
 import { createAttribute } from '../sql/attribute'
 import type { Attribute, AttributeType } from '../table'
+import { z } from 'zod'
 
 const doneAttributeSlug = 'done'
 const priorityAttributeSlug = 'priority'
+const scheduledRepeatSlug = 'scheduled_repeat'
+
 const scheduledStartSlug = 'scheduled_start'
 const scheduledEndSlug = 'scheduled_end'
 const deadlineSlug = 'deadline'
@@ -12,17 +15,18 @@ const themeColorSlug = 'theme_color'
 const tagAttributeSlug = 'tag'
 
 /** 优先级类型 */
-export type TodoItemPriority = '低' | '中' | '高'
 
 /** 优先级可选项列表 */
-export const todoItemPriorities: TodoItemPriority[] = ['低', '中', '高']
+export const todoItemPriorities = ['低', '中', '高'] as const
+export const TodoItemPriorityValidator = z.enum(todoItemPriorities)
+export type TodoItemPriority = z.infer<typeof TodoItemPriorityValidator>
 
 async function getAttributeBySlug(
   slug: string,
   name: string = '',
   description: string = '',
   type: AttributeType,
-  enums: string[] = []
+  enums: readonly string[] | string[] = []
 ): Promise<Readonly<Attribute>> {
   await dataPoolInitPromise
   const targetAttr = allAttributeMapBySlug.value.get(slug)
@@ -85,6 +89,33 @@ async function fillSchduledEnd() {
   )
 }
 
+/** 计划安排时间重复属性 */
+export const attributeSchduledRepeat = ref<Readonly<Attribute>>(undefined!)
+async function fillSchduledRepeat() {
+  attributeSchduledRepeat.value = await getAttributeBySlug(
+    scheduledRepeatSlug,
+    '计划时间重复',
+    '计划安排时间的重复属性',
+    'object'
+  )
+}
+
+export const ScheduledRepeatUnitEnums = ['days', 'weeks', 'months', 'years'] as const
+
+/** 重复属性类型 */
+export const ScheduledRepeatValidator = z.object({
+  /** 时间单位 */
+  unit: z.enum(ScheduledRepeatUnitEnums).default('days'),
+
+  /** 时间周期 */
+  quantity: z.number().int().positive().default(1),
+
+  /** 是否阴历 */
+  lunar: z.boolean().default(false)
+})
+
+export type ScheduledRepeat = z.infer<typeof ScheduledRepeatValidator>
+
 /** 截止时间属性 */
 export const attributeDeadline = ref<Readonly<Attribute>>(undefined!)
 async function fillDeadline() {
@@ -125,6 +156,7 @@ export async function initBuiltInAttributes() {
     fillPriority(),
     fillSchduledStart(),
     fillSchduledEnd(),
+    fillSchduledRepeat(),
     fillDeadline(),
     fillThemeColor()
   ])

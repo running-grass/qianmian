@@ -3,16 +3,16 @@ import { myDayjs } from '@/plugins/dayjs'
 
 /** 获取复选框的优先级样式 */
 export function getDoneInputClass(todoItem: Pick<TodoItem, 'priority'>) {
-  let cls = 'checkbox checkbox-sm'
+  let cls = 'outline outline-2'
   switch (todoItem.priority) {
     case '高':
-      cls += ' checkbox-error'
+      cls += ' outline-red-500'
       break
     case '中':
-      cls += ' checkbox-warning'
+      cls += ' outline-yellow-500'
       break
     case '低':
-      cls += ' checkbox-info'
+      cls += ' outline-blue-500'
       break
     default:
       break

@@ -47,12 +47,12 @@ async function onCommand(val: ValType[]) {
   switch (val[0]) {
     case 'delete':
       if (confirm(`确定要放弃吗?`)) {
-        await changeTodoItemDone(props.todoItem.entity_id, true, 'abandoned')
+        await changeTodoItemDone(props.todoItem, true, 'abandoned')
       }
       break
     case 'abandoned':
       if (confirm(`确定要放弃吗?`)) {
-        await changeTodoItemDone(props.todoItem.entity_id, true, 'abandoned')
+        await changeTodoItemDone(props.todoItem, true, 'abandoned')
       }
       break
     case 'move':

@@ -7,15 +7,18 @@ import 'element-plus/theme-chalk/el-message-box.css'
 import 'element-plus/theme-chalk/el-message.css'
 import 'element-plus/theme-chalk/el-dialog.css'
 
-import './style.css'
+import './assets/style.css'
 
 import posthogPlugin from './plugins/posthog' //import the plugin.
 import './plugins/dayjs'
+import PrimeVue from 'primevue/config'
 
 const app = createApp(App)
 
 app.use(posthogPlugin) //install the plugin
-
+app.use(PrimeVue, {
+  theme: 'none'
+})
 app.use(router)
 app.mount('#app')
 
