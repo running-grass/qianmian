@@ -1,5 +1,19 @@
 # 更新日志
 
+## [0.2.3](https://github.com/running-grass/qianmian/compare/0.2.2...0.2.3) (2024-11-08)
+
+
+### Features
+
+* 增加离线时的提示边框 ([#37](https://github.com/running-grass/qianmian/issues/37)) ([1373529](https://github.com/running-grass/qianmian/commit/13735294a6d647a04ce80867456d1d2a7df1de6d))
+* **todolist:** 增加间隔重复的机制 ([#39](https://github.com/running-grass/qianmian/issues/39)) ([c543d8f](https://github.com/running-grass/qianmian/commit/c543d8f1b8e103baa7ba4f04ff9d437e684f68e4))
+* **todolist:** 智能清单的排序机制调整 ([#36](https://github.com/running-grass/qianmian/issues/36)) ([fd41ea5](https://github.com/running-grass/qianmian/commit/fd41ea52fbfaece2ff3bcb2ca240f0a0e872e089))
+
+
+### Bug Fixes
+
+* **todolist:** 未归类筛选失败 ([#40](https://github.com/running-grass/qianmian/issues/40)) ([c7bc891](https://github.com/running-grass/qianmian/commit/c7bc89122993cbf1a6e52179a8127b98c6e3b512))
+
 ## [0.2.2](https://github.com/running-grass/qianmian/compare/0.2.1...0.2.2) (2024-11-04)
 
 
