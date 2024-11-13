@@ -1,11 +1,13 @@
 <script setup lang="tsx">
-import { nextTick, ref, withKeys, withModifiers } from 'vue'
+import { computed, ref, useTemplateRef, withKeys, withModifiers } from 'vue'
 
 import {
   type OrderField,
   allTodoList,
   changeBelongListTo,
   changeTodoItemAttribute,
+  changeTodoItemDone,
+  deleteTodoItem,
   deleteTodoList
 } from '../../store'
 import {
@@ -19,6 +21,7 @@ import {
   relationBelongToTodoList,
   StringRecordId,
   useMobile,
+  type EntityId,
   type TodoItem,
   type TodoList
 } from '@/core'
@@ -32,7 +35,6 @@ import {
 } from '@heroicons/vue/24/solid'
 import { useExportData, useImportData } from './importExport'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
-import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
 import { useRouter } from 'vue-router'
 import TodoItemRow from '../../components/TodoItemRow.vue'
 import {
@@ -44,11 +46,11 @@ import {
   selectedTodoItem
 } from './store'
 import { myDayjs } from '@/plugins/dayjs'
-import FloatPopover from '@/component/FloatPopover.vue'
-import TodoItemContextMenu from '../../components/TodoItemContextMenu.vue'
 import { RecordId } from 'surrealdb'
 import Drawer from 'primevue/drawer';
 import Dialog from 'primevue/dialog'
+import ContextMenu from 'primevue/contextmenu'
+import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem'
 
 const props = defineProps<{
   todoListId: string | undefined
@@ -314,12 +316,9 @@ function editTodoList(todoList: TodoList) {
   createTodoListDialogModeValue.value = todoList
   createTodoListDialogMode.value = 'edit'
   createTodoListDialog.value = true
-  closeTodoListContentMenu()
 }
 
 function deleteTodoListUI(todoList: TodoList) {
-  closeTodoListContentMenu()
-
   if (confirm(`确定要删除清单${todoList.title}吗?`)) {
     deleteTodoList(todoList.entity_id)
   }
@@ -336,23 +335,35 @@ function selectTodoList(todoList: typeof selectedTodoList.value) {
   router.push({ name: 'todo-list', params: { todoListId } })
 }
 
+// 清单右键菜单
 const todoListContextMenuTarget = ref<TodoList>()
-const todoListContextMenuVisible = ref(false)
 
-const openTodoListContentMenu = async (todoList: TodoList) => {
-  if (todoListContextMenuVisible.value) {
-    todoListContextMenuVisible.value = false
-    await nextTick()
+const todoListContextMenuRef = useTemplateRef('todoListContextMenu')
+const todoListContextCommands: MenuItem[] = [
+  {
+    label: '编辑',
+    command: () => {
+      if (typeof todoListContextMenuTarget.value === 'object') {
+        editTodoList(todoListContextMenuTarget.value)
+      }
+    }
+  },
+  {
+    label: '删除',
+    command: () => {
+      if (typeof todoListContextMenuTarget.value === 'object') {
+        deleteTodoListUI(todoListContextMenuTarget.value)
+      }
+    }
   }
 
+]
+
+const openTodoListContentMenu = async (event: Event, todoList: TodoList) => {
+  todoListContextMenuRef.value?.show(event)
   todoListContextMenuTarget.value = todoList
-  todoListContextMenuVisible.value = true
 }
 
-const closeTodoListContentMenu = () => {
-  todoListContextMenuVisible.value = false
-  todoListContextMenuTarget.value = undefined
-}
 
 const onListDropEnter = (ev: DragEvent) => {
   const target = ev.currentTarget
@@ -429,8 +440,8 @@ function TodoListRow({ todoList }: { todoList: TodoList }) {
       onDragleave={clearDragClass}
       onDrop={onItemDrop}
       data-track-category="todo-switch-todo-list"
-      onContextmenu={withModifiers(() => {
-        openTodoListContentMenu(todoList)
+      onContextmenu={withModifiers((event) => {
+        openTodoListContentMenu(event, todoList)
       }, ['stop', 'prevent'])}
       class={[
         'py-2 pl-2 pr-2 hover:bg-green-50 flex items-center cursor-pointer',
@@ -495,16 +506,64 @@ function TodoListSection() {
   )
 }
 
-const todoItemContextMenuVisible = ref(false)
-const todoItemContextMenuTarget = ref<TodoItem | undefined>(undefined)
-async function openTodoItemContextMenu(item: TodoItem) {
-  if (todoItemContextMenuVisible.value) {
-    todoItemContextMenuVisible.value = false
-    await nextTick()
+// 待办事项选中
+const todoItemContextMenuRef = useTemplateRef('todoItemContextMenu')
+const todoItemContextMenuTarget = ref<TodoItem>()
+
+const todoItemContextCommands = computed<MenuItem[]>(() => {
+  const currentItem = todoItemContextMenuTarget.value;
+  if (!currentItem) {
+    return []
   }
 
+  const currentTodoListId = currentItem.belong_to?.id?.toString()
+
+  const changeBelongListToLocal = async (event: MenuItemCommandEvent) => {
+    const item = event.item
+    if (!item.todoListId) {
+      throw new Error('no todo list id')
+    }
+    const todoListId = item.todoListId as EntityId
+    await changeBelongListTo(currentItem.entity_id, todoListId)
+    await refreshtodoItems()
+
+  }
+
+  return [
+    {
+      label: '删除',
+      leaf: true,
+      command: async () => {
+        await deleteTodoItem(currentItem.entity_id)
+        await refreshtodoItems()
+      }
+    },
+    {
+      label: '放弃',
+      disabled: currentItem.done,
+      command: async () => {
+        await changeTodoItemDone(currentItem, true, 'abandoned')
+        await refreshtodoItems()
+
+      }
+    },
+    {
+      separator: true
+    },
+    {
+      label: '移动至清单',
+      items: allTodoList.value.map((todoList) => ({
+        label: todoList.title,
+        disabled: currentTodoListId === todoList.entity_id.toJSON(),
+        todoListId: todoList.entity_id,
+        command: changeBelongListToLocal,
+      })),
+    }
+  ]
+})
+async function openTodoItemContextMenu(event: Event, item: TodoItem) {
   todoItemContextMenuTarget.value = item
-  todoItemContextMenuVisible.value = true
+  todoItemContextMenuRef.value?.show(event)
 }
 
 const showItemTags = ref(!isMobileScreen.value)
@@ -520,7 +579,7 @@ const showItemTags = ref(!isMobileScreen.value)
       <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
         <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem"
           :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)" :draggable="true"
-          :showTags="showItemTags" @contextmenu.stop.prevent="openTodoItemContextMenu(todoItem)"
+          :showTags="showItemTags" @contextmenu.stop.prevent="openTodoItemContextMenu($event, todoItem)"
           @dragstart="onItemDragStart" @dragend="onItemDragEnd" @update="refreshtodoItems" :class="[
             ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
           ]">
@@ -549,17 +608,11 @@ const showItemTags = ref(!isMobileScreen.value)
     <TodoListEditPanel @close="createTodoListDialog = false" v-model="createTodoListDialogModeValue"
       :mode="createTodoListDialogMode" />
   </Dialog>
-  <FloatPopover v-model="todoListContextMenuVisible">
-    <TodoListContextMenu v-if="todoListContextMenuTarget" :todoList="todoListContextMenuTarget" @edit="editTodoList"
-      @delete="deleteTodoListUI" />
-  </FloatPopover>
-  <FloatPopover v-model="todoItemContextMenuVisible">
-    <TodoItemContextMenu v-if="todoItemContextMenuTarget" :todoItem="todoItemContextMenuTarget" @executed="() => {
-      refreshtodoItems()
-      todoItemContextMenuVisible = false
-    }
-      " />
-  </FloatPopover>
+  <ContextMenu ref="todoListContextMenu" :model="todoListContextCommands">
+  </ContextMenu>
+
+  <ContextMenu ref="todoItemContextMenu" :model="todoItemContextCommands" @hide="refreshtodoItems">
+  </ContextMenu>
 </template>
 
 <style lang="css" scoped>

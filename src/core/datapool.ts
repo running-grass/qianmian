@@ -325,7 +325,6 @@ export const currentWorkspace = ref<Workspace>(undefined!)
 
 export let dataPoolInitPromise: Promise<unknown> | null = null
 surrealdbAuthed$.subscribe(async (authed) => {
-  console.debug('authed', authed)
   if (!authed) {
     dataPoolInitPromise = Promise.reject(new Error('SurrealDB not authed'))
     token.value = null

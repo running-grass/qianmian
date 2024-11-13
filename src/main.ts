@@ -5,7 +5,6 @@ import router from './router/'
 /* element-plus 手动导入样式，对于API的组件，自动导入失败 */
 import 'element-plus/theme-chalk/el-message-box.css'
 import 'element-plus/theme-chalk/el-message.css'
-import 'element-plus/theme-chalk/el-dialog.css'
 
 import './assets/style.css'
 
@@ -13,11 +12,14 @@ import posthogPlugin from './plugins/posthog' //import the plugin.
 import './plugins/dayjs'
 import PrimeVue from 'primevue/config'
 
+import zhLocal from 'primelocale/zh-CN.json'
+
 const app = createApp(App)
 
 app.use(posthogPlugin) //install the plugin
 app.use(PrimeVue, {
-  theme: 'none'
+  theme: 'none',
+  locale: zhLocal['zh-CN']
 })
 app.use(router)
 app.mount('#app')
