@@ -1,4 +1,4 @@
-import { DoneEventPayload, doneEventSlug } from '../built-in/entityEvent'
+import { entityEventValidatorTable } from '../built-in/entityEvent'
 import { getDb } from '../db'
 import {
   entityEventLogTable,
@@ -7,22 +7,16 @@ import {
   type EntityId
 } from '../table'
 
+// type TT = keyof typeof entityEventValidatorTable
 export async function createEntityEventLog(
-  entityId: EntityId,
-  slug: string,
-  payload: object = {}
+  slug: keyof typeof entityEventValidatorTable,
+  payload: object = {},
+  entityId?: EntityId
 ): Promise<EntityEventLogId> {
   const db = await getDb()
 
-  let payloadParsed: object
-  switch (slug) {
-    case doneEventSlug:
-      payloadParsed = DoneEventPayload.parse(payload)
-      break
-    default:
-      payloadParsed = payload
-      break
-  }
+  const validator = entityEventValidatorTable[slug]
+  const payloadParsed = validator.parse(payload)
 
   console.log({
     entity: entityId,

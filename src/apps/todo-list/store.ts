@@ -109,9 +109,13 @@ export async function changeTodoItemDone(
   type: 'finished' | 'abandoned' = 'finished'
 ): Promise<void> {
   if (done) {
-    await createEntityEventLog(todoItem.entity_id, doneEventSlug, {
-      type
-    })
+    await createEntityEventLog(
+      doneEventSlug,
+      {
+        type
+      },
+      todoItem.entity_id
+    )
 
     if (!todoItem.scheduled_repeat) {
       console.log('done', done)
