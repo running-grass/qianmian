@@ -35,7 +35,7 @@ async function createDb(auth: boolean): Promise<Surreal> {
         }
         throw new Error('Failed to auth to SurrealDB')
       } else {
-        console.log('SurrealDB authed')
+        console.debug('SurrealDB authed')
       }
     }
 

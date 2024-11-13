@@ -23,19 +23,19 @@ import type {
   EventInput
 } from '@fullcalendar/core/index.js'
 import zhLocale from '@fullcalendar/core/locales/zh-cn'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import TodoItemDetail from '../../components/TodoItemDetail.vue'
 import { allTodoListMap, changeTodoItemAttribute, deleteTodoItem } from '../../store'
-import FloatPopover from '@/component/FloatPopover.vue'
 import { getTodoItemById } from '../../function'
 import { XCircleIcon } from '@heroicons/vue/24/solid'
 import { useTemplateRef } from 'vue'
 import { RecordId } from 'surrealdb'
 import TodoItemRow from '../../components/TodoItemRow.vue'
 import Drawer from 'primevue/drawer'
+import Popover from 'primevue/popover'
 
 const isMobileScreen = useMobile()
-const detailPanelVisible = ref(false)
+const itemDetailVisible = ref(false)
 
 const selectedTodoItem = ref<TodoItem | null>(null)
 
@@ -73,8 +73,16 @@ refreshtodoItems()
 const createMode = ref(false)
 
 async function select(info: DateSelectArg) {
-  if (detailPanelVisible.value) {
-    detailPanelVisible.value = false
+
+  if (!info.jsEvent) {
+    console.error('info no have js event')
+    return
+  }
+
+  if (itemDetailVisible.value) {
+    itemDetailVisible.value = false
+    todoItemDetailPopover.value?.hide()
+
     return
   }
   const id = await createEntity(identityTodoItem.value.id, '')
@@ -87,7 +95,11 @@ async function select(info: DateSelectArg) {
 
   selectedTodoItem.value = t
   createMode.value = true
-  detailPanelVisible.value = true
+  itemDetailVisible.value = true
+
+  if (!isMobileScreen.value) {
+    todoItemDetailPopover.value?.show(info.jsEvent, info.jsEvent.target)
+  }
 }
 
 async function eventDrop(info: EventDropArg) {
@@ -107,10 +119,22 @@ async function eventDrop(info: EventDropArg) {
   refreshtodoItems()
 }
 
-function eventClick(info: EventClickArg) {
+const todoItemDetailPopover = useTemplateRef('todoItemDetailPopover')
+async function eventClick(info: EventClickArg) {
+  if (itemDetailVisible.value) {
+    itemDetailVisible.value = false
+    todoItemDetailPopover.value?.hide()
+    await nextTick()
+  }
+
+  todoItemDetailPopover.value?.hide()
   const item = info.event.extendedProps.todoItem
   selectedTodoItem.value = item
-  detailPanelVisible.value = true
+  itemDetailVisible.value = true
+
+  if (!isMobileScreen.value) {
+    todoItemDetailPopover.value?.show(info.jsEvent, info.jsEvent.target)
+  }
 }
 
 /** 安排任务面板 */
@@ -196,15 +220,11 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   }
 }))
 
-watch(events, () => {
-  console.debug('events', events.value)
-})
 
 async function onDetailPanelClose() {
   // 如果创建好以后没有编辑标题，则自动删除该事项
   if (createMode.value) {
     createMode.value = false
-    console.log('createMode', createMode.value, selectedTodoItem.value)
     if (selectedTodoItem.value && !selectedTodoItem.value.title) {
       await deleteTodoItem(selectedTodoItem.value.entity_id)
     }
@@ -241,27 +261,33 @@ function onItemDragEnd(e: DragEvent) {
 </script>
 <template>
   <section class="w-full h-full flex">
-    <FullCalendar ref="full-calendar" :options="calendarOptions" class="flex-1"> </FullCalendar>
+    <FullCalendar ref="full-calendar" :options="calendarOptions" class="flex-1">
+
+      <!-- <template v-slot:eventContent='arg'>
+        <b>{{ arg.event.title }}</b>
+      </template> -->
+    </FullCalendar>
     <section class="p-2 flex flex-col w-auto min-w-80 transition-[width] duration-1000" v-if="scheduleTodoItemPanel">
       <header class="flex flex-row justify-end mb-2">
         <XCircleIcon class="w-6 h-6 cursor-pointer hover:fill-green-900" @click="scheduleTodoItemPanel = false" />
       </header>
       <ul ref="draggable-element" class="flex-1 overflow-y-auto flex flex-col">
-        <TodoItemRow v-for="todoItem in unScheduleTodoItems" :key="todoItem.entity_id.toString()" show-checkbox
-          :todoItem="todoItem" :draggable="true" show-tags @dragstart="onItemDragStart" @dragend="onItemDragEnd">
+        <TodoItemRow @click="todoItemDetailPopover?.show($event)" v-for="todoItem in unScheduleTodoItems"
+          :key="todoItem.entity_id.toString()" show-checkbox :todoItem="todoItem" :draggable="true" show-tags
+          @dragstart="onItemDragStart" @dragend="onItemDragEnd">
         </TodoItemRow>
       </ul>
     </section>
   </section>
 
   <!-- 详情 -->
-  <Drawer v-if="isMobileScreen" class="todo-item-detail-drawer !h-[90%]" v-model:visible="detailPanelVisible"
+  <Drawer v-if="isMobileScreen" class="todo-item-detail-drawer !h-[90%]" v-model:visible="itemDetailVisible"
     position="bottom" @close="onDetailPanelClose">
     <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()" />
   </Drawer>
-  <FloatPopover v-else v-model="detailPanelVisible" @close="onDetailPanelClose">
+  <Popover ref="todoItemDetailPopover" @hide="onDetailPanelClose">
     <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
       class="min-w-[400px] min-h-[300px] bg-white shadow-xl border" @update="refreshtodoItems"
       @delete="refreshtodoItems" />
-  </FloatPopover>
+  </Popover>
 </template>
