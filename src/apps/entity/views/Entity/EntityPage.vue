@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 import { createEntity } from '@/core'
 import { useAutoSaveEntity } from '@/core'
 import { StringRecordId } from 'surrealdb'
+import Drawer from 'primevue/drawer'
 
 const { id: nid } = defineProps<{
   id: string | undefined
@@ -64,15 +65,9 @@ const relationDrawer = ref(false)
       <el-button type="primary" class="mt-4" @click="createObjectLocal">创建新对象</el-button>
       <el-divider />
       <ul class="flex-1 overflow-x-auto">
-        <li
-          v-for="entity in allEntities"
-          :key="entity.title"
-          @click="changeCurrentObject(entity)"
-          class="cursor-pointer py-2 px-4 hover:bg-primary active:bg-primary border-b"
-          :class="
-            currentObject?.entity_id.toString() == entity.entity_id.toString() ? 'bg-primary' : ''
-          "
-        >
+        <li v-for="entity in allEntities" :key="entity.title" @click="changeCurrentObject(entity)"
+          class="cursor-pointer py-2 px-4 hover:bg-primary active:bg-primary border-b" :class="currentObject?.entity_id.toString() == entity.entity_id.toString() ? 'bg-primary' : ''
+            ">
           {{ entity.title }}
         </li>
       </ul>
@@ -85,36 +80,25 @@ const relationDrawer = ref(false)
 
       <div v-else class="flex-1 flex flex-col">
         <section class="w-full mb-4 flex items-center">
-          <el-input
-            ref="titleEl"
-            class="px-4 py-2 input input-bordered flex-1 mr-4"
-            type="text"
-            v-model="currentObject.title"
-            @input="triggerInput"
-            @change="triggerChange"
-          />
+          <el-input ref="titleEl" class="px-4 py-2 input input-bordered flex-1 mr-4" type="text"
+            v-model="currentObject.title" @input="triggerInput" @change="triggerChange" />
           <el-button class="mr-4" @click="attrDrawer = true">属性</el-button>
           <el-button class="mr-4" @click="relationDrawer = true">关系</el-button>
         </section>
 
-        <el-input
-          type="textarea"
-          ref="contentEl"
-          class="entity-content textarea textarea-bordered flex-1 w-full resize-none"
-          v-model="currentObject.content"
-          @input="triggerInput"
-          @change="triggerChange"
-        />
+        <el-input type="textarea" ref="contentEl"
+          class="entity-content textarea textarea-bordered flex-1 w-full resize-none" v-model="currentObject.content"
+          @input="triggerInput" @change="triggerChange" />
       </div>
     </main>
   </div>
 
-  <el-drawer v-if="currentObject" v-model="attrDrawer" :with-header="false" destroy-on-close>
+  <Drawer v-if="currentObject" v-model:visible="attrDrawer">
     <AttributePanel :currentObject="currentObject" />
-  </el-drawer>
-  <el-drawer v-if="currentObject" v-model="relationDrawer" :with-header="false" destroy-on-close>
+  </Drawer>
+  <Drawer v-if="currentObject" v-model:visible="relationDrawer">
     <RelationPanel :currentObject="currentObject" />
-  </el-drawer>
+  </Drawer>
 </template>
 <style scoped>
 .entity-content :deep(.el-textarea__inner) {

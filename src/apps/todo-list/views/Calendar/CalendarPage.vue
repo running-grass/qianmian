@@ -32,6 +32,7 @@ import { XCircleIcon } from '@heroicons/vue/24/solid'
 import { useTemplateRef } from 'vue'
 import { RecordId } from 'surrealdb'
 import TodoItemRow from '../../components/TodoItemRow.vue'
+import Drawer from 'primevue/drawer'
 
 const isMobileScreen = useMobile()
 const detailPanelVisible = ref(false)
@@ -254,11 +255,10 @@ function onItemDragEnd(e: DragEvent) {
   </section>
 
   <!-- 详情 -->
-  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="detailPanelVisible"
-    :size="isMobileScreen ? '90%' : '40%'" :with-header="false" destroy-on-close
-    :direction="isMobileScreen ? 'btt' : 'rtl'" @close="onDetailPanelClose">
+  <Drawer v-if="isMobileScreen" class="todo-item-detail-drawer !h-[90%]" v-model:visible="detailPanelVisible"
+    position="bottom" @close="onDetailPanelClose">
     <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()" />
-  </el-drawer>
+  </Drawer>
   <FloatPopover v-else v-model="detailPanelVisible" @close="onDetailPanelClose">
     <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
       class="min-w-[400px] min-h-[300px] bg-white shadow-xl border" @update="refreshtodoItems"

@@ -173,7 +173,7 @@ watch(scheduleDate, () => {
       <span class="text-sm hover:bg-gray-200 block px-2 border-r-2 cursor-pointer" @click="toggle">{{
         currentScheduleStart }}</span>
       <Popover ref="op">
-        <DatePicker inline showWeek showButtonBar v-model="scheduleDate" />
+        <DatePicker inline showButtonBar v-model="scheduleDate" />
         <div class="form-row">
           <span>间隔重复</span>
           <ToggleSwitch v-model="hasRepeat" />
