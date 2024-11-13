@@ -31,7 +31,6 @@ import {
   PlusCircleIcon
 } from '@heroicons/vue/24/solid'
 import { useExportData, useImportData } from './importExport'
-import { ElDialog } from 'element-plus'
 import TodoListEditPanel from '../../components/TodoListEditPanel.vue'
 import TodoListContextMenu from '../../components/TodoListContextMenu.vue'
 import { useRouter } from 'vue-router'
@@ -48,6 +47,8 @@ import { myDayjs } from '@/plugins/dayjs'
 import FloatPopover from '@/component/FloatPopover.vue'
 import TodoItemContextMenu from '../../components/TodoItemContextMenu.vue'
 import { RecordId } from 'surrealdb'
+import Drawer from 'primevue/drawer';
+import Dialog from 'primevue/dialog'
 
 const props = defineProps<{
   todoListId: string | undefined
@@ -78,12 +79,12 @@ const isMobileScreen = useMobile()
 const newTitle = ref<string>('')
 
 /** 移动端抽屉 */
-const mobileDrawer = ref(false)
+const mobileDrawerVisible = ref(false)
 
 /** 切换当前选中的待办事项 */
 async function changeCurrentObject(entity: TodoItem) {
   selectedTodoItem.value = entity
-  mobileDrawer.value = true
+  mobileDrawerVisible.value = true
 }
 
 /**
@@ -534,21 +535,20 @@ const showItemTags = ref(!isMobileScreen.value)
     </article>
   </div>
 
-  <el-drawer v-if="isMobileScreen" modal-class="todo-item-detail-drawer" v-model="mobileDrawer" size="90%"
-    :with-header="false" destroy-on-close direction="btt">
+  <Drawer v-if="isMobileScreen" class="todo-item-detail-drawer !h-[90%]" v-model:visible="mobileDrawerVisible"
+    position="bottom">
     <TodoItemDetail v-if="selectedTodoItem" v-model="selectedTodoItem" :key="selectedTodoItem?.entity_id.toString()"
       @update="refreshtodoItems" @delete="refreshtodoItems" />
-  </el-drawer>
+  </Drawer>
 
-  <el-drawer v-if="isMobileScreen" v-model="todoListDrawer" size="80%" :with-header="false" destroy-on-close
-    direction="ltr">
+  <Drawer v-if="isMobileScreen" class="!h-[80%]" v-model:visible="todoListDrawer" position="bottom">
     <TodoListSection />
-  </el-drawer>
+  </Drawer>
 
-  <el-dialog v-model="createTodoListDialog" :with-header="false" destroy-on-close>
+  <Dialog v-model:visible="createTodoListDialog">
     <TodoListEditPanel @close="createTodoListDialog = false" v-model="createTodoListDialogModeValue"
       :mode="createTodoListDialogMode" />
-  </el-dialog>
+  </Dialog>
   <FloatPopover v-model="todoListContextMenuVisible">
     <TodoListContextMenu v-if="todoListContextMenuTarget" :todoList="todoListContextMenuTarget" @edit="editTodoList"
       @delete="deleteTodoListUI" />
