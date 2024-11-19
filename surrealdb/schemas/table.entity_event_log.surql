@@ -10,8 +10,9 @@ DEFINE FIELD OVERWRITE workspace ON TABLE entity_event_log TYPE record<workspace
 
 DEFINE FIELD OVERWRITE slug ON TABLE entity_event_log TYPE string READONLY ASSERT string::is::ascii($value) COMMENT "事件标识";
 DEFINE FIELD OVERWRITE created_at ON TABLE entity_event_log TYPE datetime READONLY DEFAULT time::now() COMMENT "创建时间";
+DEFINE FIELD OVERWRITE creator ON TABLE entity_event_log TYPE record<account> READONLY DEFAULT $auth.id COMMENT "创建者";
 DEFINE FIELD OVERWRITE payload ON TABLE entity_event_log FLEXIBLE TYPE object READONLY DEFAULT {} COMMENT "事件数据";
-DEFINE FIELD OVERWRITE entity ON TABLE entity_event_log TYPE record<entity> READONLY COMMENT "事件对象";
+DEFINE FIELD OVERWRITE entity ON TABLE entity_event_log TYPE option<record<entity>> READONLY COMMENT "事件对象";
 
 DEFINE INDEX OVERWRITE slug_idx ON TABLE entity_event_log FIELDS slug COMMENT "事件标识索引";
 DEFINE EVENT OVERWRITE trigger_entity_update ON TABLE entity_event_log

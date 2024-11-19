@@ -34,9 +34,6 @@ if (typeof changeLogHTML === 'string') {
     if (!started && el.tagName === 'h2') {
       started = true
     }
-
-    console.log('el', el.tagName, $(el).html())
-
     latestUpdateLog += $(el).html()
   }
 }

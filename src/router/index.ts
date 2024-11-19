@@ -1,6 +1,7 @@
 import { accountRoutes } from '@/apps/account/routes'
 import { knowledgeGraphRoutes } from '@/apps/entity/routes'
 import { todoListRoutes } from '@/apps/todo-list/routes'
+import { pomodoroRoutes } from '@/apps/pomodoro/routes'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/apps/other/views/HomePage.vue'
 import { SURREAL_TOKEN_KEY } from '@/core'
@@ -29,7 +30,7 @@ const router = createRouter({
       component: () => import('@/component/WorkbenchLayout.vue'),
       name: 'workbench',
       redirect: { name: 'todo-list' },
-      children: [todoListRoutes, knowledgeGraphRoutes]
+      children: [todoListRoutes, knowledgeGraphRoutes, pomodoroRoutes]
     }
   ]
 })

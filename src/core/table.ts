@@ -1,4 +1,5 @@
 import { RecordId, StringRecordId, Table } from 'surrealdb'
+import { z } from 'zod'
 
 export function toStringRecordId(recordId: RecordId): StringRecordId {
   return new StringRecordId(recordId.toString())
@@ -6,15 +7,41 @@ export function toStringRecordId(recordId: RecordId): StringRecordId {
 
 export const AccountTable = new Table('account')
 export type AccountId = RecordId<'account'>
+/** 个人番茄时钟配置 */
+export const PomodoroConfigValidator = z.object({
+  /** 番茄时长(分钟) */
+  pomodoro_time: z.number().int().positive().default(25),
 
-export type AccountConfig = {
-  default_workspace: WorkspaceId
-}
-export type Account = {
-  id: AccountId
-  username: string
-  config: AccountConfig
-}
+  /** 短休息时长(分钟) */
+  short_break_time: z.number().int().positive().default(5),
+
+  /** 长休息时长(分钟) */
+  long_break_time: z.number().int().positive().default(15),
+
+  /** 长休息间隔休息数 */
+  break_interval: z.number().int().positive().default(4)
+})
+
+export type PomodoroConfig = z.infer<typeof PomodoroConfigValidator>
+
+/** 个人配置检验器 */
+export const AccountConfigValidator = z.object({
+  /** 默认工作空间 */
+  default_workspace: z.instanceof(RecordId<'workspace'>),
+
+  /** 番茄时钟配置 */
+  pomodoro: PomodoroConfigValidator.default({})
+})
+
+/** 个人配置 */
+export type AccountConfig = z.infer<typeof AccountConfigValidator>
+
+export const AccountValidator = z.object({
+  id: z.instanceof(RecordId<'account'>),
+  username: z.string(),
+  config: AccountConfigValidator
+})
+export type Account = z.infer<typeof AccountValidator>
 
 export type WorkspaceConfig = {
   default_entity_identity: IdentityId
@@ -122,5 +149,6 @@ export type EntityEventLog = {
   slug: string
   payload: object
   entity: EntityId
+  creator: AccountId
   created_at: Date
 }
