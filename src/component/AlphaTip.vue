@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { APP_VERSION, LATEST_UPDATE_LOG } from '@/core';
-import { useSessionStorage } from '@vueuse/core'
+import { APP_VERSION, LATEST_UPDATE_LOG } from '@/core'
+import { useLocalStorage } from '@vueuse/core'
 import { ElMessageBox } from 'element-plus'
 
-const readTip = useSessionStorage('readTip', false)
+const readTip = useLocalStorage('readTip', false)
 
 if (!readTip.value) {
   ElMessageBox.alert(
