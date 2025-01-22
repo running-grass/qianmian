@@ -16,7 +16,6 @@ export function useDbConnected(db: Surreal): Ref<boolean> {
       async () => {
         const pinged = isOnline && (await Promise.race([db.ping(), delayResolve(1000, false)]))
         _dbConnected.value = pinged
-        console.log('db connected 5', _dbConnected.value)
       },
       3000,
       { immediate: false }

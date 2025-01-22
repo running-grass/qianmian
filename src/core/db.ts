@@ -8,80 +8,94 @@ import { useDbConnected } from './utils/network'
 import { watch } from 'vue'
 import { useNetwork } from '@vueuse/core'
 
-const { isOnline } = useNetwork()
+const { isOnline, type } = useNetwork()
 
 let globalDb: Surreal | undefined
 let dbP: Promise<Surreal> | null = null
 
+let needAuth = false
+
 export async function getDb(auth: boolean = true): Promise<Surreal> {
+  needAuth = auth
+
   if (globalDb) return globalDb
 
-  if (!dbP) dbP = createDb(auth)
+  if (!dbP) {
+    dbP = createDb(auth)
+    dbP.finally(() => {
+      dbP = null
+    })
+  }
+
   return dbP
 }
 
 async function createDb(auth: boolean): Promise<Surreal> {
-  try {
-    const db = new Surreal()
+  const db = new Surreal()
 
-    await db.connect(SURREAL_ENDPOINT)
+  await connectDb(db, auth)
 
-    if (!db.ready) {
-      throw new Error('Failed to connect to SurrealDB')
-    }
-
-    if (auth) {
-      const authed = await tryAuth(db)
-
-      if (!authed) {
-        token.value = null
-        if (location.pathname !== '/account/auth/login') {
-          location.href = '/account/auth/login'
-        }
-        throw new Error('Failed to auth to SurrealDB')
-      } else {
-        console.debug('SurrealDB authed')
+  if (auth) {
+    const connected = useDbConnected(db)
+    watch(connected, (connected) => {
+      if (!connected && isOnline.value) {
+        console.debug('SurrealDB reconnecting')
+        connectDb(db, auth)
       }
-
-      const connected = useDbConnected(db)
-      watch(connected, (connected) => {
-        if (!connected && isOnline.value) {
-          console.debug('SurrealDB reconnecting')
-          tryAuth(db)
-        }
-      })
-
-      watch(isOnline, (online) => {
-        if (online) {
-          console.debug('SurrealDB reconnecting')
-          tryAuth(db)
-        }
-      })
-
-      window.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          if (!connected.value) {
-            console.debug('SurrealDB reconnecting')
-            tryAuth(db)
-          }
-        }
-      })
-    }
-
-    // 自定关闭连接
-    window.addEventListener('beforeunload', async () => {
-      await db.close()
     })
 
-    globalDb = db
+    watch([isOnline, type], ([online]) => {
+      if (online) {
+        console.debug('SurrealDB reconnecting')
+        connectDb(db, auth)
+      }
+    })
 
-    return db
-  } catch (err) {
-    console.error('Failed to connect to SurrealDB:', err)
-    throw err
-  } finally {
-    dbP = null
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if (!connected.value) {
+          console.debug('SurrealDB reconnecting')
+          connectDb(db, auth)
+        }
+      }
+    })
   }
+
+  globalDb = db
+
+  return db
+}
+
+export async function reConnectDb() {
+  if (globalDb) {
+    await connectDb(globalDb, needAuth)
+  }
+}
+
+async function connectDb(db: Surreal, auth: boolean) {
+  await db.connect(SURREAL_ENDPOINT)
+
+  if (!db.ready) {
+    throw new Error('Failed to connect to SurrealDB')
+  }
+
+  if (!auth) {
+    return db
+  }
+
+  const authed = await tryAuth(db)
+  if (!authed) {
+    token.value = null
+    if (location.pathname !== '/account/auth/login') {
+      location.href = '/account/auth/login'
+    }
+
+    throw new Error('Failed to auth to SurrealDB')
+  }
+
+  console.debug('SurrealDB authed')
+
+  return db
 }
 
 /** 确保已经登录 */
