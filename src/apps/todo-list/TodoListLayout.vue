@@ -11,6 +11,7 @@ import { CalendarDaysIcon, MagnifyingGlassIcon, } from '@heroicons/vue/16/solid'
 import { getDb, useMobile } from '@/core';
 import { useRoute, useRouter } from 'vue-router';
 import { useDbConnected } from '@/core/utils/network';
+import { reConnectDb } from '@/core/db';
 
 await initData()
 await refreshAllTodoList()
@@ -86,7 +87,7 @@ const mobbileData = [
     <ul class="shrink-0 grow-0 h-12 w-full border-t flex justify-between px-4">
       <li class="flex-[0.5] flex justify-center  items-center">
         <span v-if="dbConnected" class="text-green-800">在线</span>
-        <span v-else class="text-red-800">离线</span>
+        <span v-else class="text-red-800 cursor-pointer" @click="reConnectDb">离线</span>
       </li>
       <li class="flex-1 flex flex-col justify-center items-center"
         :class="{ 'text-gray-400': item.disabled, 'pointer-events-none': item.disabled, 'text-green-700': item.routeName === route.name }"
@@ -102,7 +103,7 @@ const mobbileData = [
     <el-menu router :collapse="isCollapse" @open="handleOpen" @close="handleClose">
       <li class="flex-[0.5] flex justify-center  items-center">
         <span v-if="dbConnected" class="text-green-800">在线</span>
-        <span v-else class="text-red-800">离线</span>
+        <span v-else class="text-red-800 cursor-pointer" @click="reConnectDb">离线</span>
       </li>
       <el-menu-item @click="isCollapse = !isCollapse">
         <ChevronDoubleRightIcon v-if="isCollapse" class="min-w-6 min-h-6 size-6 mr-2" />

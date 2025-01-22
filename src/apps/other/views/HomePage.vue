@@ -13,7 +13,7 @@
     </section>
     <footer class="w-full text-center py-4 bg-gray-400 flex justify-center">
       <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2024089620号-2</a>
-      <img src="/public/static/icon/beian.png" class="ml-4 mr-2 w-4 object-contain">
+      <img src="/src/assets/images/beian.png?url" class="ml-4 mr-2 w-4 object-contain">
       <a href="https://beian.mps.gov.cn/#/query/webSearch?code=11011502038341" rel="noreferrer"
         target="_blank">京公网安备11011502038341</a>
     </footer>
