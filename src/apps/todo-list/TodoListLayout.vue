@@ -8,8 +8,9 @@ import {
 } from '@heroicons/vue/24/solid'
 import { initData, refreshAllTodoList } from './store'
 import { CalendarDaysIcon, MagnifyingGlassIcon, } from '@heroicons/vue/16/solid';
-import { useMobile } from '@/core';
+import { getDb, useMobile } from '@/core';
 import { useRoute, useRouter } from 'vue-router';
+import { useDbConnected } from '@/core/utils/network';
 
 await initData()
 await refreshAllTodoList()
@@ -29,6 +30,8 @@ const gotoDocs = () => {
 const isMobile = useMobile()
 const route = useRoute()
 const router = useRouter()
+const db = await getDb(true)
+
 const mobbileData = [
   {
     text: '清单',

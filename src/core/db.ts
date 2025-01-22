@@ -4,6 +4,11 @@ import { token } from './storage'
 import { SURREAL_ENDPOINT } from './const'
 import { surrealdbAuthed$ } from './subjects/surrealdbSubject'
 import { myDayjs } from '@/plugins/dayjs'
+import { useDbConnected } from './utils/network'
+import { watch } from 'vue'
+import { useNetwork } from '@vueuse/core'
+
+const { isOnline } = useNetwork()
 
 let globalDb: Surreal | undefined
 let dbP: Promise<Surreal> | null = null
@@ -37,6 +42,30 @@ async function createDb(auth: boolean): Promise<Surreal> {
       } else {
         console.debug('SurrealDB authed')
       }
+
+      const connected = useDbConnected(db)
+      watch(connected, (connected) => {
+        if (!connected && isOnline.value) {
+          console.debug('SurrealDB reconnecting')
+          tryAuth(db)
+        }
+      })
+
+      watch(isOnline, (online) => {
+        if (online) {
+          console.debug('SurrealDB reconnecting')
+          tryAuth(db)
+        }
+      })
+
+      window.addEventListener('visibilitychange', (event) => {
+        if (document.visibilityState === 'visible') {
+          if (!connected.value) {
+            console.debug('SurrealDB reconnecting')
+            tryAuth(db)
+          }
+        }
+      })
     }
 
     // 自定关闭连接
@@ -45,6 +74,7 @@ async function createDb(auth: boolean): Promise<Surreal> {
     })
 
     globalDb = db
+
     return db
   } catch (err) {
     console.error('Failed to connect to SurrealDB:', err)
