@@ -73,6 +73,9 @@ export async function reConnectDb() {
 }
 
 async function connectDb(db: Surreal, auth: boolean) {
+  if (await db.ready) {
+    await db.close()
+  }
   await db.connect(SURREAL_ENDPOINT)
 
   if (!db.ready) {
