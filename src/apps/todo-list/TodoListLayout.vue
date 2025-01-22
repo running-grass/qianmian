@@ -32,6 +32,9 @@ const route = useRoute()
 const router = useRouter()
 const db = await getDb(true)
 
+
+const dbConnected = useDbConnected(db);
+
 const mobbileData = [
   {
     text: '清单',
@@ -76,11 +79,15 @@ const mobbileData = [
 
 </script>
 <template>
-  <div v-if="isMobile" class="w-full h-full flex flex-col overflow-hidden ">
+  <div v-if="isMobile" class="w-full h-full flex flex-col overflow-hidden " :class="dbConnected ? '' : 'app-offline'">
     <section class="flex-1 w-full overflow-y-hidden">
       <RouterView />
     </section>
     <ul class="shrink-0 grow-0 h-12 w-full border-t flex justify-between px-4">
+      <li class="flex-[0.5] flex justify-center  items-center">
+        <span v-if="dbConnected" class="text-green-800">在线</span>
+        <span v-else class="text-red-800">离线</span>
+      </li>
       <li class="flex-1 flex flex-col justify-center items-center"
         :class="{ 'text-gray-400': item.disabled, 'pointer-events-none': item.disabled, 'text-green-700': item.routeName === route.name }"
         data-track-category="todo-switch-view" :data-track-id="'todo-goto-' + item.routeName"
@@ -91,8 +98,12 @@ const mobbileData = [
     </ul>
   </div>
 
-  <div v-else class="w-full h-full overflow-hidden flex">
+  <div v-else class="w-full h-full overflow-hidden flex" :class="dbConnected ? '' : 'app-offline'">
     <el-menu router :collapse="isCollapse" @open="handleOpen" @close="handleClose">
+      <li class="flex-[0.5] flex justify-center  items-center">
+        <span v-if="dbConnected" class="text-green-800">在线</span>
+        <span v-else class="text-red-800">离线</span>
+      </li>
       <el-menu-item @click="isCollapse = !isCollapse">
         <ChevronDoubleRightIcon v-if="isCollapse" class="min-w-6 min-h-6 size-6 mr-2" />
         <ChevronDoubleLeftIcon v-else class="min-w-6 min-h-6 size-6 mr-2" />
@@ -109,3 +120,11 @@ const mobbileData = [
     </main>
   </div>
 </template>
+
+<style lang="css" scoped>
+.app-offline {
+  @apply border-8 border-red-500 rounded-lg;
+  @apply transition-all duration-300;
+  @apply animate-pulse;
+}
+</style>

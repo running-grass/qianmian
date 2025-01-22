@@ -58,7 +58,7 @@ async function createDb(auth: boolean): Promise<Surreal> {
         }
       })
 
-      window.addEventListener('visibilitychange', (event) => {
+      window.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           if (!connected.value) {
             console.debug('SurrealDB reconnecting')
