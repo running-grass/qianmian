@@ -19,7 +19,7 @@ export default {
           const db = await getDb()
           const user = await db.info<Account>()
           posthog.identify(user!.id.toString(), {
-            username: user!.username ?? 'grass2'
+            username: user!.username
           })
         }
       })

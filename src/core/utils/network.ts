@@ -7,7 +7,7 @@ import { useNetwork } from '@vueuse/core'
 const { isOnline } = useNetwork()
 
 // 全局状态，用于管理轮询的状态
-const _dbConnected = ref(false)
+const _dbConnected = ref(true)
 let intervalFn: ReturnType<typeof useIntervalFn> | null = null
 
 export function useDbConnected(db: Surreal): Ref<boolean> {
