@@ -25,8 +25,12 @@ export const orderField = useLocalStorage<OrderField>('orderField', 'priority')
 /** 待办事项列表 */
 export const todoItemsByList = ref<TodoItem[]>([])
 
+/** 待办事项列表是否正在加载 */
+export const todoItemsByListLoading = ref(false)
+
 /** 触发待办事项列表的更新 */
 export async function refreshtodoItems() {
+  todoItemsByListLoading.value = true
   const _orderField = orderField.value
   const _showDones = showDones.value
 
@@ -120,6 +124,7 @@ export async function refreshtodoItems() {
 
   const [list] = await db.query<[TodoItem[]]>(sql)
 
+  todoItemsByListLoading.value = false
   todoItemsByList.value = list
 }
 

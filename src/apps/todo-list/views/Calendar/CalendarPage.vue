@@ -189,7 +189,10 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   initialView: 'dayGridMonth',
   height: '100%',
   // 待办事项相关
-  events: events.value,
+  events: async function (fetchInfo, successCallback, failureCallback) {
+    await refreshtodoItems()
+    successCallback(events.value)
+  },
 
   // 点击和拖拽操作
   editable: true,
@@ -262,11 +265,8 @@ function onItemDragEnd(e: DragEvent) {
 <template>
   <section class="w-full h-full flex">
     <FullCalendar ref="full-calendar" :options="calendarOptions" class="flex-1">
-
-      <!-- <template v-slot:eventContent='arg'>
-        <b>{{ arg.event.title }}</b>
-      </template> -->
     </FullCalendar>
+
     <section class="p-2 flex flex-col w-auto min-w-80 transition-[width] duration-1000" v-if="scheduleTodoItemPanel">
       <header class="flex flex-row justify-end mb-2">
         <XCircleIcon class="w-6 h-6 cursor-pointer hover:fill-green-900" @click="scheduleTodoItemPanel = false" />
