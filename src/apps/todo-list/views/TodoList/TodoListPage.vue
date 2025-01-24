@@ -8,7 +8,9 @@ import {
   changeTodoItemAttribute,
   changeTodoItemDone,
   deleteTodoItem,
-  deleteTodoList
+  deleteTodoList,
+  todoListInitialized,
+  todoListLoading
 } from '../../store'
 import {
   attributeSchduledStart,
@@ -43,7 +45,8 @@ import {
   todoItemsByList,
   orderField,
   showDones,
-  selectedTodoItem
+  selectedTodoItem,
+  todoItemsByListLoading
 } from './store'
 import { myDayjs } from '@/plugins/dayjs'
 import { RecordId } from 'surrealdb'
@@ -51,6 +54,7 @@ import Drawer from 'primevue/drawer';
 import Dialog from 'primevue/dialog'
 import ContextMenu from 'primevue/contextmenu'
 import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem'
+import ProgressSpinner from 'primevue/progressspinner';
 
 const props = defineProps<{
   todoListId: string | undefined
@@ -497,10 +501,12 @@ function TodoListSection() {
         <span>待办清单</span>
         <PlusCircleIcon title="新建清单" onClick={createTodoList} class="w-6 h-6" />
       </p>
-      <ul>
+      <ul class="flex flex-col">
+        {todoListLoading.value ? <ProgressSpinner class="self-center" fill="transparent" /> : null}
         {allTodoList.value.map((todoList) => (
           <TodoListRow key={todoList.entity_id.id.toString()} todoList={todoList} />
         ))}
+
       </ul>
     </>
   )
@@ -570,28 +576,38 @@ const showItemTags = ref(!isMobileScreen.value)
 </script>
 <template>
   <div class="flex w-full h-full border-green-100">
-    <aside v-if="!isMobileScreen" class="w-40 grow-[1] shrink-0 border-r-2 p-2">
-      <TodoListSection />
-    </aside>
+    <ProgressSpinner v-if="!todoListInitialized" class="self-center" fill="transparent" />
+    <template v-else>
+      <aside v-if="!isMobileScreen" class="w-40 grow-[1] shrink-0 border-r-2 p-2">
+        <TodoListSection />
+      </aside>
 
-    <section class="w-80 grow-[2] shrink-0 flex flex-col p-4 border-r-2">
-      <TodoItemCreateRow></TodoItemCreateRow>
-      <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
-        <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()" :todoItem="todoItem"
-          :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)" :draggable="true"
-          :showTags="showItemTags" @contextmenu.stop.prevent="openTodoItemContextMenu($event, todoItem)"
-          @dragstart="onItemDragStart" @dragend="onItemDragEnd" @update="refreshtodoItems" :class="[
-            ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
-          ]">
-        </TodoItemRow>
-      </TransitionGroup>
-    </section>
 
-    <article v-if="!isMobileScreen" class="grow-[3] p-2 flex-col hidden md:flex todo-item-detail-host">
-      <el-empty v-if="!selectedTodoItem" description="未选择事项" class="w-full h-full" />
-      <TodoItemDetail v-else v-model="selectedTodoItem" :key="selectedTodoItem.entity_id.id.toString()"
-        @update="refreshtodoItems" @delete="refreshtodoItems" />
-    </article>
+      <section class="w-80 grow-[2] shrink-0 flex flex-col p-4 border-r-2">
+
+        <ProgressSpinner v-if="todoItemsByListLoading" class="self-center" fill="transparent" />
+        <template v-else>
+          <TodoItemCreateRow></TodoItemCreateRow>
+          <TransitionGroup name="list" tag="ul" class="flex-1 overflow-x-hidden overflow-y-auto">
+            <TodoItemRow v-for="todoItem of todoItemsByList" :key="todoItem.entity_id.id.toString()"
+              :todoItem="todoItem" :show-list="selectedTodoList === null" @click="changeCurrentObject(todoItem)"
+              :draggable="true" :showTags="showItemTags"
+              @contextmenu.stop.prevent="openTodoItemContextMenu($event, todoItem)" @dragstart="onItemDragStart"
+              @dragend="onItemDragEnd" @update="refreshtodoItems" :class="[
+                ...(selectedTodoItem?.entity_id.id === todoItem.entity_id.id ? ['bg-green-100'] : [])
+              ]">
+            </TodoItemRow>
+          </TransitionGroup>
+        </template>
+
+      </section>
+
+      <article v-if="!isMobileScreen" class="grow-[3] p-2 flex-col hidden md:flex todo-item-detail-host">
+        <el-empty v-if="!selectedTodoItem" description="未选择事项" class="w-full h-full" />
+        <TodoItemDetail v-else v-model="selectedTodoItem" :key="selectedTodoItem.entity_id.id.toString()"
+          @update="refreshtodoItems" @delete="refreshtodoItems" />
+      </article>
+    </template>
   </div>
 
   <Drawer v-if="isMobileScreen" class="todo-item-detail-drawer !h-[90%]" v-model:visible="mobileDrawerVisible"

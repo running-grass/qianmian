@@ -26,6 +26,12 @@ import { computed, ref } from 'vue'
 /** 待办清单列表 */
 export const allTodoList = ref<ReadonlyArray<TodoList>>([])
 
+/** 待办清单列表是否已经初始化 */
+export const todoListInitialized = ref(false)
+
+/** 待办清单列表是否正在加载 */
+export const todoListLoading = ref(false)
+
 /** 待办清单列表 map */
 export const allTodoListMap = computed<ReadonlyMap<string, Readonly<TodoList>>>(() => {
   const map = new Map<string, TodoList>()
@@ -37,9 +43,12 @@ export const allTodoListMap = computed<ReadonlyMap<string, Readonly<TodoList>>>(
 
 /** 刷新待办清单列表 */
 export async function refreshAllTodoList() {
+  todoListLoading.value = true
   const db = await getDb()
   const list = await db.select<TodoList>(todoListView)
   allTodoList.value = list
+  todoListLoading.value = false
+  todoListInitialized.value = true
 }
 
 /** 排序字段 */
